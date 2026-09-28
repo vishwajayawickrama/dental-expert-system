@@ -13,7 +13,7 @@ The checks below establish software behavior on the development Mac. They do not
 | Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
 | Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
 | Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-224402/DentalExplain.app` |
+| Final timestamped image | `dist/release-20260928-230656/DentalExplain.app` |
 | Convenient local copy | `dist/DentalExplain.app` |
 | Signing | Local ad-hoc signing; not Developer ID signed or notarized |
 
@@ -74,3 +74,7 @@ The application resolves knowledge, boot resources, JPL and its native dependenc
 Qualified-dentist review (including pediatric rules), clinical validation, another-Mac clean-install testing, Developer ID signing/notarization, Intel Mac testing and Windows packaging are pending. No passing clinical review or Windows executable is claimed. No knowledge editor, treatment prescribing or patient database is included.
 
 See the [user manual](user-manual.md) for launch and consultation instructions and the [architecture](architecture.md) for the shared knowledge and inference design.
+
+## Layout revision
+
+The top brand banner and bottom status bar were removed, and the window title changed to **DentalExplain • Expert system**. The revised app was rebuilt, launched and visually inspected at 1180×850; both bars are absent and the welcome actions remain visible. The updated bundle passed signature verification and the clean-environment Java/Prolog runtime check. The automated clinical suite above was not rerun for this layout-only revision.

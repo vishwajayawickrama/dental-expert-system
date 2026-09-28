@@ -20,7 +20,6 @@ public final class App extends JFrame {
     private Bridge bridge;
     final Map<String,AnswerControl> fields=new LinkedHashMap<>();
     private final JPanel screens=new JPanel(new CardLayout());
-    private final JLabel state=new JLabel("Initializing the clinical knowledge base…");
     final JComboBox<String> mode=new JComboBox<>(new String[]{"Forward chaining","Backward chaining"});
     final JComboBox<Bridge.Option> goal=new JComboBox<>();
     private final JTextArea resultText=new JTextArea();
@@ -46,22 +45,17 @@ public final class App extends JFrame {
         });
     }
     public App(){
-        super("DentalExplain • Dental decision support");
+        super("DentalExplain • Expert system");
         installEditingKeys();
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);setSize(1180,850);setMinimumSize(new Dimension(960,680));setLocationRelativeTo(null);
         setIconImage(icon(128));setLayout(new BorderLayout());
-        JPanel top=new JPanel(new BorderLayout());top.setBackground(NAVY);top.setBorder(new EmptyBorder(18,28,18,28));
-        JLabel brand=new JLabel("DENTAL EXPLAIN");brand.setForeground(Color.WHITE);brand.setFont(BODY.deriveFont(Font.BOLD,18));
-        JLabel role=new JLabel("DENTIST WORKSPACE   /   v1.0");role.setForeground(new Color(188,213,230));role.setFont(new Font("Monospaced",Font.PLAIN,12));
-        top.add(brand,BorderLayout.WEST);top.add(role,BorderLayout.EAST);add(top,BorderLayout.NORTH);
         screens.setBackground(Color.WHITE);add(screens,BorderLayout.CENTER);
-        state.setForeground(GRAY);state.setBorder(new EmptyBorder(10,28,10,28));add(state,BorderLayout.SOUTH);
         JPanel loading=page("Preparing your workspace", "Loading questions, facts and rules from SWI-Prolog.");screens.add(loading,"loading");
         worker.submit(()->{try{Bridge b=new Bridge();SwingUtilities.invokeLater(()->initialize(b));}catch(Throwable e){SwingUtilities.invokeLater(()->startupError(e));}});
     }
     private void startupError(Throwable e){
         e.printStackTrace();
-        state.setText("Initialization failed");JTextArea error=textArea("Could not initialize the bundled Prolog runtime.\n\n"+e+"\n\nSee the troubleshooting section of the user manual.");
+        JTextArea error=textArea("Could not initialize the bundled Prolog runtime.\n\n"+e+"\n\nSee the troubleshooting section of the user manual.");
         JPanel panel=page("Runtime unavailable","The application needs matching Java, SWI-Prolog and JPL libraries.");panel.add(new JScrollPane(error),BorderLayout.CENTER);screens.add(panel,"error");show("error");
     }
     void initialize(Bridge b){
@@ -70,7 +64,7 @@ public final class App extends JFrame {
         for(var c:b.conditions.entrySet())goal.addItem(new Bridge.Option(new Atom(c.getKey()),c.getValue()));
         goal.setEditable(false);mode.setEditable(false);
         screens.add(welcome(),"welcome");screens.add(setup(),"setup");screens.add(questionnaire(),"questionnaire");screens.add(results(),"results");
-        screens.add(knowledge(),"knowledge");refreshVisibility();state.setText("25 rules  •  30 domain facts  •  Clinical expert review pending");show("welcome");
+        screens.add(knowledge(),"knowledge");refreshVisibility();show("welcome");
     }
     private JPanel welcome(){
         JPanel page=page("A structured dental assessment", "For dentists assessing tooth pain and gum symptoms across age groups.");
@@ -159,15 +153,15 @@ public final class App extends JFrame {
         Map<String,Term> a=new LinkedHashMap<>();fields.forEach((k,f)->{if(visible(f.question.visibility()))a.put(k,f.value());});return a;
     }
     void invalidateAssessment(){generation++;savedResult=null;saveButton.setEnabled(false);}
-    void reset(){generation++;fields.values().forEach(AnswerControl::reset);mode.setSelectedIndex(0);if(goal.getItemCount()>0)goal.setSelectedIndex(0);resultText.setText("");savedResult=null;saveButton.setEnabled(false);assessButton.setEnabled(true);refreshVisibility();if(questionnaire!=null)questionnaire.scrollRectToVisible(new Rectangle(0,0,1,1));}
+    void reset(){generation++;fields.values().forEach(AnswerControl::reset);mode.setSelectedIndex(0);if(goal.getItemCount()>0)goal.setSelectedIndex(0);resultText.setText("");savedResult=null;saveButton.setEnabled(false);assessButton.setEnabled(true);assessButton.setText("Assess presentation");refreshVisibility();if(questionnaire!=null)questionnaire.scrollRectToVisible(new Rectangle(0,0,1,1));}
     void assess(){
         Map<String,Term> input=answers();String method=mode.getSelectedIndex()==0?"forward":"backward";
         String target=method.equals("forward")?"all":((Bridge.Option)goal.getSelectedItem()).value().name();
-        long ticket=++generation;assessButton.setEnabled(false);state.setText("Assessing the supplied findings…");
+        long ticket=++generation;assessButton.setEnabled(false);assessButton.setText("Assessing…");
         worker.submit(()->{try{Bridge.Result r=bridge.assess(input,method,target);SwingUtilities.invokeLater(()->{
-            assessButton.setEnabled(true);if(ticket!=generation){state.setText("Ready for a new assessment  •  Expert review pending");return;}
-            present(r,input,method,target);state.setText("Assessment complete  •  Knowledge v"+bridge.version+"  •  Expert review pending");show("results");
-        });}catch(Throwable e){SwingUtilities.invokeLater(()->{assessButton.setEnabled(true);if(ticket!=generation)return;state.setText("Assessment failed");JOptionPane.showMessageDialog(this,e.toString(),"Runtime error",JOptionPane.ERROR_MESSAGE);});}});
+            assessButton.setEnabled(true);assessButton.setText("Assess presentation");if(ticket!=generation){return;}
+            present(r,input,method,target);show("results");
+        });}catch(Throwable e){SwingUtilities.invokeLater(()->{assessButton.setEnabled(true);assessButton.setText("Assess presentation");if(ticket!=generation)return;JOptionPane.showMessageDialog(this,e.toString(),"Runtime error",JOptionPane.ERROR_MESSAGE);});}});
     }
     private void present(Bridge.Result r,Map<String,Term> input,String method,String target){
         String title=switch(r.status()){case "candidates"->"Supported candidate conditions";case "incomplete"->"Additional information needed";case "conflict"->"Clarify conflicting selections";case "invalid"->"Correct invalid inputs";case "outside_scope"->"Outside the supported scope";default->"No supported conclusion";};resultTitle.setText(title);
@@ -186,7 +180,7 @@ public final class App extends JFrame {
         String file=chooser.getFile(),directory=chooser.getDirectory();chooser.dispose();
         if(file==null)return;Path path=Path.of(directory,file);
         if(Files.exists(path)&&JOptionPane.showConfirmDialog(this,"Replace the existing result file?","Save result",JOptionPane.YES_NO_OPTION)!=JOptionPane.YES_OPTION)return;
-        try{Files.writeString(path,savedResult);state.setText("Saved result to "+path.getFileName());}catch(Exception e){JOptionPane.showMessageDialog(this,e.getMessage(),"Save failed",JOptionPane.ERROR_MESSAGE);}
+        try{Files.writeString(path,savedResult);JOptionPane.showMessageDialog(this,"Saved result to "+path.getFileName(),"Result saved",JOptionPane.INFORMATION_MESSAGE);}catch(Exception e){JOptionPane.showMessageDialog(this,e.getMessage(),"Save failed",JOptionPane.ERROR_MESSAGE);}
     }
     String savedResultForTest(){return savedResult;}
     void show(String card){((CardLayout)screens.getLayout()).show(screens,card);}

@@ -6,7 +6,7 @@
 
 The first package targets Apple Silicon macOS. Copy the complete `DentalExplain.app` to a location of your choice and double-click its tooth icon in Finder. The bundle contains Java and SWI-Prolog/JPL; no terminal configuration or separate Prolog installation is needed. Keep the bundle intact. It is locally ad-hoc signed, with no Developer ID notarization; broader distribution and another-Mac verification are follow-up work. No Windows executable is provided in this release.
 
-Wait for the welcome screen and the counts in the bottom status bar. Initialization and reasoning run in a background worker. An initialization error means the application is unavailable; it is not a clinical assessment.
+Wait for the welcome screen. The window title is DentalExplain • Expert system; catalogue counts appear in the knowledge workspace. Initialization and reasoning run in a background worker. An initialization error means the application is unavailable; it is not a clinical assessment.
 
 ## Consultation setup
 
@@ -35,7 +35,7 @@ Questions are grouped as reported symptoms, relevant history, dentist-supplied t
 
 Measurements use dropdowns: probing depth and attachment loss 0–15 mm in 0.5 mm steps; bleeding on probing 0–100% in 5% steps. Record the supplied maximum examination measurements as defined by each field. Do not invent or round a finding solely to fit a rule. For unavailable or unrepresentable measurements choose Unknown; the current catalogue may request additional findings or support no conclusion. Durations use days/weeks/months/over-six-month categories; brief/lingering/episodic describe persistence, without a universal numeric pain cutoff.
 
-Choose **Assess presentation**. The window remains usable while reasoning runs.
+Choose **Assess presentation**. The Assess button displays Assessing… while reasoning runs. The window remains usable.
 
 ## Results
 
@@ -50,7 +50,7 @@ Choose **Assess presentation**. The window remains usable while reasoning runs.
 
 These are candidate outputs, not confirmed diagnoses, certainty scores or treatment prescriptions. Primary-tooth irreversible-pulpitis symptoms can overlap with necrosis. All clinical rules and acceptance expectations await dentist review.
 
-**Edit answers** returns to the questionnaire. To change setup or reasoning mode, use Back to setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels, mode, goal, knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
+**Edit answers** returns to the questionnaire. To change setup or reasoning mode, use Back to setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels, mode, goal, knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
 
 **New consultation** clears all selections and the result, restores defaults, and rejects delayed responses from the previous consultation. Saved text files remain on disk. Exiting closes the app; consultation selections are not restored on relaunch.
 
