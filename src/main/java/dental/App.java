@@ -17,7 +17,19 @@ import java.util.concurrent.*;
 
 public final class App extends JFrame {
     static final Color NAVY=new Color(24,48,77), BLUE=new Color(234,242,248), TEAL=new Color(20,112,117), GRAY=new Color(79,96,112);
-    static final Font BODY=new Font("SansSerif",Font.PLAIN,14), DISPLAY=BODY.deriveFont(Font.BOLD,32f);
+    static final Font BODY=loadInterfaceFont(), DISPLAY=BODY.deriveFont(Font.BOLD,32f);
+
+    private static Font loadInterfaceFont(){
+        try{
+            for(String style:List.of("Regular","Bold")){
+                try(var stream=App.class.getResourceAsStream("/fonts/Inter-"+style+".otf")){
+                    if(stream==null)throw new IllegalStateException("Bundled Inter font missing: "+style);
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT,stream));
+                }
+            }
+            return new Font("Inter",Font.PLAIN,14);
+        }catch(Exception e){throw new ExceptionInInitializerError(e);}
+    }
     private Bridge bridge;
     final Map<String,AnswerControl> fields=new LinkedHashMap<>();
     private final JPanel screens=new JPanel(new CardLayout());

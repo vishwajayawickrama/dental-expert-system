@@ -13,7 +13,7 @@ The checks below establish software behavior on the development Mac. They do not
 | Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
 | Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
 | Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-231033/DentalExplain.app` |
+| Final timestamped image | `dist/release-20260928-231512/DentalExplain.app` |
 | Convenient local copy | `dist/DentalExplain.app` |
 | Signing | Local ad-hoc signing; not Developer ID signed or notarized |
 
@@ -82,3 +82,7 @@ The top brand banner and bottom status bar were removed, and the window title ch
 ## Font revision
 
 All app-owned Swing text uses the SansSerif family, with size and weight providing heading hierarchy. Shared defaults cover labels, buttons, dropdowns, radio buttons, checkboxes, tabs, search fields, table headers, menus and Swing dialogs. Native macOS window chrome and the system file picker retain system typography. The rebuilt app passed bundled-runtime and signature checks; welcome and knowledge screens were visually inspected at 1180×850. Clinical tests were not rerun for this font-only change.
+
+## Inter font update
+
+The generic SansSerif family was replaced by bundled Inter 4.1 Regular and Bold from the [official release](https://github.com/rsms/inter/releases/tag/v4.1). Original OpenType files and their SIL Open Font License are included in source resources and the JAR. A headless check loading the built JAR verified the physical font names Inter Regular and Inter Bold. The packaged app passed runtime and signature checks, and the welcome screen was visually inspected at 1180×850. Native macOS chrome/file-picker typography remains system-managed; clinical tests were not rerun.
