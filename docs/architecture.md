@@ -1,119 +1,136 @@
 # DentalExplain architecture
 
-**Status:** Selected architecture; application and packaging are not implemented yet.
+**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.1.0. Verified on the development Apple Silicon Mac on 28 September 2026. Clinical expert review is pending.
 
-DentalExplain will use **Java Swing for its desktop interface, JPL for Java–Prolog integration, and SWI-Prolog for its knowledge base and inference engine**. The intended deliverables are a macOS application and a Windows application with an executable launcher. Clicking the application icon will open the consultation interface.
-
-The domain, expert-review requirements, and agreed target of **25 meaningful rules and 40 authored domain facts** are described in the [project proposal](project-proposal.md). The [20 consultation test cases](test-cases.md) define provisional inputs and expected results.
+See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
 
 ## 1. Technology decision
 
-| Responsibility | Selected technology | Reason |
+Java Swing supplies the native desktop interface. Java 21 calls SWI-Prolog 10.0.2 through the matching vendor JPL Java and JNI libraries. A `jpackage` application image bundles Java, the application, Prolog modules and native dependencies. Opening its icon opens the interface without a terminal or a separately installed Prolog runtime.
+
+| Option | Integration, advantages and tradeoffs | Delivery |
 | --- | --- | --- |
-| Desktop interface | Java Swing | Suitable for consultation forms, follow-up questions, and results; included in the Java desktop module. |
-| Integration | JPL | Dedicated bridge for calling SWI-Prolog predicates and retrieving structured terms from Java. |
-| Knowledge base | SWI-Prolog | Stores reusable domain facts and rules with identifiers and provenance. |
-| Inference engine | SWI-Prolog | Implements explicit forward and backward chaining over the same knowledge. |
-| Desktop packaging | `jpackage` | Produces a native launcher and application package with a Java runtime and icon. Prolog/JPL dependencies must be included separately. |
+| **Java Swing — selected** | JPL structured terms; standard Java desktop controls; shared Java source across platforms. JNI and Prolog binaries still need platform-specific packaging. JavaFX would require an additional GUI runtime. | Development JAR plus native `jpackage` image. macOS verified; Windows follow-up. |
+| C++/Qt | Embed through SWI's C++ interface. Native UI and strong platform integration, but more C++/Qt/native build dependencies and deployment work. | Separate Qt/Prolog bundles per platform. |
+| Local web | SWI HTTP server with HTML/CSS/JavaScript. A launcher could start it and open a browser; an icon requirement does not technically exclude it. | Server, assets and runtime plus browser launcher. Not selected. |
+| Prolog XPCE | GUI and knowledge in Prolog; fewer language boundaries, but different GUI tooling and runtime resources. | XPCE/Prolog runtime bundle. |
+| Terminal | Direct Prolog consultation; useful for reasoning tests and development. | Script plus Prolog runtime; not the delivered consultation interface. |
 
-Java is chosen because the application can share its UI and integration source across macOS and Windows while offering a dedicated desktop window. For this assignment, Swing provides sufficient controls without adding JavaFX's separate runtime dependencies.
+Official references: [Swing](https://docs.oracle.com/javase/tutorial/uiswing/), [JPL](https://github.com/SWI-Prolog/packages-jpl), [SWI C++ interface](https://www.swi-prolog.org/pldoc/man?section=cpp2), [SWI HTTP](https://www.swi-prolog.org/pldoc/man?section=http), [XPCE](https://www.swi-prolog.org/packages/xpce/), and [Java 21 jpackage](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-overview.html).
 
-C++/Qt could also supply a desktop application, but introduces more native build and deployment work for this project. XPCE and a terminal UI are alternatives rather than the selected user interface.
-
-A local web interface could also be opened by an icon that starts a server and browser. The icon requirement therefore does not technically rule it out. We are choosing a Java desktop interface because it matches the preferred application experience; the selected design needs no browser or HTTP server.
+A shell script requires its interpreter and dependencies. A `.jar` contains Java classes and needs Java; this application's JAR also needs JPL and native Prolog files. A native launcher (`.app` on macOS or `.exe` on Windows) starts the bundled application; distribute its complete bundle. An installer installs that bundle and can create shortcuts. A Mac build cannot supply a verified Windows executable. A single JAR is not a dependency-free cross-platform deliverable.
 
 ## 2. Component structure
 
 ```mermaid
 flowchart TD
-    User["User or dental professional"] -->|"Consultation input"| UI["Java Swing interface"]
-    UI -->|"Actions and validated input"| Service["Java consultation service"]
-    Service -->|"Structured queries"| Bridge["JPL bridge"]
-    Bridge -->|"Predicate calls"| Engine["SWI-Prolog inference engine"]
-    KB["Prolog knowledge base: facts and shared rules"] --> Engine
-    Engine --> Forward["Forward chaining"]
-    Engine --> Backward["Backward chaining"]
-    Forward -->|"Conclusions and follow-up questions"| Bridge
-    Backward -->|"Conclusions and follow-up questions"| Bridge
-    Bridge -->|"Java result models"| Service
-    Service -->|"Presentation data"| UI
-    UI -->|"Questions and results"| User
-    Expert["Qualified dentist and source review"] -->|"Reviewed knowledge"| KB
+    Expert["Human expert: qualified dentist; review pending"] --> Acquisition["Knowledge acquisition and source review"]
+    Sources["Dental reference sources"] --> Acquisition
+    Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 shared rules"]
+    Dentist["Dentist"] -->|"Predefined consultation selections"| UI["Java Swing interface and consultation controller"]
+    UI -->|"Structured observation terms, mode and goal"| JPL["JPL bridge"]
+    JPL --> Engine["SWI-Prolog inference engine"]
+    KB --> Engine
+    Engine --> Forward["Forward fixed-point processing"]
+    Engine --> Backward["Recursive backward goal evaluation"]
+    Forward -->|"Structured assessment"| JPL
+    Backward -->|"Structured assessment"| JPL
+    JPL -->|"Status, candidates, missing fields and messages"| UI
+    UI -->|"Questions and results"| Dentist
+    KB -->|"Read-only catalogue"| JPL
 ```
 
 ### Java interface and consultation service
 
-The interface will provide age and dentition input, symptom/history/finding forms, a reasoning-mode choice, follow-up questions, results, and new-consultation/reset controls. It will distinguish unknown answers from negative answers and reported symptoms from supplied examination findings.
+`App.java` owns the welcome → setup → questionnaire → results flow and read-only knowledge workspace. `AnswerControl.java` builds every clinical field from the shared Prolog question catalogue. Back navigation preserves active selections. Conditional fields reset to Unknown when hidden and are excluded from submitted observations. A new consultation clears fields and results.
 
-Java handles input format validation, navigation, and presentation. A consultation service owns the current consultation and coordinates calls to Prolog. It converts structured Prolog results into Java models instead of parsing display text.
+Clinical controls are non-editable dropdowns, radio groups or checkbox groups. Search in the knowledge workspace and file names in the save dialog are the only editable text inputs. Neither is clinical evidence. Dropdown keyboard type-ahead selects an existing option; it cannot create a new value. The form has accessible labels, focusable controls, button mnemonics, Tab traversal and native Mac editing shortcuts for search/save dialogs.
+
+A single background executor initializes Prolog and performs reasoning. The catalogue is loaded before the interface becomes ready; subsequent tab viewing reads cached records. Swing updates occur on the event-dispatch thread. A generation token invalidates pending callbacks after edits or reset, preventing delayed results from replacing a new consultation. See [Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
 
 ### JPL integration boundary
 
-JPL embeds access to the Prolog engine within the Java application through JNI and native SWI-Prolog libraries. It is not a pure-Java Prolog implementation. The Java library and native components must come from a compatible JPL/SWI-Prolog distribution. See the [official JPL project](https://github.com/SWI-Prolog/packages-jpl).
+`Bridge.java` constructs `Atom`, numeric, list and `Compound` terms and closes each query. Labels never become clinical query text. The native libraries, boot image and modules are resolved relative to `dental.home`; `jpackage` sets that to its application directory. No Prolog process, HTTP server or command-line shell participates in an assessment.
 
-Use JPL term objects to construct predicate arguments and read results, rather than concatenating user-entered text into executable Prolog queries. Keep query construction, error handling, and result conversion in one integration layer. Close queries after use. See the [JPL Java API overview](https://jpl7.org/JavaApiOverview).
+```prolog
+assess(Observations, Mode, Goal,
+       result(Status, CandidateIds, MissingQuestionIds, Messages)).
+% Observations: [obs(age,16),obs(triggers,[cold]), ...]
+% Mode: forward | backward
+% Goal: all | caries | reversible_pulpitis | irreversible_pulpitis
+%             | gingivitis | periodontitis
+catalog(questions, Records).
+catalog(facts, Records).
+catalog(rules, Records).
+catalog(conditions, Records).
+catalog(version, [Version]).
+catalog(question_sources, Records).
+```
+
+Prolog validates the list shape, ground identifiers/values, schema membership, unique keys, age range, mode and goal before inference. Duplicate or arbitrary fields cannot bypass controlled UI input. Contradictory pain answers and incompatible tooth selections return conflicts.
 
 ### Prolog knowledge and reasoning
 
-Prolog owns clinical rule applicability, age-group interpretation, candidate support, and intermediate conclusions. Java must not duplicate these decisions. Age boundaries and diagnostic rules remain pending dental-source research and expert review. The proposed targets are dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis, and periodontitis.
+`domain.pl` contains exactly **30 `domain_fact/5` records and 25 `rule/5` production rules**, with sources and pending review. Questions, condition labels, IDs, source metadata, observation lists and test fixtures are excluded from these counts. `questions.pl` contains 44 questions with control types, labels, explicit allowed values and conditional visibility. Display labels map directly to stable atoms or numbers; checkbox lists expand only explicitly selected items to presence. None maps all group items to No; unchecked items otherwise remain Unknown. Not applicable stays distinct and cannot satisfy a required clinical premise.
 
-The knowledge base is reusable across consultations. The Java consultation service passes current inputs directly to Prolog; intermediate deductions remain within inference processing. Consultation inputs and derived conclusions do not count toward the 40 authored facts.
+`engine.pl` forward chaining repeatedly evaluates rule premises and adds unique conclusions until the sorted conclusion set stops changing. The finite rule conclusions guarantee termination. Intermediate deductions exist only within the current inference call.
 
-Forward chaining repeatedly applies satisfied rules until no new conclusions follow, avoiding repeated derivations. Backward chaining evaluates a candidate condition's supporting rules and asks for missing evidence. Both read the shared rule base and return candidate conclusions or requests for additional input.
+Backward chaining recursively evaluates the selected candidate's rules and intermediate premises, independently of forward chaining. A cycle guard terminates recursion. A conjunction fails if a known premise fails; unknown required premises produce missing-input identifiers. Alternative supporting rules succeed if any complete branch succeeds. The production rules are shared by both modes.
+
+Age is required and validated at 0–120 completed years. The engine does not invent age-based diagnoses or guess dentition/root maturity from age. Primary and immature permanent teeth follow their supplied dentition/root findings; mature-tooth thermal findings are hidden for those teeth. Age-group diagnosis thresholds remain subject to expert review. The five candidates can coexist; the forward focus limits assessment to tooth, gum or all targets. Backward mode investigates the explicitly selected target.
+
+The rule catalogue's purposes are:
+
+| Rule | Purpose | Source family |
+| --- | --- | --- |
+| r01 | Recognize a cavitated, softened carious lesion | NIDCR |
+| r02 | Recognize a dentist-interpreted radiographic carious lesion | NIDCR |
+| r03 | Recognize decay-related discoloration with softened tissue | NIDCR |
+| r04 | Support caries from an identified lesion | NIDCR |
+| r05 | Recognize cold-provoked tooth pain | AAE |
+| r06 | Recognize sweet-provoked tooth pain | NIDCR |
+| r07 | Recognize heat-provoked tooth pain | AAE |
+| r08 | Recognize brief provoked discomfort | AAPD |
+| r09 | Form the limited reversible-pulpitis pattern with supplied negative findings | AAPD |
+| r10 | Apply that pattern to a primary tooth | AAPD |
+| r11 | Apply that pattern to an immature permanent tooth | AAPD |
+| r12 | Apply that pattern with a brief mature-tooth thermal response | AAE |
+| r13 | Recognize spontaneous pain supporting irreversible inflammation | AAE |
+| r14 | Recognize lingering provoked pain supporting irreversible inflammation | AAE |
+| r15 | Support the provisional primary-tooth irreversible candidate | AAPD |
+| r16 | Support the mature permanent-tooth irreversible candidate | AAE |
+| r17 | Support the immature permanent-tooth irreversible candidate | AAPD |
+| r18 | Recognize plaque-associated bleeding inflammation | AAP |
+| r19 | Recognize plaque-associated red/swollen gingiva | AAP |
+| r20 | Support gingivitis on an intact periodontium | EFP gingival consensus |
+| r21 | Recognize interdental loss at nonadjacent teeth, excluding other causes | EFP periodontitis guidance |
+| r22 | Recognize the alternative buccal/oral attachment-loss pattern | EFP periodontitis guidance |
+| r23 | Support periodontitis from periodontal destruction | EFP periodontitis guidance |
+| r24 | Recognize pocket depth greater than 3 mm | EFP periodontitis guidance |
+| r25 | Recognize plaque-associated bleeding on probing at ≥10% of sites | EFP gingival consensus |
+
+Exact premises, conclusions and source URLs are in the read-only Rules tab and `domain.pl`. These provisional combinations are narrower than complete dental differential diagnosis. In particular, primary-tooth symptoms can overlap with necrosis; the interface flags that limitation.
 
 ## 3. Consultation data flow and lifecycle
 
-1. The native application launcher starts the bundled Java runtime and opens the Swing window.
-2. Initialization locates packaged Prolog resources and native libraries, initializes JPL/SWI-Prolog, and loads the knowledge and inference modules. The UI becomes ready only after initialization succeeds.
-3. The user starts a consultation and supplies age, relevant dentition information, symptoms, history, and available findings.
-4. Java validates input formats and passes structured evidence to Prolog through JPL.
-5. The selected reasoning mode returns conclusions and missing-evidence questions. Additional answers are added to the current consultation before reasoning continues.
-6. Java presents the returned results without inventing clinical certainty percentages.
-7. Reset clears consultation inputs and derived conclusions while retaining the reusable knowledge base. Exit closes active queries and application resources.
+1. Native launcher opens the bundled Java runtime and Swing window.
+2. Background initialization loads native libraries, boot resources and the shared catalogue.
+3. The dentist supplies setup, symptoms, history and professional examination selections.
+4. JPL sends structured observations to Prolog; the boundary validates them.
+5. The engine returns candidates, missing-input requests, conflicts, outside-scope or no-supported-conclusion status.
+6. Results can be saved as plain-text inputs and results. No patient database is maintained.
+7. Reset clears the consultation and invalidates pending results. Reusable knowledge remains loaded.
 
-Prolog initialization and reasoning will run outside Swing's event-dispatch thread. Serialize consultation operations through one background worker and update Swing components on the event-dispatch thread. Prevent overlapping reasoning/reset actions and ensure an old result cannot overwrite a new consultation. This follows Swing's separation of UI and background work; see [Oracle's Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
+## 4. macOS delivery
 
-Resolve packaged files relative to the installed application, not the user's current working directory. A shortcut launch must work just as reliably as a terminal launch.
+Build requirements are an Apple Silicon Mac, Java 21, Apple's command-line tools and the official SWI-Prolog 10.0.2 universal distribution. `bootstrap.sh` downloads and checksum-verifies the vendor runtime into an ignored directory; no global Prolog installation is made. `build.sh`, `test.sh`, `run.sh` and `package.sh` provide shell commands without Python or Maven.
 
-## 4. Cross-platform delivery
+Packaging copies the vendor Prolog resources, frameworks and plugins into the application image, adds loader-relative rpaths for embedding, bundles matching `jpl.jar`, generates a tooth icon and re-signs the modified image locally. Prolog and Java redistribution notices are retained within the bundled runtimes. The initial package is ad-hoc signed; Developer ID signing/notarization and Windows packaging remain follow-up work. A second-machine clean-install test has not been performed.
 
-**Shared source code does not mean one dependency-free JAR.** The Java application can be shared across supported platforms, but its JVM, SWI-Prolog runtime, and JPL native libraries must match the operating system and processor architecture.
-
-| Deliverable | Intended use | Dependencies |
-| --- | --- | --- |
-| Application JAR | Additional developer artifact | Compatible Java, SWI-Prolog/JPL native libraries, Prolog modules, and configured resource/library paths. |
-| macOS `DentalExplain.app` | Main macOS deliverable; launch by icon | Bundled Java runtime, application/JPL JARs, Prolog modules, matching native libraries, and other required Prolog resources. |
-| Windows application image | Main portable Windows bundle; launch `DentalExplain.exe` | The executable together with its bundled runtime, libraries, Prolog modules, and resources. Distribute the complete directory, such as in a ZIP. |
-| Windows `.exe` installer | Optional installation deliverable | Installs the complete application and can create a shortcut. The installer differs from the installed launcher. |
-
-The final package should require no manual Java or SWI-Prolog installation on the target machine. This is an acceptance goal, not a verified capability today. A launcher `.exe` by itself is insufficient; the accompanying application files must be distributed.
-
-### Planned packaging process
-
-1. Pin a compatible JDK, SWI-Prolog, and JPL combination and verify a minimal Java-to-Prolog query on each target platform before building the full UI.
-2. Compile the shared Java application, include `jpl.jar`, and stage the Prolog modules, runtime resources, and platform-specific native dependencies. Keep compatible Java and native binaries for each target architecture.
-3. Use `jpackage --type app-image` to create and test the application image, including an application icon and native-library/resource configuration. Ensure the Java runtime includes Swing's `java.desktop` module.
-4. Test the complete image by clicking its launcher. Only then produce an installer or distribution archive if required.
-5. Include the relevant redistribution notices and the installation/launch instructions in the eventual release.
-
-`jpackage` creates a Java runtime and supports native application packaging, but it does not automatically discover and bundle SWI-Prolog/JPL dependencies. Application packages must be built on their target platform. Windows installer tooling depends on the pinned JDK's requirements. See [Oracle's packaging overview](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-overview.html).
-
-Development can take place on the Mac, with a Windows GitHub Actions build planned for the Windows artifact. A separate macOS build produces the Mac artifact. CI can check compilation, integration, and packaging, but a complete GUI consultation and icon launch still need verification on each intended target machine.
-
-Exact JDK/Prolog versions, supported OS versions and CPU architectures, installer format, and CI configuration remain to be pinned during the integration and packaging feasibility check. No claim is made that a macOS package runs on Windows or that all Macs/Windows machines are already supported.
+Source commits exclude vendor runtimes, build outputs, application images and the reference report. The [manual](user-manual.md) explains developer and packaged launch steps.
 
 ## 5. Failure handling and verification
 
-| Scenario | Required behavior or check |
-| --- | --- |
-| Missing or incompatible native dependency | Show an actionable initialization error identifying the failed component; do not enable reasoning as if initialization succeeded. |
-| Prolog exception or malformed integration result | Report an application/integration error separately from a valid “no supported conclusion” result. |
-| Unknown or contradictory consultation evidence | Preserve uncertainty or identify the conflict; do not silently turn unknown into false. |
-| Repeated reasoning and reset | No duplicate conclusions, stale UI results, or evidence carried into another consultation. |
-| UI responsiveness | The window remains responsive during initialization and reasoning. |
-| Cross-platform integration | Verify JPL initialization, module loading, both reasoning modes, result conversion, and query cleanup on macOS and Windows. |
-| Packaged application | On a clean target machine with no separately installed Java/Prolog, launch by icon, complete a case, view results, reset, and exit. Also test paths containing spaces. |
+Initialization errors are presented separately from clinical outcomes. Unknown evidence does not become false. Invalid input and contradictions block candidate output. Swelling, drainage or fever routes beyond this limited five-condition catalogue; it does not supply treatment or claim a complete urgent-care assessment.
 
-Reasoning correctness will be tested in Prolog; Java integration and packaged-launch tests will verify the desktop boundary. The [proposal's test plan](project-proposal.md#7-test-and-acceptance-plan) covers acceptance criteria, and the [20 test cases](test-cases.md) provide manual question-and-answer data. They are specifications only and have not been executed.
-
-This document records the selected technical architecture. It does not claim that a working application, executable, clinical knowledge base, expert review, or passing tests already exist.
+The 20 acceptance fixtures run through both modes in Prolog and through JPL. Additional tests cover schema values, invalid boundary input, age endpoints, recursion/fixed-point termination, duplicate prevention, coexisting findings, reset and independent backward reasoning. Swing component tests verify control round trips, exclusivity, conditional clearing and navigation. Actual native UI and bundled launch checks are recorded in [verification.md](verification.md). Passing synthetic software tests is not clinical validation.

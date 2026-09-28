@@ -1,6 +1,6 @@
-# DentalExplain: 20 manual test cases
+# DentalExplain: 20 acceptance test cases
 
-**Status:** Test specifications only. No inference engine exists yet; every actual result and pass/fail field is **Not run**. All clinical expectations are **Pending dentist review**.
+**Status:** Implemented and executed against knowledge v0.1.0 using SWI-Prolog and the Java/JPL bridge. All 20 cases passed the software assertions in both modes. Clinical expectations remain **Pending dentist review**; software passes do not establish clinical accuracy.
 
 These are synthetic cases, not real patient records. They cover 14 diagnostic presentations and 6 input/lifecycle edge cases. The [proposal](project-proposal.md) defines the scope; the [architecture](architecture.md) defines Java Swing, JPL, and SWI-Prolog integration.
 
@@ -15,7 +15,22 @@ These are synthetic cases, not real patient records. They cover 14 diagnostic pr
 
 For TC01–TC14, start a fresh consultation, enter all rows, and run forward chaining. Reset, re-enter identical values, and evaluate the named target through backward chaining. The target condition is selected as the backward-chaining goal only; it is never supplied as a clinical finding. Both runs must include the expected candidate. Coexisting supported conditions, such as caries with pulpitis, are allowed. Do not report a diagnosis as confirmed, prescribe treatment, or invent certainty percentages.
 
-For TC15–TC19, attempt both reasoning modes with the listed input and check the validation or follow-up response. TC20 checks reset after each mode. Expected messages below specify meaning; equivalent wording is acceptable. Record a pass only when the candidate/message and prohibited-outcome checks succeed in both modes after implementation. Clinical expectations must be reviewed before the cases are used to claim clinical correctness.
+For TC15–TC19, attempt both reasoning modes with the listed input and check the validation or follow-up response. TC20 checks reset after each mode. Expected messages below specify meaning; equivalent wording is acceptable. Record a pass only when the candidate/message and prohibited-outcome checks succeed in both modes against the implemented engine. Clinical expectations must be reviewed before the cases are used to claim clinical correctness.
+
+
+## Mapping the catalogue to controlled inputs
+
+The question-and-answer tables describe synthetic clinical observations. The executable fixtures use only identifiers from `knowledge/questions.pl`; unspecified findings remain Unknown. Narrative details without a corresponding supported question (such as exact radiographic depth or pulp exposure) are contextual descriptions and are not parsed or inferred. Do not enter the expected condition as evidence.
+
+- Exact ages and FDI identifiers map directly to the non-editable dropdown values. Tooth type and root maturity are supplied explicitly. TC01/TC04/TC07 use mixed dentition with a primary affected tooth; TC05 supplies an immature permanent tooth.
+- Reported severity maps to Mild, Moderate or Severe. Brief post-trigger pain maps to `brief`; prolonged pain maps to `lingering`. A few days maps to 1-7 days, weeks to 1-4 weeks, months to 1-6 months, and TC14's longer history to Over 6 months. The duration categories are input labels, not diagnostic thresholds.
+- Cold, Hot and Sweet map to the corresponding checkbox identifiers. Explicitly absent relevant history maps to None reported. Omitted triggers stay Unknown; TC07's spontaneous presentation does not silently establish that all triggers are absent.
+- A probing range is represented by its supplied maximum: 1-3 mm becomes 3 mm, TC13's 5-6 mm becomes 6 mm and TC14's 6-7 mm becomes 7 mm. Supplied attachment loss is represented similarly. TC10/TC11/TC12 use bleeding-on-probing values 30%/40%/35%. Findings not measured remain Unknown.
+- TC16 bypasses the UI and submits `obs(age,-2)` to both Prolog and JPL validation boundaries. The UI cannot select a negative age.
+- TC17 first requests affected tooth type. Additional examination requests can follow after it is supplied; the engine does not invent a conclusion while this required field is unavailable.
+- TC20's blank-input fixture verifies the post-reset engine response. Separate Prolog tests assess TC11 then blank inputs in both modes. Swing lifecycle tests verify clearing and rejection of a delayed worker result. The native UI also exercises New consultation after a completed candidate assessment.
+
+Unchecked substantive checkbox items remain Unknown unless None is explicitly selected; Unknown, None and Not applicable are distinct. Hidden inapplicable controls are cleared and excluded by the interface. The detailed results and packaging/UI observations are recorded in [verification](verification.md).
 
 ## Catalogue
 
@@ -75,10 +90,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries | Candidate dental caries |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc02"></a>
 
@@ -111,10 +126,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries | Candidate dental caries |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc03"></a>
 
@@ -147,10 +162,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries | Candidate dental caries |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc04"></a>
 
@@ -183,10 +198,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc05"></a>
 
@@ -219,10 +234,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc06"></a>
 
@@ -255,10 +270,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc07"></a>
 
@@ -293,10 +308,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc08"></a>
 
@@ -329,10 +344,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc09"></a>
 
@@ -365,10 +380,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc10"></a>
 
@@ -401,10 +416,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis | Candidate gingivitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc11"></a>
 
@@ -437,10 +452,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis | Candidate gingivitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc12"></a>
 
@@ -473,10 +488,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis | Candidate gingivitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc13"></a>
 
@@ -509,10 +524,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate periodontitis | Candidate periodontitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc14"></a>
 
@@ -545,10 +560,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Candidate periodontitis | Candidate periodontitis |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 ## Edge cases
 
@@ -577,16 +592,16 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request age; no candidates | Incomplete; request age; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc16"></a>
 
 ### TC16 — Invalid negative age
 
-**Steps:** Start a fresh consultation, enter the raw age value −2, and attempt to continue.
+**Steps:** Submit the raw age value −2 through the structured Prolog/JPL assessment boundary. Confirm rejection in both modes. The controlled UI offers only Unknown and completed years 0–120, so this value cannot be entered through the questionnaire.
 
 | Question or action | Test answer / value |
 | --- | --- |
@@ -605,10 +620,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Invalid; reject age -2; no candidates | Invalid; reject age -2; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc17"></a>
 
@@ -638,10 +653,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request affected tooth type; no candidates | Incomplete; request affected tooth type; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc18"></a>
 
@@ -668,10 +683,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Conflict; clarify tooth-pain answers; no candidates | Conflict; clarify tooth-pain answers; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc19"></a>
 
@@ -700,10 +715,10 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Outside supported scope; no candidates | Outside supported scope; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 <a id="tc20"></a>
 
@@ -730,15 +745,15 @@ For TC15–TC19, attempt both reasoning modes with the listed input and check th
 
 | Execution record | Forward chaining | Backward chaining |
 | --- | --- | --- |
-| Application / knowledge-base version | Not run | Not run |
-| Date / tester | Not run | Not run |
-| Actual response | Not run | Not run |
-| Pass / fail | Not run | Not run |
+| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
+| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request age; no candidates | Incomplete; request age; no candidates |
+| Pass / fail | **PASS — software** | **PASS — software** |
 
 ## Acceptance and maintenance
 
 The catalogue has exactly 20 cases: TC01–TC14 are diagnostic candidates and TC15–TC20 are edge cases. Both modes use identical clinical evidence. Additional supported candidates are allowed, but prohibited outcomes fail the case. A software exception is not a valid outside-scope or incomplete-assessment response.
 
-When implementation exists, record observed responses and both mode outcomes in the tables. Where the UI blocks an invalid input before Prolog is called, record that validation result for both attempted modes. Do not mark an unexecuted case as passing. Record expert revisions before changing expected clinical outcomes; do not edit expectations merely to make a failing implementation pass.
+Record observed responses and both mode outcomes in the tables on every knowledge revision. Where the UI blocks an invalid input before Prolog is called, record that validation result for both attempted modes. Do not mark an unexecuted case as passing. Record expert revisions before changing expected clinical outcomes; do not edit expectations merely to make a failing implementation pass.
 
-These cases are manual specifications only. They add no automated fixtures or application code. Case data do not count toward the 25 rules or 40 authored domain facts. The full test programme must also check target-platform packaging, integration failures, and reasoning termination as specified in the proposal and architecture.
+The executable fixtures are in `knowledge/acceptance.pl`; Java/JPL integration and control tests are in `src/test/java/dental/IntegrationTest.java`. Run `./scripts/test.sh`. Case data do not count toward the 25 rules or 30 authored domain facts. The full test programme must also check target-platform packaging, integration failures, and reasoning termination as specified in the proposal and architecture.
