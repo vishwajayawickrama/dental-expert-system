@@ -13,7 +13,7 @@ The checks below establish software behavior on the development Mac. They do not
 | Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
 | Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
 | Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-231512/DentalExplain.app` |
+| Final timestamped image | `dist/release-20260928-232038/DentalExplain.app` |
 | Convenient local copy | `dist/DentalExplain.app` |
 | Signing | Local ad-hoc signing; not Developer ID signed or notarized |
 
@@ -86,3 +86,9 @@ All app-owned Swing text uses the SansSerif family, with size and weight providi
 ## Inter font update
 
 The generic SansSerif family was replaced by bundled Inter 4.1 Regular and Bold from the [official release](https://github.com/rsms/inter/releases/tag/v4.1). Original OpenType files and their SIL Open Font License are included in source resources and the JAR. A headless check loading the built JAR verified the physical font names Inter Regular and Inter Bold. The packaged app passed runtime and signature checks, and the welcome screen was visually inspected at 1180×850. Native macOS chrome/file-picker typography remains system-managed; clinical tests were not rerun.
+
+## Reference font update
+
+The supplied reference resembles Computer Modern Sans. Bundled [Latin Modern Sans](https://ctan.org/pkg/lm), based on Computer Modern, now replaces Inter throughout app-owned controls. Page headings use regular weight to match the reference; section and question labels retain bold weight. Original Regular and Bold OpenType files, attribution, the GUST Font License and LPPL 1.3c are included in source resources and the JAR.
+
+A headless check of the rebuilt JAR resolved `LMSans10-Regular` and `LMSans10-Bold` and verified glyph coverage for the application's title punctuation and age-range symbols. Clean builds remove generated classes before copying resources; inspection confirmed the JAR contains the new fonts with no stale Inter resources. The packaged app passed bundled-runtime and signature checks. The consultation setup was visually inspected at 1180×850 with readable headings, labels, dropdowns and buttons; screenshot evidence is `build/ui-screenshots/latin-modern-setup.png`. Clinical tests were not rerun for this typography change.
