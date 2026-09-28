@@ -5,6 +5,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
@@ -16,7 +17,7 @@ import java.util.concurrent.*;
 
 public final class App extends JFrame {
     static final Color NAVY=new Color(24,48,77), BLUE=new Color(234,242,248), TEAL=new Color(20,112,117), GRAY=new Color(79,96,112);
-    static final Font BODY=new Font("SansSerif",Font.PLAIN,14), DISPLAY=new Font("Georgia",Font.PLAIN,32);
+    static final Font BODY=new Font("SansSerif",Font.PLAIN,14), DISPLAY=BODY.deriveFont(Font.BOLD,32f);
     private Bridge bridge;
     final Map<String,AnswerControl> fields=new LinkedHashMap<>();
     private final JPanel screens=new JPanel(new CardLayout());
@@ -39,8 +40,10 @@ public final class App extends JFrame {
         }
         SwingUtilities.invokeLater(()->{
             try{UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());}catch(Exception ignored){}
-            UIManager.put("Label.font",BODY);UIManager.put("Button.font",BODY);UIManager.put("ComboBox.font",BODY);
-            UIManager.put("TextArea.font",BODY);UIManager.put("TabbedPane.font",BODY);
+            // Include inherited fonts used by search fields, table headers, menus and dialogs.
+            for(Object key:new ArrayList<>(UIManager.getDefaults().keySet())){
+                if(UIManager.get(key) instanceof Font)UIManager.put(key,new FontUIResource(BODY));
+            }
             new App().setVisible(true);
         });
     }

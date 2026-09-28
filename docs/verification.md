@@ -13,7 +13,7 @@ The checks below establish software behavior on the development Mac. They do not
 | Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
 | Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
 | Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-230656/DentalExplain.app` |
+| Final timestamped image | `dist/release-20260928-231033/DentalExplain.app` |
 | Convenient local copy | `dist/DentalExplain.app` |
 | Signing | Local ad-hoc signing; not Developer ID signed or notarized |
 
@@ -78,3 +78,7 @@ See the [user manual](user-manual.md) for launch and consultation instructions a
 ## Layout revision
 
 The top brand banner and bottom status bar were removed, and the window title changed to **DentalExplain • Expert system**. The revised app was rebuilt, launched and visually inspected at 1180×850; both bars are absent and the welcome actions remain visible. The updated bundle passed signature verification and the clean-environment Java/Prolog runtime check. The automated clinical suite above was not rerun for this layout-only revision.
+
+## Font revision
+
+All app-owned Swing text uses the SansSerif family, with size and weight providing heading hierarchy. Shared defaults cover labels, buttons, dropdowns, radio buttons, checkboxes, tabs, search fields, table headers, menus and Swing dialogs. Native macOS window chrome and the system file picker retain system typography. The rebuilt app passed bundled-runtime and signature checks; welcome and knowledge screens were visually inspected at 1180×850. Clinical tests were not rerun for this font-only change.
