@@ -2,13 +2,13 @@
 
 ## Project proposal
 
-- **Full name:** DentalExplain — An Explainable Dental Diagnosis Expert System
+- **Full name:** DentalExplain — A Dental Diagnosis Expert System
 - **Repository:** [vishwajayawickrama/dental-expert-system](https://github.com/vishwajayawickrama/dental-expert-system)
 - **Course:** CM3321 — Logic Programming and Artificial Cognitive Systems
 - **Status:** Initial proposal; application implementation has not started.
 - **Updated:** 28 September 2026
 
-DentalExplain will assess common tooth-pain and gum-symptom presentations using an explainable, rule-based expert system. SWI-Prolog will implement both the knowledge base and inference engine. The selected desktop interface is Java Swing, integrated through JPL. See the [architecture document](architecture.md) for component responsibilities and macOS/Windows packaging.
+DentalExplain will assess common tooth-pain and gum-symptom presentations using a rule-based expert system. SWI-Prolog will implement both the knowledge base and inference engine. The selected desktop interface is Java Swing, integrated through JPL. See the [architecture document](architecture.md) for component responsibilities and macOS/Windows packaging, and the [20 test cases](test-cases.md) for consultation inputs and provisional expected responses.
 
 ## 1. Assignment requirements and deliverables
 
@@ -16,17 +16,16 @@ DentalExplain will assess common tooth-pain and gum-symptom presentations using 
 | --- | --- |
 | Use an expert-system shell or native implementation | Native rule-based implementation in SWI-Prolog. |
 | State a specific domain and clear scope | Tooth pain and gum symptoms across age groups, as defined below. |
-| Explain expert-system anatomy | Block diagram and component descriptions in Section 4. |
+| Describe expert-system anatomy | Block diagram and component descriptions in Section 4. |
 | Identify the human expert | Qualified dentist providing and reviewing knowledge; participation pending. |
-| Demonstrate forward and backward chaining | Explicit implementations over a shared rule base, with visible traces. |
-| Show why answers are produced | Evidence, fired rules, intermediate conclusions, and age-dependent applicability. |
+| Demonstrate forward and backward chaining | Explicit implementations over a shared rule base, with testable results. |
 | Provide sufficient knowledge | Agreed target: 25 meaningful rules and 40 distinct authored domain facts. |
 | Demonstrate correct operation | Automated reasoning tests and recorded consultation and packaging tests. |
 | Submit a runnable application, beyond screenshots | Executable or runnable package appropriate to the selected platform. |
-| Supply a user manual | Installation, consultation workflow, explanations, reset, and troubleshooting. |
+| Supply a user manual | Installation, consultation workflow, results, reset, and troubleshooting. |
 | Do not build using Python | No Python application, inference engine, knowledge base, or integration layer. |
 
-The repository currently contains this proposal and the [selected architecture](architecture.md). The application, knowledge base, full manual, screenshots, executable, and test results are later deliverables.
+The documentation contains this proposal, the [selected architecture](architecture.md), and [20 manual test specifications](test-cases.md). The application, knowledge base, full manual, screenshots, executable, and actual test results are later deliverables.
 
 ## 2. Specific domain and scope
 
@@ -39,10 +38,10 @@ Consultations will collect age and use it to select relevant questions and rules
 - Reported tooth pain: location, duration, triggering factors, persistence, and associated symptoms.
 - Gum symptoms: bleeding, swelling, tenderness, and other findings supported by the reviewed knowledge base.
 - Relevant dental history and explicitly supplied examination findings. The system will distinguish reported symptoms from findings entered by a dental professional.
-- Age-appropriate candidate conditions, additional questions needed to evaluate them, and explanations of supported conclusions.
+- Age-appropriate candidate conditions and additional questions needed to evaluate them.
 - An explicit outcome when evidence is incomplete, contradictory, or insufficient to support a condition.
 
-The initial condition catalogue will focus on decay-related tooth pain and gum inflammation or periodontal disease. These are starting research areas, not approved diagnostic rules. [NIDCR's tooth-decay overview](https://www.nidcr.nih.gov/health-info/tooth-decay) and [gum-disease overview](https://www.nidcr.nih.gov/health-info/gum-disease) provide initial background; detailed diagnostic distinctions and pediatric applicability still need appropriate dental sources and expert review.
+The proposed condition catalogue contains **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis, and periodontitis**. These are test targets, not approved diagnostic rules. [NIDCR's tooth-decay overview](https://www.nidcr.nih.gov/health-info/tooth-decay) and [gum-disease overview](https://www.nidcr.nih.gov/health-info/gum-disease) provide initial background; the [test catalogue](test-cases.md) links additional clinical sources. Diagnostic distinctions and pediatric applicability still need expert review.
 
 ### Excluded scope
 
@@ -57,7 +56,7 @@ The intended human expert is a **qualified dentist**, with pediatric knowledge o
 The planned acquisition process is:
 
 1. Research the bounded domain and prepare questions about symptom distinctions, age, dentition, required findings, and ambiguous cases.
-2. Ask the dentist to explain how candidate conditions are supported or excluded and what additional evidence is needed.
+2. Ask the dentist to specify criteria for supporting or excluding candidate conditions and identify any additional evidence needed.
 3. Translate approved knowledge into declarative facts and identifiable rules in Prolog.
 4. Record each fact's source and each rule's identifier, purpose, premises, conclusion, source, and review status.
 5. Have the expert review the knowledge and expected outcomes for representative cases; revise and retest when knowledge changes.
@@ -84,16 +83,10 @@ flowchart TD
     Sources["Dental reference sources"] --> Acquisition
     Acquisition -->|"Reviewed facts and rules"| KB["Knowledge base: SWI-Prolog"]
     User["User or dental professional"] -->|"Age, symptoms, history, findings"| UI["User interface"]
-    UI -->|"Consultation observations"| WM["Working memory"]
-    UI -->|"Start reasoning or investigate a condition"| Engine["Inference engine: forward and backward chaining"]
+    UI -->|"Current inputs and reasoning selection"| Engine["Inference engine: forward and backward chaining"]
     KB -->|"Facts and applicable rules"| Engine
-    WM -->|"Available evidence"| Engine
-    Engine -->|"Derived conclusions"| WM
-    Engine -->|"Missing-evidence questions"| UI
-    Engine -->|"Rule and evidence traces"| Explain["Explanation facility"]
-    WM -->|"Consultation evidence"| Explain
-    Explain -->|"Why questions and how conclusions"| UI
-    UI -->|"Questions, results, explanations"| User
+    Engine -->|"Conclusions and follow-up questions"| UI
+    UI -->|"Questions and results"| User
 ```
 
 | Component | Responsibility |
@@ -101,30 +94,28 @@ flowchart TD
 | Human expert | Supplies domain reasoning and reviews its correctness and age applicability. |
 | Knowledge acquisition | Converts sourced and reviewed knowledge into facts and rules with provenance. |
 | Knowledge base | Stores reusable domain knowledge; independent of interface technology. |
-| Working memory | Holds one consultation's observations and derived conclusions; cleared on reset. |
-| Inference engine | Applies the shared rules using forward or backward reasoning. |
-| Explanation facility | Uses actual evidence and reasoning traces to explain results and questions. |
-| User interface | Collects information and presents questions, conclusions, and explanations. |
+| Inference engine | Processes current inputs and intermediate deductions using forward or backward reasoning. |
+| User interface | Collects current consultation inputs and presents follow-up questions and conclusions. |
 
 The interface exchanges structured consultation information with Prolog. Diagnostic decisions remain in Prolog rather than being duplicated in JavaScript, Java, or C++.
 
-## 5. Inference and explanations
+## 5. Inference and results
 
 ### Forward chaining: evidence to conclusions
 
-Start with entered age, symptoms, history, and findings in working memory. Identify rules whose premises are satisfied, derive their conclusions, and repeat until no new conclusions follow. Record each fired rule and its supporting evidence. Prevent duplicate conclusions and repeated firing from causing an endless loop.
+Start with entered age, symptoms, history, and findings passed directly to the inference engine. Identify rules whose premises are satisfied, derive their conclusions, and repeat until no new conclusions follow. Prevent duplicate conclusions and repeated firing from causing an endless loop. Intermediate deductions remain part of inference processing.
 
 ### Backward chaining: candidate condition to evidence
 
-Start with a candidate condition. Find rules capable of supporting it, then recursively check their premises against working memory or other rules. Ask for missing information when it can be supplied by the user; do not treat an unknown answer as a negative answer. Record successful reasoning, unmet premises, and why each question was needed.
+Start with a candidate condition. Find rules capable of supporting it, then recursively check their premises against current inputs or other rules. Ask for missing information when it can be supplied by the user; do not treat an unknown answer as a negative answer.
 
 Prolog normally uses goal-directed execution. Calling ordinary Prolog predicates alone does not demonstrate a separate forward-chaining engine; forward chaining must be implemented explicitly.
 
-### Shared knowledge and explainable output
+### Shared knowledge and output
 
-Both modes will use the same authored rules and facts. For the same complete evidence, they should agree on whether a supported candidate conclusion follows, although their question order and traces may differ.
+Both modes will use the same authored rules and facts. For the same complete evidence, they should agree on whether a supported candidate conclusion follows, although their question order may differ.
 
-Each result should display the conclusion, supplied evidence, applicable rule identifiers, intermediate conclusions, relevant age or dentition restrictions, and remaining uncertainty. Each question should explain which candidate or rule needs its answer. Explanations must come from the recorded reasoning, rather than generic text added afterward. Conflicting evidence or unsupported conclusions must be visible rather than forced into a diagnosis.
+Each result should display supported candidate conditions or an explicit incomplete-input, contradictory-input, or unsupported-scope outcome. Follow-up questions request needed information. Coexisting supported findings, such as caries with pulpitis, need not be mutually exclusive. Reset clears previous inputs and conclusions before another consultation.
 
 ## 6. Interface options
 
@@ -132,23 +123,23 @@ The comparison below records the alternatives considered. **Java Swing with JPL 
 
 | Option | Advantages | Disadvantages | Integration and runnable delivery |
 | --- | --- | --- | --- |
-| Local web interface | Flexible consultation and explanation screens; familiar browser interaction; no separate language bridge needed. | Requires a local server, browser launch, port handling, and reliable server shutdown. | SWI-Prolog serves HTML/CSS/JavaScript and structured requests; distribute server, assets, runtime, and launcher. |
+| Local web interface | Flexible consultation and result screens; familiar browser interaction; no separate language bridge needed. | Requires a local server, browser launch, port handling, and reliable server shutdown. | SWI-Prolog serves HTML/CSS/JavaScript and structured requests; distribute server, assets, runtime, and launcher. |
 | Java Swing/JavaFX | Conventional desktop UI; Java packaging tools; suitable for structured forms. | JPL adds native-library configuration; JavaFX adds its own dependencies; more packaging components. | Query Prolog through JPL; bundle Java runtime, application, Prolog runtime, and matching JPL native libraries. |
 | C++/Qt | Native desktop application; extensive GUI controls; direct Prolog embedding. | More build configuration, platform-specific dependency work, and native integration complexity. | Initialize SWI-Prolog through its C++ interface; deploy application with Qt and Prolog dependencies. |
 | Prolog XPCE | GUI and reasoning written in Prolog; fewer language boundaries. | Less flexibility for contemporary UI design; GUI runtime availability must be checked. | Use XPCE forms and controls calling the same reasoning predicates; package required Prolog/XPCE resources. |
-| Terminal interface | Smallest implementation; useful for debugging, automated demonstrations, and visible traces. | Less convenient consultation experience; limited presentation for the final demonstration. | Implement question prompts and explanation output in Prolog; launch through a script or packaged executable. |
+| Terminal interface | Smallest implementation; useful for debugging and automated demonstrations. | Less convenient consultation experience; limited presentation for the final demonstration. | Implement question prompts and results in Prolog; launch through a script or packaged executable. |
 
 ### How to implement and package each option
 
 **Local web interface — alternative, not selected:** Use SWI-Prolog's [HTTP server libraries](https://www.swi-prolog.org/pldoc/man?section=httpserver) to serve the interface and handle consultation requests. Keep consultation state isolated and bind the service to the local machine. Supply startup, browser-opening, and shutdown behavior. Package the server using [saved-state/executable support](https://www.swi-prolog.org/pldoc/man?predicate=qsave_program/2), include assets and required libraries, and test the delivered bundle. A browser interface does not require public website hosting.
 
-**Java Swing — selected:** Use [JPL](https://github.com/SWI-Prolog/packages-jpl) to call Prolog and map results and traces into Swing UI models. JPL uses native integration, so a Java runtime alone is insufficient. Use [Oracle's jpackage guidance](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-overview.html) to create an application image or installer with the Java runtime, then include compatible Prolog/JPL libraries and verify library loading. JavaFX remains an alternative; Swing is selected for the initial application.
+**Java Swing — selected:** Use [JPL](https://github.com/SWI-Prolog/packages-jpl) to call Prolog and map results into Swing UI models. JPL uses native integration, so a Java runtime alone is insufficient. Use [Oracle's jpackage guidance](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-overview.html) to create an application image or installer with the Java runtime, then include compatible Prolog/JPL libraries and verify library loading. JavaFX remains an alternative; Swing is selected for the initial application.
 
-**C++/Qt:** Build forms and explanation views in Qt, initialize an embedded Prolog engine, and call reasoning predicates through the [SWI-Prolog C++ interface](https://www.swi-prolog.org/pldoc/man?section=cpp2). Configure the compiler and linker for Prolog, deploy Qt and Prolog runtime dependencies, and verify their discovery on a clean target machine.
+**C++/Qt:** Build forms and result views in Qt, initialize an embedded Prolog engine, and call reasoning predicates through the [SWI-Prolog C++ interface](https://www.swi-prolog.org/pldoc/man?section=cpp2). Configure the compiler and linker for Prolog, deploy Qt and Prolog runtime dependencies, and verify their discovery on a clean target machine.
 
-**XPCE:** Build dialogs, questions, results, and explanation views using the [SWI-Prolog native GUI library](https://www.swi-prolog.org/packages/xpce/). Call the common inference predicates directly and package the saved program with its GUI runtime resources. Check the selected distribution's GUI support on each intended platform.
+**XPCE:** Build dialogs, questions, and result views using the [SWI-Prolog native GUI library](https://www.swi-prolog.org/packages/xpce/). Call the common inference predicates directly and package the saved program with its GUI runtime resources. Check the selected distribution's GUI support on each intended platform.
 
-**Terminal:** Build a Prolog consultation loop with validated prompts, reasoning-mode selection, traces, and reset/exit commands. Use it as a development interface or final interface if chosen; package with the same platform-specific Prolog executable approach.
+**Terminal:** Build a Prolog consultation loop with validated prompts, reasoning-mode selection, results, and reset/exit commands. Use it as a development interface or final interface if chosen; package with the same platform-specific Prolog executable approach.
 
 ### What counts as a runnable deliverable?
 
@@ -162,31 +153,30 @@ The comparison below records the alternatives considered. **Java Swing with JPL 
 
 SWI-Prolog's [Windows executable guide](https://www.swi-prolog.org/FAQ/WinExe.md) describes creating an `.exe` and distributing required DLLs. An `.exe` is not automatically a dependency-free single file. Java's `jpackage` also requires building native package formats on the target platform. Windows delivery must therefore be built and tested on Windows or a suitable Windows build environment; a successful macOS run does not verify it.
 
-The final demonstration should include the actual runnable artifact and its required dependencies, installation/launch instructions, and a complete consultation with explanations. Screenshots supplement that demonstration.
+The final demonstration should include the actual runnable artifact and its required dependencies, installation/launch instructions, and a complete consultation with results. Screenshots supplement that demonstration.
 
 ## 7. Test and acceptance plan
 
 Use [SWI-Prolog PlUnit](https://www.swi-prolog.org/pldoc/package/plunit.html) for reasoning tests, with manual interface and delivered-package checks. Expert-reviewed fixtures must establish diagnostic expectations before results are marked correct.
 
-For every test record: test ID, input age/dentition and evidence, reasoning mode, expected conclusion or question, expected rule/evidence trace, actual result, pass/fail status, and knowledge-base version. Actual outcomes are currently **not run**.
+The [20 manual test cases](test-cases.md) contain 14 diagnostic cases and 6 edge cases. For every test record: test ID, input age/dentition and evidence, reasoning mode, expected conclusion or question, prohibited outcomes, source references, review status, actual result, pass/fail status, and knowledge-base version. Actual outcomes are currently **not run**.
 
 | Scenario | Expected behavior to verify | Current status |
 | --- | --- | --- |
 | Supported condition | Each finalized condition has a reviewed positive case and a discriminating negative case; expected rules support the result. | Not run |
-| Age-dependent reasoning | Paired cases with changed age use the reviewed age restrictions and explain any changed result. | Not run |
+| Age-dependent reasoning | Paired cases with changed age use only reviewed age restrictions; no arbitrary age-based diagnosis. | Not run |
 | Age boundaries | Test values immediately below, at, and above each approved boundary. | Not run |
 | Missing age or dentition | Ask for required information or report insufficient evidence; do not assume adulthood or tooth type. | Not run |
 | Overlapping symptoms | Preserve supported alternatives and request distinguishing evidence where available. | Not run |
 | Incomplete evidence | Identify unmet premises and avoid presenting an unsupported conclusion as established. | Not run |
 | Contradictory evidence | Expose the conflict and request correction or clarification. | Not run |
-| No supported conclusion | Return an explicit insufficient-evidence or outside-scope outcome with an explanation. | Not run |
+| No supported conclusion | Return an explicit insufficient-evidence or outside-scope outcome. | Not run |
 | Consultation reset | Clear previous observations and derived conclusions; no evidence leaks into the next case. | Not run |
 | Chaining agreement | Both modes agree on candidate support when given identical complete evidence. | Not run |
-| Explanation correctness | Every claimed fired rule and supporting observation appears in the actual trace; question reasons match unmet premises. | Not run |
 | Termination and repeated input | Forward reasoning terminates; repeated evidence does not create duplicate conclusions or loops. | Not run |
 | Runnable delivery | Launch the packaged application on a clean target machine, complete a case, reset, and exit successfully. | Not run |
 
-Acceptance requires the agreed authored knowledge counts, reviewed condition coverage, working demonstrations of both chaining modes, trace-based explanations, passing recorded tests, a runnable package, and a usable manual. Until clinical review occurs, software test success alone must not be described as clinical validation.
+Acceptance requires the agreed authored knowledge counts, reviewed condition coverage, working demonstrations of both chaining modes, passing recorded tests, a runnable package, and a usable manual. Until clinical review occurs, software test success alone must not be described as clinical validation.
 
 ## 8. User manual outline
 
@@ -197,10 +187,10 @@ The full manual will be produced alongside the application and contain:
 3. **Launch and exit:** platform-specific startup instructions and clean shutdown.
 4. **Start a consultation:** enter age, dentition where relevant, symptoms, history, and available findings; indicate unknown answers.
 5. **Reasoning modes:** run forward chaining and investigate candidates through backward chaining.
-6. **Read results:** inspect conclusions, alternatives, unmet evidence, rule traces, and age-related explanations.
+6. **Read results:** inspect candidate conclusions, alternatives, and incomplete-input or unsupported-scope outcomes.
 7. **Reset:** start a fresh consultation without previous evidence.
 8. **Troubleshooting:** missing runtime or native libraries, server/port issues for a web UI, invalid inputs, and incomplete evidence.
-9. **Worked examples:** reviewed cases showing inputs, results, and explanations.
+9. **Worked examples:** reviewed cases showing questions, supplied answers, and results.
 
 ## 9. Decisions and next steps
 
@@ -214,7 +204,9 @@ The full manual will be produced alongside the application and contain:
 | Interface | Selected: Java Swing with JPL integration. |
 | Delivery platform and executable format | Planned: macOS `.app` and Windows application with an `.exe` launcher, bundling Java and Prolog/JPL dependencies; optional Windows installer. Exact supported versions and architectures remain pending. |
 | Human expert and clinical review | Pending. |
-| Exact conditions, age boundaries, and rules | Pending source research and expert review. |
+| Condition targets | Proposed: dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis, and periodontitis; clinical review pending. |
+| Age boundaries and diagnostic rules | Pending source research and expert review. |
+| Manual test catalogue | Specified in [20 test cases](test-cases.md); not executed. |
 | Application, executable, full manual, and test results | Not implemented. |
 
 Next, verify Java/JPL integration and packaging on the target platforms, establish the reviewed condition catalogue and age/dentition model, acquire the knowledge, and then implement and validate the system. This proposal introduces no implemented API or clinical rule set.

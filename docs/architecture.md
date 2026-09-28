@@ -4,17 +4,16 @@
 
 DentalExplain will use **Java Swing for its desktop interface, JPL for Java–Prolog integration, and SWI-Prolog for its knowledge base and inference engine**. The intended deliverables are a macOS application and a Windows application with an executable launcher. Clicking the application icon will open the consultation interface.
 
-The domain, expert-review requirements, and agreed target of **25 meaningful rules and 40 authored domain facts** are described in the [project proposal](project-proposal.md).
+The domain, expert-review requirements, and agreed target of **25 meaningful rules and 40 authored domain facts** are described in the [project proposal](project-proposal.md). The [20 consultation test cases](test-cases.md) define provisional inputs and expected results.
 
 ## 1. Technology decision
 
 | Responsibility | Selected technology | Reason |
 | --- | --- | --- |
-| Desktop interface | Java Swing | Suitable for consultation forms, follow-up questions, results, and rule-trace views; included in the Java desktop module. |
+| Desktop interface | Java Swing | Suitable for consultation forms, follow-up questions, and results; included in the Java desktop module. |
 | Integration | JPL | Dedicated bridge for calling SWI-Prolog predicates and retrieving structured terms from Java. |
 | Knowledge base | SWI-Prolog | Stores reusable domain facts and rules with identifiers and provenance. |
 | Inference engine | SWI-Prolog | Implements explicit forward and backward chaining over the same knowledge. |
-| Explanation generation | SWI-Prolog | Produces evidence and rule traces from actual reasoning; Java presents them. |
 | Desktop packaging | `jpackage` | Produces a native launcher and application package with a Java runtime and icon. Prolog/JPL dependencies must be included separately. |
 
 Java is chosen because the application can share its UI and integration source across macOS and Windows while offering a dedicated desktop window. For this assignment, Swing provides sufficient controls without adding JavaFX's separate runtime dependencies.
@@ -32,21 +31,19 @@ flowchart TD
     Service -->|"Structured queries"| Bridge["JPL bridge"]
     Bridge -->|"Predicate calls"| Engine["SWI-Prolog inference engine"]
     KB["Prolog knowledge base: facts and shared rules"] --> Engine
-    Evidence["Consultation evidence and working memory"] <--> Engine
     Engine --> Forward["Forward chaining"]
     Engine --> Backward["Backward chaining"]
-    Forward --> Explain["Prolog explanation facility"]
-    Backward --> Explain
-    Explain -->|"Conclusions, questions, and traces"| Bridge
+    Forward -->|"Conclusions and follow-up questions"| Bridge
+    Backward -->|"Conclusions and follow-up questions"| Bridge
     Bridge -->|"Java result models"| Service
     Service -->|"Presentation data"| UI
-    UI -->|"Results and explanations"| User
+    UI -->|"Questions and results"| User
     Expert["Qualified dentist and source review"] -->|"Reviewed knowledge"| KB
 ```
 
 ### Java interface and consultation service
 
-The interface will provide age and dentition input, symptom/history/finding forms, a reasoning-mode choice, follow-up questions, results, an explanation view, and new-consultation/reset controls. It will distinguish unknown answers from negative answers and reported symptoms from supplied examination findings.
+The interface will provide age and dentition input, symptom/history/finding forms, a reasoning-mode choice, follow-up questions, results, and new-consultation/reset controls. It will distinguish unknown answers from negative answers and reported symptoms from supplied examination findings.
 
 Java handles input format validation, navigation, and presentation. A consultation service owns the current consultation and coordinates calls to Prolog. It converts structured Prolog results into Java models instead of parsing display text.
 
@@ -56,15 +53,13 @@ JPL embeds access to the Prolog engine within the Java application through JNI a
 
 Use JPL term objects to construct predicate arguments and read results, rather than concatenating user-entered text into executable Prolog queries. Keep query construction, error handling, and result conversion in one integration layer. Close queries after use. See the [JPL Java API overview](https://jpl7.org/JavaApiOverview).
 
-### Prolog knowledge, reasoning, and explanations
+### Prolog knowledge and reasoning
 
-Prolog owns clinical rule applicability, age-group interpretation, candidate support, intermediate conclusions, and explanations. Java must not duplicate these decisions. Age boundaries and diagnostic rules remain pending dental-source research and expert review.
+Prolog owns clinical rule applicability, age-group interpretation, candidate support, and intermediate conclusions. Java must not duplicate these decisions. Age boundaries and diagnostic rules remain pending dental-source research and expert review. The proposed targets are dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis, and periodontitis.
 
-The knowledge base is reusable across consultations. Working memory is consultation-specific and contains observations and derived conclusions; it does not count toward the 40 authored facts.
+The knowledge base is reusable across consultations. The Java consultation service passes current inputs directly to Prolog; intermediate deductions remain within inference processing. Consultation inputs and derived conclusions do not count toward the 40 authored facts.
 
-Forward chaining repeatedly applies satisfied rules until no new conclusions follow, recording fired rules and avoiding repeated derivations. Backward chaining evaluates a candidate condition's supporting rules and asks for missing evidence. Both read the shared rule base.
-
-The explanation facility records rule identifiers, supporting observations, intermediate conclusions, age/dentition applicability, and unmet premises. It supplies both “how was this result reached?” and “why is this question needed?” content.
+Forward chaining repeatedly applies satisfied rules until no new conclusions follow, avoiding repeated derivations. Backward chaining evaluates a candidate condition's supporting rules and asks for missing evidence. Both read the shared rule base and return candidate conclusions or requests for additional input.
 
 ## 3. Consultation data flow and lifecycle
 
@@ -72,9 +67,9 @@ The explanation facility records rule identifiers, supporting observations, inte
 2. Initialization locates packaged Prolog resources and native libraries, initializes JPL/SWI-Prolog, and loads the knowledge and inference modules. The UI becomes ready only after initialization succeeds.
 3. The user starts a consultation and supplies age, relevant dentition information, symptoms, history, and available findings.
 4. Java validates input formats and passes structured evidence to Prolog through JPL.
-5. The selected reasoning mode returns conclusions, missing-evidence questions, and explanation traces. Additional answers are added to the current consultation before reasoning continues.
-6. Java presents the returned results and traces without inventing diagnostic explanations or confidence percentages.
-7. Reset clears consultation observations, derived conclusions, and traces while retaining the reusable knowledge base. Exit closes active queries and application resources.
+5. The selected reasoning mode returns conclusions and missing-evidence questions. Additional answers are added to the current consultation before reasoning continues.
+6. Java presents the returned results without inventing clinical certainty percentages.
+7. Reset clears consultation inputs and derived conclusions while retaining the reusable knowledge base. Exit closes active queries and application resources.
 
 Prolog initialization and reasoning will run outside Swing's event-dispatch thread. Serialize consultation operations through one background worker and update Swing components on the event-dispatch thread. Prevent overlapping reasoning/reset actions and ensure an old result cannot overwrite a new consultation. This follows Swing's separation of UI and background work; see [Oracle's Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
 
@@ -115,11 +110,10 @@ Exact JDK/Prolog versions, supported OS versions and CPU architectures, installe
 | Prolog exception or malformed integration result | Report an application/integration error separately from a valid “no supported conclusion” result. |
 | Unknown or contradictory consultation evidence | Preserve uncertainty or identify the conflict; do not silently turn unknown into false. |
 | Repeated reasoning and reset | No duplicate conclusions, stale UI results, or evidence carried into another consultation. |
-| Explanation display | Display actual rule/evidence traces and missing-premise reasons returned by Prolog. |
 | UI responsiveness | The window remains responsive during initialization and reasoning. |
 | Cross-platform integration | Verify JPL initialization, module loading, both reasoning modes, result conversion, and query cleanup on macOS and Windows. |
-| Packaged application | On a clean target machine with no separately installed Java/Prolog, launch by icon, complete a case, view explanations, reset, and exit. Also test paths containing spaces. |
+| Packaged application | On a clean target machine with no separately installed Java/Prolog, launch by icon, complete a case, view results, reset, and exit. Also test paths containing spaces. |
 
-Reasoning correctness will be tested in Prolog; Java integration and packaged-launch tests will verify the desktop boundary. The [proposal's test plan](project-proposal.md#7-test-and-acceptance-plan) covers clinical case expectations and chaining agreement.
+Reasoning correctness will be tested in Prolog; Java integration and packaged-launch tests will verify the desktop boundary. The [proposal's test plan](project-proposal.md#7-test-and-acceptance-plan) covers acceptance criteria, and the [20 test cases](test-cases.md) provide manual question-and-answer data. They are specifications only and have not been executed.
 
 This document records the selected technical architecture. It does not claim that a working application, executable, clinical knowledge base, expert review, or passing tests already exist.
