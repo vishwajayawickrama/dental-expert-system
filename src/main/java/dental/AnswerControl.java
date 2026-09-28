@@ -69,7 +69,7 @@ public final class AnswerControl extends JPanel {
         }
         changing=false;
     }
-    public void reset(){setValue(question.key().equals("focus")?new Atom("full"):new Atom("unknown"));}
+    public void reset(){setValue(new Atom("unknown"));}
     public String displayed(){
         if(combo!=null)return combo.getSelectedItem().toString();
         return String.join(", ",buttons.values().stream().filter(AbstractButton::isSelected).map(AbstractButton::getText).toList());

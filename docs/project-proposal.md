@@ -6,7 +6,7 @@
 - **Repository:** [vishwajayawickrama/dental-expert-system](https://github.com/vishwajayawickrama/dental-expert-system)
 - **Course:** CM3321 — Logic Programming and Artificial Cognitive Systems
 - **Status:** First dentist-only desktop implementation. Expert identity, participation and clinical validation remain pending.
-- **Updated:** 28 September 2026
+- **Updated:** 29 September 2026
 
 DentalExplain assesses common tooth-pain and gum-symptom presentations using native SWI-Prolog rules and facts, with Java Swing integrated through JPL. The first deliverable targets Apple Silicon macOS. See the [architecture](architecture.md), [20 cases](test-cases.md), [user manual](user-manual.md) and [actual verification](verification.md).
 
@@ -18,7 +18,7 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 | Specific domain and scope | Dentist decision support for common tooth pain and gum symptoms across age groups. |
 | Expert-system anatomy | Block diagram below and detailed architecture. |
 | Human expert | Qualified dentist's knowledge-acquisition and validation role; identity/participation pending. |
-| Forward and backward chaining | Explicit fixed-point forward processing and independent recursive backward reasoning over shared rules. |
+| Forward chaining only | Evidence-driven fixed-point processing; this decision replaces the earlier requirement for both methods. |
 | Knowledge size | Exactly 25 meaningful production rules and 30 authored domain facts. |
 | Tests | 20 synthetic acceptance cases and additional boundary, engine and interface checks. |
 | Runnable deliverable | Development JAR and bundled macOS `.app` with native launcher and icon. |
@@ -29,7 +29,7 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 
 **Domain:** Dental diagnostic decision support for common tooth pain and gum symptoms in children, adolescents and adults. The interface is intended for dentists, who enter reported symptoms/history and explicitly supplied examination findings. This is not restricted to an educational or adult-only domain.
 
-The supported candidates are **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis**. Age is captured in completed years (0–120, or Unknown); dentition, affected tooth type and root maturity are supplied independently. No diagnosis is inferred from chronological age alone. Primary/immature teeth use appropriate question applicability and separate rule branches; clinical age thresholds and these rules require dentist review.
+The supported candidates are **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis**. Age is captured using five groups (0–5, 6–12, 13–17, 18–64 and 65–120 years, or Unknown); dentition, affected tooth type and root maturity are supplied independently. No diagnosis is inferred from chronological age alone. Primary/immature teeth use appropriate question applicability and separate rule branches; these clinical rules require dentist review. Age bands describe context and are not diagnostic thresholds.
 
 Included inputs cover symptom presence, location, duration categories, severity, thermal/sweet triggers, persistence, spontaneous/sleep pain, gum bleeding/redness/tenderness, relevant history, surface/radiographic findings, root maturity, pulp-test observations, percussion, mobility and periodontal examination measurements. Numeric findings use predefined measurement dropdowns. The dentist interprets examinations and images before entering their findings.
 
@@ -77,13 +77,13 @@ flowchart TD
 | Human expert | Supplies knowledge and reviews source interpretation, clinical combinations and pediatric applicability. |
 | Knowledge acquisition | Translates source/expert knowledge into reusable Prolog records with provenance. |
 | Knowledge base | Stores facts, shared production rules and the separate question schema. |
-| Inference engine | Validates current evidence and processes intermediate deductions within the assessment call using the selected chaining mode. |
+| Inference engine | Validates current evidence and processes intermediate deductions within the assessment call using forward chaining. |
 | JPL integration | Exchanges structured terms between Java and embedded SWI-Prolog. |
 | Interface | Collects predefined inputs, preserves navigation, presents outcomes and provides read-only knowledge viewing. |
 
 ## 5. Inference and results
 
-Forward chaining starts from supplied observations and applies satisfied rules until a fixed point, deduplicating conclusions. Backward chaining starts from a selected candidate and recursively evaluates its supporting rules and missing premises. Neither implementation relies on the other to establish a candidate. Both use the same rule definitions.
+Forward chaining starts from supplied observations and applies satisfied rules until a fixed point, deduplicating conclusions. It fits the evidence-first consultation, assesses the full catalogue, and permits multiple candidates without asking the dentist to nominate a diagnosis. This decision replaces the earlier requirement for both methods. A further forward pass propagates missing prerequisites through unblocked rules until stable; it does not recursively prove goals.
 
 Unknown or Not applicable findings do not satisfy required premises. A known failing premise blocks a rule. Results list candidate conditions and missing fields, without unsupported certainty percentages. The system returns no treatment instructions. Primary-tooth irreversible-pulpitis candidates explicitly retain the possible overlap with necrosis.
 
@@ -97,10 +97,10 @@ The development JAR requires the matching runtime files. The macOS application i
 
 The [20-case catalogue](test-cases.md) retains concrete reported symptoms, history and supplied findings, source references, expected/prohibited outcomes and review status. Its automated fixtures map durations and measurements to permitted categories without introducing arbitrary age-based conclusions.
 
-Both modes must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover value validation, age boundaries, contradictory inputs, incomplete evidence, unsupported goals/presentations, coexisting findings, termination, duplicate prevention, consultation reset and chaining independence. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
+Forward chaining must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover all five age groups, Unknown/missing groups, invalid boundary values, contradictory inputs, incomplete evidence, blocked rules, unsupported presentations, coexisting findings, termination, duplicate prevention and reset. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
 
 Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, save results and reset. Another-machine verification, Developer ID signing/notarization and Windows delivery remain follow-up work.
 
 ## 8. User manual
 
-The [manual](user-manual.md) describes packaged launch and developer commands, setup, questionnaire values, forward/backward assessment, result interpretation, editing, saving, new consultations, knowledge browsing and troubleshooting.
+The [manual](user-manual.md) describes packaged launch and developer commands, setup, questionnaire values, forward-only assessment, result interpretation, editing, saving, new consultations, knowledge browsing and troubleshooting.

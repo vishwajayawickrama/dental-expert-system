@@ -1,6 +1,6 @@
 # DentalExplain architecture
 
-**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.1.0. Verified on the development Apple Silicon Mac on 28 September 2026. Clinical expert review is pending.
+**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.2.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
 
 See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
 
@@ -26,15 +26,13 @@ A shell script requires its interpreter and dependencies. A `.jar` contains Java
 flowchart TD
     Expert["Human expert: qualified dentist; review pending"] --> Acquisition["Knowledge acquisition and source review"]
     Sources["Dental reference sources"] --> Acquisition
-    Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 shared rules"]
+    Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 rules"]
     Dentist["Dentist"] -->|"Predefined consultation selections"| UI["Java Swing interface and consultation controller"]
-    UI -->|"Structured observation terms, mode and goal"| JPL["JPL bridge"]
+    UI -->|"Structured observation terms"| JPL["JPL bridge"]
     JPL --> Engine["SWI-Prolog inference engine"]
     KB --> Engine
     Engine --> Forward["Forward fixed-point processing"]
-    Engine --> Backward["Recursive backward goal evaluation"]
     Forward -->|"Structured assessment"| JPL
-    Backward -->|"Structured assessment"| JPL
     JPL -->|"Status, candidates, missing fields and messages"| UI
     UI -->|"Questions and results"| Dentist
     KB -->|"Read-only catalogue"| JPL
@@ -53,12 +51,10 @@ A single background executor initializes Prolog and performs reasoning. The cata
 `Bridge.java` constructs `Atom`, numeric, list and `Compound` terms and closes each query. Labels never become clinical query text. The native libraries, boot image and modules are resolved relative to `dental.home`; `jpackage` sets that to its application directory. No Prolog process, HTTP server or command-line shell participates in an assessment.
 
 ```prolog
-assess(Observations, Mode, Goal,
+assess(Observations,
        result(Status, CandidateIds, MissingQuestionIds, Messages)).
-% Observations: [obs(age,16),obs(triggers,[cold]), ...]
-% Mode: forward | backward
-% Goal: all | caries | reversible_pulpitis | irreversible_pulpitis
-%             | gingivitis | periodontitis
+% Observations: [obs(age_group,adolescent),obs(triggers,[cold]), ...]
+% Java boundary: Bridge.assess(answers)
 catalog(questions, Records).
 catalog(facts, Records).
 catalog(rules, Records).
@@ -67,17 +63,19 @@ catalog(version, [Version]).
 catalog(question_sources, Records).
 ```
 
-Prolog validates the list shape, ground identifiers/values, schema membership, unique keys, age range, mode and goal before inference. Duplicate or arbitrary fields cannot bypass controlled UI input. Contradictory pain answers and incompatible tooth selections return conflicts.
+Prolog validates the list shape, ground identifiers/values, schema membership, unique keys and predefined age-group atoms before inference. Duplicate or arbitrary fields cannot bypass controlled UI input. Contradictory pain answers and incompatible tooth selections return conflicts.
 
 ### Prolog knowledge and reasoning
 
-`domain.pl` contains exactly **30 `domain_fact/5` records and 25 `rule/5` production rules**, with sources and pending review. Questions, condition labels, IDs, source metadata, observation lists and test fixtures are excluded from these counts. `questions.pl` contains 44 questions with control types, labels, explicit allowed values and conditional visibility. Display labels map directly to stable atoms or numbers; checkbox lists expand only explicitly selected items to presence. None maps all group items to No; unchecked items otherwise remain Unknown. Not applicable stays distinct and cannot satisfy a required clinical premise.
+`domain.pl` contains exactly **30 `domain_fact/5` records and 25 `rule/5` production rules**, with sources and pending review. Questions, condition labels, IDs, source metadata, observation lists and test fixtures are excluded from these counts. `questions.pl` contains 43 questions with control types, labels, explicit allowed values and conditional visibility. Display labels map directly to stable atoms or numbers; checkbox lists expand only explicitly selected items to presence. None maps all group items to No; unchecked items otherwise remain Unknown. Not applicable stays distinct and cannot satisfy a required clinical premise.
 
 `engine.pl` forward chaining repeatedly evaluates rule premises and adds unique conclusions until the sorted conclusion set stops changing. The finite rule conclusions guarantee termination. Intermediate deductions exist only within the current inference call.
 
-Backward chaining recursively evaluates the selected candidate's rules and intermediate premises, independently of forward chaining. A cycle guard terminates recursion. A conjunction fails if a known premise fails; unknown required premises produce missing-input identifiers. Alternative supporting rules succeed if any complete branch succeeds. The production rules are shared by both modes.
+**Forward chaining is the selected method.** Consultations begin with reported evidence and dentist-supplied findings. The engine evaluates all five conditions, permits coexisting candidates, and does not require the dentist to nominate a diagnosis. This evidence-first workflow suits forward chaining better than investigating a selected goal. This decision replaces the earlier requirement to implement both forward and backward chaining; backward processing and target filtering have been removed.
 
-Age is required and validated at 0–120 completed years. The engine does not invent age-based diagnoses or guess dentition/root maturity from age. Primary and immature permanent teeth follow their supplied dentition/root findings; mature-tooth thermal findings are hidden for those teeth. Age-group diagnosis thresholds remain subject to expert review. The five candidates can coexist; the forward focus limits assessment to tooth, gum or all targets. Backward mode investigates the explicitly selected target.
+After confirmed deductions reach a fixed point, a second forward pass propagates unresolved prerequisite sets across every unblocked rule until stable. A known false premise blocks the whole rule, including its pending-input requests. Unknown and Not applicable cannot establish a premise; their question identifiers propagate through intermediate deductions. Alternative rule branches carry their own pending sets. Missing inputs are collected only for candidates not already supported. This pass does not recursively prove candidate goals. Finite rule conclusions and finite sets of input identifiers, together with duplicate prevention, ensure termination.
+
+Age group is required: Unknown, 0–5 (`young_child`), 6–12 (`child`), 13–17 (`adolescent`), 18–64 (`adult`) or 65–120 (`older_adult`). Unknown requests completion; numeric ages and unrecognized values are rejected at the boundary. These bands describe consultation context, not diagnostic thresholds. The engine does not guess dentition or root maturity from age. Primary and immature permanent teeth follow supplied findings; mature-tooth thermal fields are hidden for those teeth. Every assessment considers all five candidates, which may coexist.
 
 The rule catalogue's purposes are:
 
@@ -133,4 +131,4 @@ Source commits exclude vendor runtimes, build outputs, application images and th
 
 Initialization errors are presented separately from clinical outcomes. Unknown evidence does not become false. Invalid input and contradictions block candidate output. Swelling, drainage or fever routes beyond this limited five-condition catalogue; it does not supply treatment or claim a complete urgent-care assessment.
 
-The 20 acceptance fixtures run through both modes in Prolog and through JPL. Additional tests cover schema values, invalid boundary input, age endpoints, recursion/fixed-point termination, duplicate prevention, coexisting findings, reset and independent backward reasoning. Swing component tests verify control round trips, exclusivity, conditional clearing and navigation. Actual native UI and bundled launch checks are recorded in [verification.md](verification.md). Passing synthetic software tests is not clinical validation.
+The 20 acceptance fixtures run through forward-only Prolog assessment and JPL. Additional tests cover all age groups, missing/Unknown groups, invalid values/identifiers, blocked and unresolved prerequisites, fixed-point termination, duplicate prevention, coexisting findings and reset. Swing component tests verify control round trips, exclusivity, conditional clearing and navigation. Actual native UI and bundled launch checks are recorded in [verification.md](verification.md). Passing synthetic software tests is not clinical validation.

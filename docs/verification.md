@@ -1,8 +1,8 @@
 # DentalExplain verification record
 
-**Run date:** 28 September 2026. **Application:** 1.0.0. **Knowledge:** 0.1.0. **Clinical review:** pending dentist review throughout.
+**Run date:** 29 September 2026. **Application:** 1.0.0. **Knowledge:** 0.2.0. **Clinical review:** pending dentist review.
 
-The checks below establish software behavior on the development Mac. They do not establish diagnostic sensitivity, specificity or suitability for clinical deployment. The reference report informed the welcome/setup/questionnaire/results flow; its clinical knowledge was not reused.
+This record covers the age-group and forward-only revision, which replaces the earlier two-method implementation. The checks establish software behavior on the development Mac, not clinical accuracy. All patient presentations used for verification are synthetic.
 
 ## Environment and deliverables
 
@@ -10,91 +10,67 @@ The checks below establish software behavior on the development Mac. They do not
 | --- | --- |
 | Platform | Apple Silicon, arm64; macOS 27.0, build 26A428 |
 | Java | Temurin Java 21.0.11 |
-| Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
-| Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
-| Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-234553/DentalExplain.app` |
-| Convenient local copy | `dist/DentalExplain.app` |
-| Signing | Local ad-hoc signing; not Developer ID signed or notarized |
+| Prolog/JPL | Official SWI-Prolog 10.0.2 universal distribution and matching vendor JPL |
+| Knowledge | 43 questions, 30 authored domain facts, 25 production rules; version 0.2.0 |
+| Development artifact | `build/stage/DentalExplain.jar`, matching `jpl.jar` and local runtime |
+| Timestamped image | `dist/release-20260929-001450/DentalExplain.app` |
+| Local bundle | `dist/DentalExplain.app` |
+| Installed bundle | `/Applications/DentalExplain.app`, updated and launched |
+| Previous installation backup | `/private/tmp/DentalExplain-before-0.2.0.app` |
+| Signing | Local ad-hoc signing; Developer ID signing/notarization pending |
 
-Runtime download checksum: SHA-256 `bf775f0b8d7880f4908dee513316013ef42a73793be392814fde2a0a8e9ddc5d`. Java/Prolog license resources are retained in the image. Generated artifacts, runtime files, screenshots and the supplied reference report are ignored by Git.
+Runtime download SHA-256: `bf775f0b8d7880f4908dee513316013ef42a73793be392814fde2a0a8e9ddc5d`. Bundled vendor license resources are retained. Runtime files, generated artifacts, screenshots and the reference report remain excluded from source commits.
 
 ## Automated outcomes
 
-Run `./scripts/test.sh` to reproduce these checks. The shell command exited successfully after the final save-dialog change. Local transcripts are in `build/reports/prolog-tests.txt` and `build/reports/java-tests.txt`.
+The final `./scripts/test.sh` run exited successfully. Transcripts are in `build/reports/prolog-tests.txt` and `build/reports/java-tests.txt`. The native Swing checks require macOS window access; an initial sandboxed Java run aborted when initializing native UI, and the subsequent permitted native run passed.
 
 | Check | Actual outcome |
 | --- | --- |
-| TC01–TC14 in forward and backward modes | PASS: all 14 target candidates supported by both modes |
-| TC15–TC20 in both modes | PASS: missing age, invalid age, missing tooth type, conflict, outside scope and blank reset input returned their expected statuses without candidates |
-| Java/JPL acceptance integration | PASS: 40 assessments, covering all 20 cases in both modes |
-| Prolog unit tests | PASS: 21 tests |
-| Age/identifier validation | PASS: age -2/121/fractional values, arbitrary values, duplicate fields, invalid mode/goal and incompatible tooth selections rejected; endpoints 0/120 accepted as ages |
-| Reasoning | PASS: fixed-point termination and duplicate prevention; recursive backward evaluation independent of forward closure; missing inputs and coexisting candidates |
-| Catalogue/control mapping | PASS: every allowed value in all 44 question schemas validated by Prolog and round-tripped by the Swing controls; dropdowns non-editable; accessible labels present |
-| Checkbox semantics | PASS: substantive multiple selection, mutually exclusive None/Unknown/Not applicable; unchecked triggers remain Unknown, explicit None becomes No |
-| Swing lifecycle | PASS: selections preserved across back navigation, hidden thermal field cleared/excluded, reset clears answers, delayed worker result discarded |
+| TC01–TC14 | PASS: every expected target supported through forward-only assessment |
+| TC15–TC20 | PASS: missing age group, invalid numeric group, missing tooth type, contradictory answers, outside scope and blank consultation return expected statuses without candidates |
+| Java/JPL integration | PASS: 20 assessments, including expected and prohibited-outcome assertions |
+| Prolog unit tests | PASS: 27 checks; some fixture-based checks retain harmless choicepoints |
+| Age-group boundary | PASS: all five atoms accepted; absent/Unknown group requests completion; −2, other numeric values, unlisted atoms and legacy `age` identifiers rejected |
+| Other boundary checks | PASS: removed `focus`, arbitrary values, duplicate fields, incompatible tooth selections and mixed checkbox alternatives rejected |
+| Reasoning | PASS: confirmed and pending forward propagation terminate; duplicate conclusions prevented; known negative premises block missing requests; Unknown/Not applicable cannot support required premises |
+| Coexisting candidates | PASS: caries and supported pulpitis coexist; diagnoses unchanged when only a valid age group changes |
+| Catalogue and controls | PASS: 43 schemas; every allowed choice validates and round-trips; all clinical dropdowns non-editable and accessible labels present |
+| Checkbox semantics | PASS: None/Unknown/Not applicable exclusive; unchecked substantive items remain Unknown; explicit None supplies negative trigger observations |
+| Swing lifecycle | PASS: navigation preserves age group, conditional fields clear/exclude hidden responses, reset clears answers and discards delayed results |
+| Saved snapshot | PASS: age-group atom and displayed band, version 0.2.0 and Forward chaining method present; no saved goal |
 
-TC04–TC09 also return caries in forward mode where lesion findings support it. Backward mode returns the selected pulpitis target. This is agreement on the target, not an assertion that both modes must list identical candidates when they evaluate different target sets. Detailed per-case actual responses are in [test-cases.md](test-cases.md).
+TC04–TC09 also support caries where supplied lesion findings establish it. TC10–TC14 request missing caries findings while retaining their supported gum candidate: full-catalogue assessment no longer filters targets. See the individual records in [test-cases.md](test-cases.md). TC20 includes a blank-input fixture, a separate TC11 → blank engine check, and Swing lifecycle verification. The 20 fixtures were automated rather than all manually entered through the interface.
 
-TC20 has a blank-input acceptance fixture plus a separate engine test that assesses TC11 then blank inputs in both modes. Swing and native UI reset checks cover the consultation lifecycle separately; the 20 catalogue cases were automated rather than all manually entered through the UI.
+## Interface observations
 
-## Native interface observations
+The installed bundle was launched and its setup, questionnaire, candidate results, knowledge workspace, save dialog and reset flow were exercised using native macOS UI automation. Setup was inspected at 1180×850 and 1180×680. Automated Swing windows used the same look-and-feel and bundled Latin Modern Sans defaults to capture setup, questionnaire, populated results and knowledge screens at both 1180×850 and the 960×680 minimum; those component renderings were visually inspected. Minimum-width inspection used Swing rendering rather than a successful manual window-edge resize.
 
-The packaged application was exercised through native macOS UI automation and screenshots. Welcome, setup, questionnaire, results and knowledge workspace were visually inspected. Text and controls remain readable in the inspected 1180×850 window; the questionnaire and long results scroll. The window is resizable with a 960×680 minimum. Exhaustive window-size and screen-reader testing remains unperformed.
+The setup retains its white form/viewport/dropdowns, 20 px internal padding, two columns, existing spacing and navy buttons. The age dropdown contains only Unknown and the five bands. Assessment focus, reasoning mode and candidate selectors are absent. Questionnaire and results scroll at minimum height; controls/actions remain readable. Long knowledge cells remain horizontally scrollable and have a detail panel. Exhaustive assistive-technology testing remains pending.
 
 | Walkthrough | Observed result |
 | --- | --- |
-| Finder icon launch | The tooth-icon application opens the Swing welcome screen and initializes the catalogue |
-| Setup and questionnaire | Predefined age/dentition/tooth selections and Yes/No/Unknown/Not applicable controls are available; scrolling exposes grouped professional findings |
-| Candidate assessment | Supplied cavitation/softened tissue produces candidate caries; backward caries assessment also exercised |
-| Incomplete assessment | Blank age requests age and displays no candidate |
-| Edit and back navigation | Existing selections remain available when editing and returning to setup |
-| Knowledge viewing | Questions (44), Facts (30), Rules (25) tabs display read-only records, sources and pending review; searching `f07` filters the facts table and row selection displays full content |
-| Result saving | Native macOS picker saves UTF-8 inputs/results; `/private/tmp/DentalExplain-candidate-result.txt` inspected for age 6, selected observations, mode, version and caries candidate |
-| New consultation | Previous selections/results cleared; blank assessment requests age |
-| Keyboard controls | Dropdown navigation and native save-folder shortcuts exercised; component tests verify focusable standard controls and accessible labels. Full assistive-technology audit remains pending |
+| Age group | Selected 18–64 years from the dropdown; selection survived questionnaire → edit → setup navigation |
+| Clinical input | Selected No tooth pain and Yes dentist-interpreted coronal carious lesion using predefined controls |
+| Candidate result | Dental caries supported; missing periodontal findings requested for unresolved gum conditions |
+| Knowledge viewing | Read-only Questions (43), Facts (30), Rules (25); age-group mappings and pending-review sources displayed |
+| Native saving | Native picker saved `/private/tmp/DentalExplain-forward-result.txt`; file inspection confirmed `age_group = adult`, `18-64 years`, Forward chaining, knowledge 0.2.0 and caries candidate; no goal |
+| Reset | Fresh consultation restored Unknown age group; assessment returned incomplete with age-group request and no old candidate |
 
-During development, a Swing save-dialog interaction failed to reliably accept the automated filename entry. The final build uses AWT's native `FileDialog`; selecting a filename/destination and exporting the result then succeeded. Duration labels were changed to ASCII hyphens after an observed JPL label-encoding issue, and a label-integrity assertion now passes.
+Evidence is in ignored `build/ui-screenshots/forward-*.png` and `component-*-1180x850.png` / `component-*-960x680.png`. Native macOS chrome and file-picker fonts remain system-managed; app-owned controls use bundled Latin Modern Sans.
 
-Local screenshot evidence includes `build/ui-screenshots/results.png`. These files are build evidence, not committed patient records. The saved synthetic text files contain no patient identifiers.
+## Bundle checks
 
-## Bundle verification
-
-`codesign --verify --deep --strict --verbose=2 dist/DentalExplain.app` reported **valid on disk** and **satisfies its Designated Requirement**. The final launcher also succeeded with an empty environment except `PATH=/usr/bin:/bin`:
+Both the local bundle and installed `/Applications/DentalExplain.app` passed `codesign --verify --deep --strict --verbose=2`, reporting **valid on disk** and **satisfies its Designated Requirement**. Both launchers passed verification with an empty environment except `PATH=/usr/bin:/bin`:
 
 ```text
-Bundled runtime: Java 21.0.11; SWI/JPL ready; KB 0.1.0; 44 questions
+Bundled runtime: Java 21.0.11; SWI/JPL ready; KB 0.2.0; 43 questions
 ```
 
-The application resolves knowledge, boot resources, JPL and its native dependencies from its bundle. It was launched from the assignment path, which contains multiple spaces, without terminal configuration. This verifies the development Mac; it is not a second-machine clean-install or Gatekeeper distribution test.
+The local image resides in the assignment path containing spaces; verification resolves bundled knowledge, boot resources, JPL and native dependencies without terminal configuration or a separately installed runtime. The updated installed application opened successfully through its app bundle.
 
-## Pending verification
+## Pending work
 
-Qualified-dentist review (including pediatric rules), clinical validation, another-Mac clean-install testing, Developer ID signing/notarization, Intel Mac testing and Windows packaging are pending. No passing clinical review or Windows executable is claimed. No knowledge editor, treatment prescribing or patient database is included.
+Qualified-dentist review including pediatric rules, clinical validation, another-Mac clean-install testing, Developer ID signing/notarization, Intel Mac testing and Windows packaging remain pending. Software test passes are separate from expert approval.
 
-See the [user manual](user-manual.md) for launch and consultation instructions and the [architecture](architecture.md) for the shared knowledge and inference design.
-
-## Layout revision
-
-The top brand banner and bottom status bar were removed, and the window title changed to **DentalExplain • Expert system**. The revised app was rebuilt, launched and visually inspected at 1180×850; both bars are absent and the welcome actions remain visible. The updated bundle passed signature verification and the clean-environment Java/Prolog runtime check. The automated clinical suite above was not rerun for this layout-only revision.
-
-## Font revision
-
-All app-owned Swing text uses the SansSerif family, with size and weight providing heading hierarchy. Shared defaults cover labels, buttons, dropdowns, radio buttons, checkboxes, tabs, search fields, table headers, menus and Swing dialogs. Native macOS window chrome and the system file picker retain system typography. The rebuilt app passed bundled-runtime and signature checks; welcome and knowledge screens were visually inspected at 1180×850. Clinical tests were not rerun for this font-only change.
-
-## Inter font update
-
-The generic SansSerif family was replaced by bundled Inter 4.1 Regular and Bold from the [official release](https://github.com/rsms/inter/releases/tag/v4.1). Original OpenType files and their SIL Open Font License are included in source resources and the JAR. A headless check loading the built JAR verified the physical font names Inter Regular and Inter Bold. The packaged app passed runtime and signature checks, and the welcome screen was visually inspected at 1180×850. Native macOS chrome/file-picker typography remains system-managed; clinical tests were not rerun.
-
-## Reference font update
-
-The supplied reference resembles Computer Modern Sans. Bundled [Latin Modern Sans](https://ctan.org/pkg/lm), based on Computer Modern, now replaces Inter throughout app-owned controls. Page headings use regular weight to match the reference; section and question labels retain bold weight. Original Regular and Bold OpenType files, attribution, the GUST Font License and LPPL 1.3c are included in source resources and the JAR.
-
-A headless check of the rebuilt JAR resolved `LMSans10-Regular` and `LMSans10-Bold` and verified glyph coverage for the application's title punctuation and age-range symbols. Clean builds remove generated classes before copying resources; inspection confirmed the JAR contains the new fonts with no stale Inter resources. The packaged app passed bundled-runtime and signature checks. The consultation setup was visually inspected at 1180×850 with readable headings, labels, dropdowns and buttons; screenshot evidence is `build/ui-screenshots/latin-modern-setup.png`. Clinical tests were not rerun for this typography change.
-
-## Setup spacing and background update
-
-The setup form and scroll viewport now use white backgrounds matching the page, with 20 px internal padding and no outer scroll-pane border. Setup dropdowns, reasoning mode and the backward candidate selector also use white backgrounds. The two-column layout, 28 px column gap, 22 px row gap, fonts and navy actions are preserved; questionnaire section colors remain unchanged.
-
-The rebuilt packaged app was inspected in forward and backward modes at 1180×850 and the 960×680 minimum. Fields and actions remain readable without horizontal clipping; the lowest backward candidate field is fully reachable by vertical scrolling at minimum height. A synthetic age of 6, backward mode and the caries target remained selected after navigating to the questionnaire and back. Screenshot evidence is in `build/ui-screenshots/setup-white-*.png`. Packaging, the bundled Java/Prolog runtime check and strict signature verification passed. Clinical inference tests were not rerun for this setup-only styling change.
+See the [user manual](user-manual.md), [architecture and forward-chaining justification](architecture.md), and [proposal](project-proposal.md).

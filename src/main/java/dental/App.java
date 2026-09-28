@@ -33,12 +33,9 @@ public final class App extends JFrame {
     private Bridge bridge;
     final Map<String,AnswerControl> fields=new LinkedHashMap<>();
     private final JPanel screens=new JPanel(new CardLayout());
-    final JComboBox<String> mode=new JComboBox<>(new String[]{"Forward chaining","Backward chaining"});
-    final JComboBox<Bridge.Option> goal=new JComboBox<>();
     private final JTextArea resultText=new JTextArea();
     private final JButton assessButton=button("Assess presentation",'A');
     private final JButton saveButton=button("Save result",'S');
-    private final JPanel goalRow=new JPanel(new BorderLayout(8,8));
     private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"dental-inference");t.setDaemon(true);return t;});
     long generation;
     private String savedResult;
@@ -76,8 +73,6 @@ public final class App extends JFrame {
     void initialize(Bridge b){
         bridge=b;
         for(Bridge.Question q:b.questions)fields.put(q.key(),new AnswerControl(q,this::refreshVisibility));
-        for(var c:b.conditions.entrySet())goal.addItem(new Bridge.Option(new Atom(c.getKey()),c.getValue()));
-        goal.setEditable(false);mode.setEditable(false);
         screens.add(welcome(),"welcome");screens.add(setup(),"setup");screens.add(questionnaire(),"questionnaire");screens.add(results(),"results");
         screens.add(knowledge(),"knowledge");refreshVisibility();show("welcome");
     }
@@ -93,13 +88,9 @@ public final class App extends JFrame {
         JButton kb=button("View knowledge base",'K');kb.addActionListener(e->show("knowledge"));page.add(actions(kb,start),BorderLayout.SOUTH);return page;
     }
     private JPanel setup(){
-        JPanel p=page("01 / Consultation setup","Record age and the affected dentition. Choose how the engine will reason.");
+        JPanel p=page("01 / Consultation setup","Record the age group and affected dentition for the assessment.");
         JPanel grid=new JPanel(new GridLayout(0,2,28,22));grid.setOpaque(false);
         fields.values().stream().filter(f->f.question.section().equals("setup")).forEach(f->{f.combo.setBackground(Color.WHITE);grid.add(f);});
-        mode.setBackground(Color.WHITE);goal.setBackground(Color.WHITE);
-        JPanel reasoning=new JPanel(new BorderLayout(8,8));reasoning.setOpaque(false);reasoning.add(new JLabel("Reasoning mode"),BorderLayout.NORTH);reasoning.add(mode,BorderLayout.CENTER);grid.add(reasoning);
-        goalRow.setOpaque(false);goalRow.add(new JLabel("Candidate to investigate"),BorderLayout.NORTH);goalRow.add(goal,BorderLayout.CENTER);grid.add(goalRow);
-        mode.addActionListener(e->{goalRow.setVisible(mode.getSelectedIndex()==1);invalidateAssessment();});
         JPanel holder=new JPanel(new BorderLayout());holder.setBackground(Color.WHITE);holder.setBorder(new EmptyBorder(20,20,20,20));holder.add(grid,BorderLayout.NORTH);
         JScrollPane scroll=new JScrollPane(holder);scroll.setBorder(BorderFactory.createEmptyBorder());scroll.setBackground(Color.WHITE);scroll.getViewport().setBackground(Color.WHITE);scroll.getVerticalScrollBar().setUnitIncrement(24);p.add(scroll,BorderLayout.CENTER);
         JButton back=button("Welcome",'W');back.addActionListener(e->show("welcome"));JButton next=button("Continue to questionnaire",'C');next.addActionListener(e->{refreshVisibility();show("questionnaire");});p.add(actions(back,next),BorderLayout.SOUTH);return p;
@@ -163,31 +154,30 @@ public final class App extends JFrame {
             boolean show=visible(f.question.visibility());
             if(!show)f.reset();f.setVisible(show);
         }
-        goalRow.setVisible(mode.getSelectedIndex()==1);invalidateAssessment();
+        invalidateAssessment();
         if(questionnaire!=null){questionnaire.revalidate();questionnaire.repaint();}
     }
     Map<String,Term> answers(){
         Map<String,Term> a=new LinkedHashMap<>();fields.forEach((k,f)->{if(visible(f.question.visibility()))a.put(k,f.value());});return a;
     }
     void invalidateAssessment(){generation++;savedResult=null;saveButton.setEnabled(false);}
-    void reset(){generation++;fields.values().forEach(AnswerControl::reset);mode.setSelectedIndex(0);if(goal.getItemCount()>0)goal.setSelectedIndex(0);resultText.setText("");savedResult=null;saveButton.setEnabled(false);assessButton.setEnabled(true);assessButton.setText("Assess presentation");refreshVisibility();if(questionnaire!=null)questionnaire.scrollRectToVisible(new Rectangle(0,0,1,1));}
+    void reset(){generation++;fields.values().forEach(AnswerControl::reset);resultText.setText("");savedResult=null;saveButton.setEnabled(false);assessButton.setEnabled(true);assessButton.setText("Assess presentation");refreshVisibility();if(questionnaire!=null)questionnaire.scrollRectToVisible(new Rectangle(0,0,1,1));}
     void assess(){
-        Map<String,Term> input=answers();String method=mode.getSelectedIndex()==0?"forward":"backward";
-        String target=method.equals("forward")?"all":((Bridge.Option)goal.getSelectedItem()).value().name();
+        Map<String,Term> input=answers();
         long ticket=++generation;assessButton.setEnabled(false);assessButton.setText("Assessing…");
-        worker.submit(()->{try{Bridge.Result r=bridge.assess(input,method,target);SwingUtilities.invokeLater(()->{
+        worker.submit(()->{try{Bridge.Result r=bridge.assess(input);SwingUtilities.invokeLater(()->{
             assessButton.setEnabled(true);assessButton.setText("Assess presentation");if(ticket!=generation){return;}
-            present(r,input,method,target);show("results");
+            present(r,input);show("results");
         });}catch(Throwable e){SwingUtilities.invokeLater(()->{assessButton.setEnabled(true);assessButton.setText("Assess presentation");if(ticket!=generation)return;JOptionPane.showMessageDialog(this,e.toString(),"Runtime error",JOptionPane.ERROR_MESSAGE);});}});
     }
-    private void present(Bridge.Result r,Map<String,Term> input,String method,String target){
+    private void present(Bridge.Result r,Map<String,Term> input){
         String title=switch(r.status()){case "candidates"->"Supported candidate conditions";case "incomplete"->"Additional information needed";case "conflict"->"Clarify conflicting selections";case "invalid"->"Correct invalid inputs";case "outside_scope"->"Outside the supported scope";default->"No supported conclusion";};resultTitle.setText(title);
         StringBuilder out=new StringBuilder();for(String c:r.candidates())out.append("• ").append(bridge.conditions.get(c)).append("\n");
         if(!r.candidates().isEmpty())out.append("\n");for(String message:r.messages())out.append(message).append("\n\n");
         if(!r.missing().isEmpty()){out.append("Missing or unusable findings:\n");for(String k:r.missing())out.append("• ").append(fields.containsKey(k)?fields.get(k).question.label():k).append("\n");}
         if(r.candidates().contains("irreversible_pulpitis")&&input.getOrDefault("tooth_type",new Atom("unknown")).name().equals("primary"))out.append("\nPrimary-tooth findings can overlap with pulp necrosis; this candidate requires dentist review.\n");
         resultText.setText(out.toString());resultText.setCaretPosition(0);
-        StringBuilder record=new StringBuilder("DentalExplain consultation\nSaved assessment: "+Instant.now()+"\nKnowledge version: "+bridge.version+"\nExpert review: pending\nMode: "+method+"\nGoal: "+target+"\n\nINPUTS\n");
+        StringBuilder record=new StringBuilder("DentalExplain consultation\nSaved assessment: "+Instant.now()+"\nKnowledge version: "+bridge.version+"\nExpert review: pending\nMethod: Forward chaining\n\nINPUTS\n");
         input.forEach((k,v)->record.append(k).append(" = ").append(v).append(" | ").append(fields.get(k).displayed()).append("\n"));record.append("\nSTATUS: ").append(r.status()).append("\n\n").append(out);savedResult=record.toString();saveButton.setEnabled(true);
     }
     private void save(){

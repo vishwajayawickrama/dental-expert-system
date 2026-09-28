@@ -1,6 +1,6 @@
 # DentalExplain user manual
 
-**Audience:** Dentists entering reported history/symptoms and findings they have already obtained and interpreted. Application bundle 1.0.0; knowledge 0.1.0; clinical expert review pending.
+**Audience:** Dentists entering reported history/symptoms and findings they have already obtained and interpreted. Application bundle 1.0.0; knowledge 0.2.0; clinical expert review pending.
 
 ## Installation and launch
 
@@ -11,11 +11,9 @@ Wait for the welcome screen. The window title is DentalExplain • Expert system
 ## Consultation setup
 
 1. Choose **Start consultation**.
-2. Select age in completed years from 0–120. Unknown is available, but assessment requires a known age. Age never automatically sets dentition.
+2. Select **Age group**: 0–5, 6–12, 13–17, 18–64 or 65–120 years. Unknown is the default and requests completion before assessment. Age group never automatically sets dentition or determines a diagnosis.
 3. Choose dentition, affected tooth type, FDI tooth identifier and region. For multiple teeth, a second-tooth field appears. Use Not applicable for an item that does not apply, such as a single-tooth identifier for generalized gingival symptoms.
-4. Select assessment focus: Full assessment evaluates all five targets; Tooth pain evaluates the three tooth targets; Gum symptoms evaluates the two gum targets.
-5. Select Forward chaining to assess evidence against the chosen focus. Backward chaining reveals a candidate dropdown and investigates that selected condition, regardless of focus.
-6. Choose **Continue to questionnaire**.
+4. Choose **Continue to questionnaire**. All five supported conditions are assessed using forward chaining; there is no focus, reasoning-mode or candidate selector.
 
 ## Questionnaire
 
@@ -44,19 +42,19 @@ Choose **Assess presentation**. The Assess button displays Assessing… while re
 | Supported candidate conditions | One or more rule-supported candidates. Coexisting caries and pulpitis are permitted. |
 | Additional information needed | No target can yet be supported; select the requested predefined findings and reassess. |
 | Clarify conflicting selections | Correct contradictory pain answers or incompatible tooth selections before assessment. |
-| Correct invalid inputs | Boundary validation rejected an invalid identifier/value. Negative age is impossible in the UI but rejected at the Prolog boundary. |
+| Correct invalid inputs | Boundary validation rejected an invalid identifier/value. Numeric age-group values (including −2) and unrecognized identifiers are rejected at the Prolog boundary. |
 | Outside supported scope | The presentation requires assessment beyond the limited catalogue. |
 | No supported conclusion | No supported rule combination follows; this does not exclude other dental conditions. |
 
 These are candidate outputs, not confirmed diagnoses, certainty scores or treatment prescriptions. Primary-tooth irreversible-pulpitis symptoms can overlap with necrosis. All clinical rules and acceptance expectations await dentist review.
 
-**Edit answers** returns to the questionnaire. To change setup or reasoning mode, use Back to setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels, mode, goal, knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
+**Edit answers** returns to the questionnaire. To change setup, use Back to setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels including the selected age group, method (Forward chaining), knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
 
 **New consultation** clears all selections and the result, restores defaults, and rejects delayed responses from the previous consultation. Saved text files remain on disk. Exiting closes the app; consultation selections are not restored on relaunch.
 
 ## Knowledge workspace
 
-From Welcome choose **View knowledge base**. Questions (44), Facts (30) and Rules (25) are separate read-only tabs. Search filters the current table. Select a row to view its full content/source/review status below; horizontal and vertical scrollbars expose long values. All clinical knowledge has pending review status. Editing knowledge through the interface is not supported.
+From Welcome choose **View knowledge base**. Questions (43), Facts (30) and Rules (25) are separate read-only tabs. Search filters the current table. Select a row to view its full content/source/review status below; horizontal and vertical scrollbars expose long values. All clinical knowledge has pending review status. Editing knowledge through the interface is not supported.
 
 ## Developer commands
 
@@ -81,7 +79,7 @@ The bootstrap needs internet access. Build/launch/tests use the local runtime. `
 | Missing JPL or native library / initialization error | Use the complete application bundle, or rerun bootstrap/build for development. Match SWI 10.0.2, vendor JPL and Java 21; do not substitute individual libraries. |
 | Wrong CPU architecture | Use the Apple Silicon package. Windows and Intel-Mac packages have not been verified. |
 | Missing `boot.prc` or knowledge module | Restore/rebuild the intact bundle; do not move its internal resources individually. |
-| Blank/Unknown age | Select a completed-year value before assessment. |
+| Blank/Unknown age group | Select a predefined age group before assessment. |
 | Missing evidence request | Enter only findings actually supplied. Unknown must not be changed to No to force an answer. |
 | Contradictory answers | Correct the specifically reported contradiction and reassess. |
 | Cannot save | Choose a writable destination and valid filename; retry. The app reports filesystem errors. |

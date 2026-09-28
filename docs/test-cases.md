@@ -1,6 +1,6 @@
 # DentalExplain: 20 acceptance test cases
 
-**Status:** Implemented and executed against knowledge v0.1.0 using SWI-Prolog and the Java/JPL bridge. All 20 cases passed the software assertions in both modes. Clinical expectations remain **Pending dentist review**; software passes do not establish clinical accuracy.
+**Status:** Implemented and executed against knowledge v0.2.0 using SWI-Prolog and the Java/JPL bridge. All 20 cases passed the software assertions using forward chaining. Clinical expectations remain **Pending dentist review**; software passes do not establish clinical accuracy.
 
 These are synthetic cases, not real patient records. They cover 14 diagnostic presentations and 6 input/lifecycle edge cases. The [proposal](project-proposal.md) defines the scope; the [architecture](architecture.md) defines Java Swing, JPL, and SWI-Prolog integration.
 
@@ -13,22 +13,20 @@ These are synthetic cases, not real patient records. They cover 14 diagnostic pr
 - Ages, durations, severity descriptions, and measurement values are authored test data, not universal diagnostic thresholds. Dentition is explicitly supplied rather than inferred from age.
 - Primary/immature-tooth thermal and electric results are not relied upon. Candidate pulpitis results remain provisional, particularly when necrosis has not been excluded. This follows [AAPD diagnostic guidance](https://www.aapd.org/media/Policies_Guidelines/BP_PulpTherapy.pdf).
 
-For TC01–TC14, start a fresh consultation, enter all rows, and run forward chaining. Reset, re-enter identical values, and evaluate the named target through backward chaining. The target condition is selected as the backward-chaining goal only; it is never supplied as a clinical finding. Both runs must include the expected candidate. Coexisting supported conditions, such as caries with pulpitis, are allowed. Do not report a diagnosis as confirmed, prescribe treatment, or invent certainty percentages.
-
-For TC15–TC19, attempt both reasoning modes with the listed input and check the validation or follow-up response. TC20 checks reset after each mode. Expected messages below specify meaning; equivalent wording is acceptable. Record a pass only when the candidate/message and prohibited-outcome checks succeed in both modes against the implemented engine. Clinical expectations must be reviewed before the cases are used to claim clinical correctness.
+For TC01–TC14, start a fresh consultation, enter the controlled selections and run forward chaining. Each result must include its expected target and respect prohibited outcomes. Coexisting supported conditions, such as caries with pulpitis, are allowed. For TC15–TC19 check the validation or follow-up response; TC20 checks reset. Equivalent message wording is acceptable. No condition is entered as evidence or selected as a goal. Software passes do not replace dentist review.
 
 
 ## Mapping the catalogue to controlled inputs
 
 The question-and-answer tables describe synthetic clinical observations. The executable fixtures use only identifiers from `knowledge/questions.pl`; unspecified findings remain Unknown. Narrative details without a corresponding supported question (such as exact radiographic depth or pulp exposure) are contextual descriptions and are not parsed or inferred. Do not enter the expected condition as evidence.
 
-- Exact ages and FDI identifiers map directly to the non-editable dropdown values. Tooth type and root maturity are supplied explicitly. TC01/TC04/TC07 use mixed dentition with a primary affected tooth; TC05 supplies an immature permanent tooth.
+- Age values in the original synthetic scenarios map to one of five predefined age groups; exact ages are no longer submitted. FDI identifiers map to the non-editable dropdown values. Tooth type and root maturity are supplied explicitly. TC01/TC04/TC07 use mixed dentition with a primary affected tooth; TC05 supplies an immature permanent tooth.
 - Reported severity maps to Mild, Moderate or Severe. Brief post-trigger pain maps to `brief`; prolonged pain maps to `lingering`. A few days maps to 1-7 days, weeks to 1-4 weeks, months to 1-6 months, and TC14's longer history to Over 6 months. The duration categories are input labels, not diagnostic thresholds.
 - Cold, Hot and Sweet map to the corresponding checkbox identifiers. Explicitly absent relevant history maps to None reported. Omitted triggers stay Unknown; TC07's spontaneous presentation does not silently establish that all triggers are absent.
 - A probing range is represented by its supplied maximum: 1-3 mm becomes 3 mm, TC13's 5-6 mm becomes 6 mm and TC14's 6-7 mm becomes 7 mm. Supplied attachment loss is represented similarly. TC10/TC11/TC12 use bleeding-on-probing values 30%/40%/35%. Findings not measured remain Unknown.
-- TC16 bypasses the UI and submits `obs(age,-2)` to both Prolog and JPL validation boundaries. The UI cannot select a negative age.
+- TC16 bypasses the UI and submits `obs(age_group,-2)` to Prolog and JPL validation boundaries. Numeric values are invalid for this atom-valued field, even if they describe a valid exact age; the UI permits only the listed groups.
 - TC17 first requests affected tooth type. Additional examination requests can follow after it is supplied; the engine does not invent a conclusion while this required field is unavailable.
-- TC20's blank-input fixture verifies the post-reset engine response. Separate Prolog tests assess TC11 then blank inputs in both modes. Swing lifecycle tests verify clearing and rejection of a delayed worker result. The native UI also exercises New consultation after a completed candidate assessment.
+- TC20's blank-input fixture verifies the post-reset engine response. Separate Prolog tests assess TC11 then blank inputs using forward chaining. Swing lifecycle tests verify clearing and rejection of a delayed worker result. The native UI also exercises New consultation after a completed candidate assessment.
 
 Unchecked substantive checkbox items remain Unknown unless None is explicitly selected; Unknown, None and Not applicable are distinct. Hidden inapplicable controls are cleared and excluded by the interface. The detailed results and packaging/UI observations are recorded in [verification](verification.md).
 
@@ -50,12 +48,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 | [TC12](#tc12) | Gingivitis candidate in an adult, age 45 | Candidate gingivitis |
 | [TC13](#tc13) | Periodontitis candidate in an adult, age 38 | Candidate periodontitis |
 | [TC14](#tc14) | Periodontitis candidate in an older adult, age 68 | Candidate periodontitis |
-| [TC15](#tc15) | Missing age | Please enter age before completing the assessment. |
-| [TC16](#tc16) | Invalid negative age | Age must be a valid non-negative value. Please correct it. |
+| [TC15](#tc15) | Missing age group | Please select age group before completing the assessment. |
+| [TC16](#tc16) | Invalid numeric age-group value | Age group must be a listed predefined value. Please correct it. |
 | [TC17](#tc17) | Required dentition and examination information unavailable | Please provide the affected tooth type and available dental examination findings. Assessment incomplete. |
 | [TC18](#tc18) | Contradictory tooth-pain answers | Your tooth-pain answers conflict. Please clarify whether tooth pain is present. |
 | [TC19](#tc19) | Jaw clicking outside the supported presentation scope | This presentation is outside the supported tooth-pain and gum-symptom scope. No supported dental conclusion. |
-| [TC20](#tc20) | Reset after a completed consultation | Please enter age and start a new consultation. No previous candidate or input remains. |
+| [TC20](#tc20) | Reset after a completed consultation | Please select age group and start a new consultation. No previous candidate or input remains. |
 
 ## Diagnostic cases
 
@@ -65,7 +63,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 6 |
+| What is the age group? | User/parent | 6–12 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Mixed dentition; lower-right primary second molar (FDI 85), explicitly confirmed primary. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No; duration/severity: Not applicable. A cavity was noticed 2 weeks ago. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Not applicable; no pain episodes. |
@@ -88,12 +86,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate dental caries | Candidate dental caries |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc02"></a>
 
@@ -101,7 +99,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 12 |
+| What is the age group? | User/parent | 6–12 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent affected tooth: upper-right first molar (FDI 16). |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No; duration/severity: Not applicable. Food trapping noticed for 3 weeks. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Not applicable; no pain episodes. |
@@ -124,12 +122,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate dental caries | Candidate dental caries |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc03"></a>
 
@@ -137,7 +135,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 35 |
+| What is the age group? | User/parent | 18–64 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; lower-left first molar (FDI 36). |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No; duration/severity: Not applicable. Food trapping noticed for 1 month. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Not applicable; no pain episodes. |
@@ -160,12 +158,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate dental caries | Candidate dental caries |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate dental caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc04"></a>
 
@@ -173,7 +171,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 8 |
+| What is the age group? | User/parent | 6–12 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Mixed dentition; lower-left primary second molar (FDI 75), explicitly confirmed primary. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 75, mild, present for 4 days. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Sweet foods; episode resolves within about 2 seconds of removing the stimulus. |
@@ -196,12 +194,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc05"></a>
 
@@ -209,7 +207,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 14 |
+| What is the age group? | User/parent | 13–17 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent affected tooth: upper-right second molar (FDI 17); dentist reports immature roots. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 17, mild, present for 5 days. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Cold drinks; episode resolves within about 3 seconds of removing the stimulus. |
@@ -232,12 +230,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc06"></a>
 
@@ -245,7 +243,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 42 |
+| What is the age group? | User/parent | 18–64 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; lower-right first molar (FDI 46). |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 46, mild, present for 1 week. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Cold drinks and sweet food; episode resolves within about 2 seconds of removal. |
@@ -268,12 +266,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and reversible pulpitis | Candidate reversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and reversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc07"></a>
 
@@ -281,7 +279,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 9 |
+| What is the age group? | User/parent | 6–12 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Mixed dentition; upper-left primary second molar (FDI 65), explicitly confirmed primary. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 65, severe, present for 3 days. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Not consistently stimulus-linked; episodes last about 10 minutes. |
@@ -306,12 +304,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc08"></a>
 
@@ -319,7 +317,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 17 |
+| What is the age group? | User/parent | 13–17 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; lower-left first molar (FDI 36); mature roots confirmed by dentist. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 36, severe, present for 4 days. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Cold; pain persists for about 60 seconds after removal. |
@@ -342,12 +340,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc09"></a>
 
@@ -355,7 +353,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 50 |
+| What is the age group? | User/parent | 18–64 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; upper-right first molar (FDI 16). |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | Yes; localized to FDI 16, severe, present for 5 days. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Hot/cold drinks; discomfort lasts about 90 seconds after removal. |
@@ -378,12 +376,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidates dental caries and symptomatic irreversible pulpitis | Candidate symptomatic irreversible pulpitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidates dental caries and symptomatic irreversible pulpitis |
+| Pass / fail | **PASS — software** |
 
 <a id="tc10"></a>
 
@@ -391,7 +389,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 10 |
+| What is the age group? | User/parent | 6–12 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Mixed dentition; marginal gums around several teeth, no single affected tooth. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No tooth pain; duration/severity: Not applicable. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Gum bleeding with brushing; thermal pain: Not applicable. |
@@ -414,12 +412,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate gingivitis | Candidate gingivitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis; missing discoloration, radiographic_caries and soft_tissue for unresolved caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc11"></a>
 
@@ -427,7 +425,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 16 |
+| What is the age group? | User/parent | 13–17 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; generalized marginal gums, no single affected tooth. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No tooth pain; duration/severity: Not applicable. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Gum bleeding when brushing; thermal pain: Not applicable. |
@@ -450,12 +448,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate gingivitis | Candidate gingivitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis; missing discoloration, radiographic_caries and soft_tissue for unresolved caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc12"></a>
 
@@ -463,7 +461,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 45 |
+| What is the age group? | User/parent | 18–64 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; gingival margins around upper and lower anterior teeth. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No tooth pain; duration/severity: Not applicable. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Gum bleeding on brushing/flossing; thermal pain: Not applicable. |
@@ -486,12 +484,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate gingivitis | Candidate gingivitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate gingivitis; missing discoloration, radiographic_caries and soft_tissue for unresolved caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc13"></a>
 
@@ -499,7 +497,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 38 |
+| What is the age group? | User/parent | 18–64 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent dentition; periodontal sites around FDI 16 and 36, nonadjacent teeth. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No toothache; duration/severity: Not applicable. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Bleeding during brushing; thermal pain: Not applicable. |
@@ -522,12 +520,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate periodontitis | Candidate periodontitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate periodontitis; missing discoloration, radiographic_caries and soft_tissue for unresolved caries |
+| Pass / fail | **PASS — software** |
 
 <a id="tc14"></a>
 
@@ -535,7 +533,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question | Answer provider | Test answer |
 | --- | --- | --- |
-| What is the age in completed years? | User/parent | 68 |
+| What is the age group? | User/parent | 65–120 years |
 | What is the dentition and affected tooth or region? | User; dentist confirms | Permanent remaining teeth; affected periodontal sites around FDI 26 and 46, nonadjacent teeth. |
 | Is there tooth pain? Where, how severe, and for how long? | User/parent | No toothache; duration/severity: Not applicable. |
 | What triggers it and how long does an episode last after the trigger stops? | User/parent | Bleeding while brushing; thermal pain: Not applicable. |
@@ -558,59 +556,59 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Candidate periodontitis | Candidate periodontitis |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Candidate periodontitis; missing discoloration, radiographic_caries and soft_tissue for unresolved caries |
+| Pass / fail | **PASS — software** |
 
 ## Edge cases
 
 <a id="tc15"></a>
 
-### TC15 — Missing age
+### TC15 — Missing age group
 
-**Steps:** Start a fresh consultation. Enter the symptom answers below, leave age blank, and attempt assessment.
+**Steps:** Start a fresh consultation. Enter the symptom answers below, leave Age group Unknown, and attempt assessment.
 
 | Question or action | Test answer / value |
 | --- | --- |
-| Age | Unknown; field left blank. |
+| Age group | Unknown (default). |
 | Dentition / tooth | Permanent affected tooth; FDI 36, reported by user. |
 | Pain / duration / triggers | Yes; mild localized tooth pain for 2 days, provoked by cold; persistence Unknown. |
 | Spontaneous / biting pain | Unknown / Unknown. |
 | Gum symptoms / swelling / fever | Unknown / Unknown / Unknown. |
 | History / professional findings | Unknown; no examination data supplied. |
 
-**Expected response:** Please enter age before completing the assessment.
+**Expected response:** Please select age group before completing the assessment.
 
-**Prohibited outcomes:** Assuming adulthood, deriving a clinical condition from default age, or accepting missing age as zero.
+**Prohibited outcomes:** Assuming adulthood, deriving a clinical condition from default age group, or accepting missing age group as 0–5.
 
 **Sources:** [Consultation input requirements](project-proposal.md#2-specific-domain-and-scope). Validation behavior is a project requirement, not a sourced clinical rule.
 
 **Review status:** Pending software requirement review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Incomplete; request age; no candidates | Incomplete; request age; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request age group; no candidates |
+| Pass / fail | **PASS — software** |
 
 <a id="tc16"></a>
 
-### TC16 — Invalid negative age
+### TC16 — Invalid numeric age-group value
 
-**Steps:** Submit the raw age value −2 through the structured Prolog/JPL assessment boundary. Confirm rejection in both modes. The controlled UI offers only Unknown and completed years 0–120, so this value cannot be entered through the questionnaire.
+**Steps:** Submit `obs(age_group,-2)` through the structured Prolog/JPL boundary and confirm rejection. The controlled UI permits only Unknown or the five listed groups; it cannot submit a numeric age.
 
 | Question or action | Test answer / value |
 | --- | --- |
-| Age | −2 (raw invalid input). |
+| Age group | −2 (raw invalid numeric input). |
 | Dentition / tooth | Unknown. |
 | Pain / duration / triggers | Unknown / Unknown / Unknown. |
 | Gum symptoms / history / examination | Unknown / Unknown / Unknown. |
 
-**Expected response:** Age must be a valid non-negative value. Please correct it.
+**Expected response:** Age group must be a listed predefined value. Please correct it.
 
 **Prohibited outcomes:** Silently converting −2 to 2 or zero, accepting the value, or returning a diagnosis.
 
@@ -618,12 +616,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending software requirement review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Invalid; reject age -2; no candidates | Invalid; reject age -2; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Invalid; reject numeric age_group -2; no candidates |
+| Pass / fail | **PASS — software** |
 
 <a id="tc17"></a>
 
@@ -633,7 +631,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question or action | Test answer / value |
 | --- | --- |
-| Age | 11. |
+| Age group | 6–12 years. |
 | Dentition / affected tooth | Unknown primary/permanent; lower-left back tooth reported, FDI identity Unknown. |
 | Pain / duration / severity | Yes; localized pain for 3 days; moderate. |
 | Trigger / persistence | Cold drink; persistence Unknown. |
@@ -651,12 +649,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending software requirement review; supporting clinical data pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Incomplete; request affected tooth type; no candidates | Incomplete; request affected tooth type; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request affected tooth type; no candidates |
+| Pass / fail | **PASS — software** |
 
 <a id="tc18"></a>
 
@@ -666,7 +664,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question or action | Test answer / value |
 | --- | --- |
-| Age | 30. |
+| Age group | 18–64 years. |
 | Dentition / tooth | Permanent dentition; FDI 46 reported. |
 | Is tooth pain present? | No. |
 | Does tooth pain occur spontaneously? | Yes; spontaneous tooth pain for 3 days. |
@@ -681,12 +679,12 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending software requirement review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Conflict; clarify tooth-pain answers; no candidates | Conflict; clarify tooth-pain answers; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Conflict; clarify tooth-pain answers; no candidates |
+| Pass / fail | **PASS — software** |
 
 <a id="tc19"></a>
 
@@ -696,7 +694,7 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 | Question or action | Test answer / value |
 | --- | --- |
-| Age | 24. |
+| Age group | 18–64 years. |
 | Dentition / region | Permanent dentition reported; jaw joint area, no affected tooth. |
 | Tooth pain / thermal symptoms | No / Not applicable. |
 | Gum bleeding / swelling / redness / tenderness | No / No / No / No. |
@@ -713,47 +711,47 @@ Unchecked substantive checkbox items remain Unknown unless None is explicitly se
 
 **Review status:** Pending software requirement review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Outside supported scope; no candidates | Outside supported scope; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Outside supported scope; no candidates |
+| Pass / fail | **PASS — software** |
 
 <a id="tc20"></a>
 
 ### TC20 — Reset after a completed consultation
 
-**Steps:** Run TC11 and record its result. Click New consultation/Reset. Attempt assessment without entering new data. Repeat once after forward chaining and once after backward chaining.
+**Steps:** Run TC11 and record its result. Click New consultation/Reset. Attempt assessment without entering new data. Run using forward chaining.
 
 | Question or action | Test answer / value |
 | --- | --- |
 | Before reset | All TC11 question/answer rows; target candidate gingivitis. |
 | Action | Click New consultation/Reset after the result is returned. |
-| After reset: age / dentition / tooth | Unknown / Unknown / Unknown; fields cleared. |
+| After reset: age group / dentition / tooth | Unknown / Unknown / Unknown; fields cleared. |
 | After reset: symptoms / duration / triggers / history | Unknown / Unknown / Unknown / Unknown; fields cleared. |
 | After reset: examination findings | Unknown; cleared. |
 | After reset: prior result | No candidate displayed or reused. |
 
-**Expected response:** Please enter age and start a new consultation. No previous candidate or input remains.
+**Expected response:** Please select age group and start a new consultation. No previous candidate or input remains.
 
-**Prohibited outcomes:** Reusing age 16, TC11 symptoms/findings, or the previous gingivitis candidate; a delayed old result repopulating the screen.
+**Prohibited outcomes:** Reusing the 13–17 age group, TC11 symptoms/findings, or the previous gingivitis candidate; a delayed old result repopulating the screen.
 
 **Sources:** [Consultation lifecycle and reset](architecture.md#3-consultation-data-flow-and-lifecycle). This is a lifecycle test using TC11 as setup, not an additional clinical case.
 
 **Review status:** Pending software requirement review; supporting clinical data pending dentist review.
 
-| Execution record | Forward chaining | Backward chaining |
-| --- | --- | --- |
-| Application / knowledge-base version | 1.0.0 / 0.1.0 | 1.0.0 / 0.1.0 |
-| Date / tester | 2026-09-28 / automated Prolog + JPL checks | 2026-09-28 / automated Prolog + JPL checks |
-| Actual response | Incomplete; request age; no candidates | Incomplete; request age; no candidates |
-| Pass / fail | **PASS — software** | **PASS — software** |
+| Execution record | Forward chaining |
+| --- | --- |
+| Application / knowledge-base version | 1.0.0 / 0.2.0 |
+| Date / tester | 2026-09-29 / automated Prolog + JPL checks |
+| Actual response | Incomplete; request age group; no candidates |
+| Pass / fail | **PASS — software** |
 
 ## Acceptance and maintenance
 
 The catalogue has exactly 20 cases: TC01–TC14 are diagnostic candidates and TC15–TC20 are edge cases. Both modes use identical clinical evidence. Additional supported candidates are allowed, but prohibited outcomes fail the case. A software exception is not a valid outside-scope or incomplete-assessment response.
 
-Record observed responses and both mode outcomes in the tables on every knowledge revision. Where the UI blocks an invalid input before Prolog is called, record that validation result for both attempted modes. Do not mark an unexecuted case as passing. Record expert revisions before changing expected clinical outcomes; do not edit expectations merely to make a failing implementation pass.
+Record observed forward-chaining responses in the tables on every knowledge revision. Where the UI blocks an invalid input before Prolog is called, record that validation result for the attempted assessment. Do not mark an unexecuted case as passing. Record expert revisions before changing expected clinical outcomes; do not edit expectations merely to make a failing implementation pass.
 
 The executable fixtures are in `knowledge/acceptance.pl`; Java/JPL integration and control tests are in `src/test/java/dental/IntegrationTest.java`. Run `./scripts/test.sh`. Case data do not count toward the 25 rules or 30 authored domain facts. The full test programme must also check target-platform packaging, integration failures, and reasoning termination as specified in the proposal and architecture.

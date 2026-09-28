@@ -2,7 +2,7 @@
 
 A dentist-only Java Swing desktop expert system using SWI-Prolog 10.0.2 through JPL. Supports candidate dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis across supplied age/dentition groups.
 
-Clinical inputs are predefined dropdowns, radio buttons and checkboxes. The shared Prolog catalogue contains 44 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining reaches a fixed point; backward chaining recursively investigates a selected goal independently. All clinical knowledge and expected outcomes await dentist review.
+Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledge version 0.2.0 contains 43 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining evaluates the full condition catalogue to a fixed point. Age uses five predefined groups; no diagnosis target or assessment focus is selected. All clinical knowledge and expected outcomes await dentist review.
 
 ## Run on Apple Silicon macOS
 
