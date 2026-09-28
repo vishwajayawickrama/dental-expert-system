@@ -8,7 +8,7 @@
 - **Status:** Initial proposal; application implementation has not started.
 - **Updated:** 28 September 2026
 
-DentalExplain will assess common tooth-pain and gum-symptom presentations using an explainable, rule-based expert system. SWI-Prolog will implement both the knowledge base and inference engine. The interface is still to be selected; a local web interface is the current recommendation.
+DentalExplain will assess common tooth-pain and gum-symptom presentations using an explainable, rule-based expert system. SWI-Prolog will implement both the knowledge base and inference engine. The selected desktop interface is Java Swing, integrated through JPL. See the [architecture document](architecture.md) for component responsibilities and macOS/Windows packaging.
 
 ## 1. Assignment requirements and deliverables
 
@@ -26,7 +26,7 @@ DentalExplain will assess common tooth-pain and gum-symptom presentations using 
 | Supply a user manual | Installation, consultation workflow, explanations, reset, and troubleshooting. |
 | Do not build using Python | No Python application, inference engine, knowledge base, or integration layer. |
 
-This repository initialization supplies only this proposal. The application, knowledge base, full manual, screenshots, executable, and test results are later deliverables.
+The repository currently contains this proposal and the [selected architecture](architecture.md). The application, knowledge base, full manual, screenshots, executable, and test results are later deliverables.
 
 ## 2. Specific domain and scope
 
@@ -128,7 +128,7 @@ Each result should display the conclusion, supplied evidence, applicable rule id
 
 ## 6. Interface options
 
-The comparison below is a project assessment. **The interface and delivery platform remain undecided.**
+The comparison below records the alternatives considered. **Java Swing with JPL is selected**, with macOS and Windows desktop packages planned. The [architecture document](architecture.md) explains this decision and the runtime dependencies.
 
 | Option | Advantages | Disadvantages | Integration and runnable delivery |
 | --- | --- | --- | --- |
@@ -140,9 +140,9 @@ The comparison below is a project assessment. **The interface and delivery platf
 
 ### How to implement and package each option
 
-**Local web interface — recommended, not selected:** Use SWI-Prolog's [HTTP server libraries](https://www.swi-prolog.org/pldoc/man?section=httpserver) to serve the interface and handle consultation requests. Keep consultation state isolated and bind the service to the local machine. Supply startup, browser-opening, and shutdown behavior. Package the server using [saved-state/executable support](https://www.swi-prolog.org/pldoc/man?predicate=qsave_program/2), include assets and required libraries, and test the delivered bundle. A browser interface does not require public website hosting.
+**Local web interface — alternative, not selected:** Use SWI-Prolog's [HTTP server libraries](https://www.swi-prolog.org/pldoc/man?section=httpserver) to serve the interface and handle consultation requests. Keep consultation state isolated and bind the service to the local machine. Supply startup, browser-opening, and shutdown behavior. Package the server using [saved-state/executable support](https://www.swi-prolog.org/pldoc/man?predicate=qsave_program/2), include assets and required libraries, and test the delivered bundle. A browser interface does not require public website hosting.
 
-**Java:** Choose Swing or JavaFX, use [JPL](https://github.com/SWI-Prolog/packages-jpl) to call Prolog, and map results and traces into UI models. JPL uses native integration, so a Java runtime alone is insufficient. Use [Oracle's jpackage guidance](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-overview.html) to create an application image or installer with the Java runtime, then include compatible Prolog/JPL libraries and verify library loading. Swing versus JavaFX remains a later choice if Java is selected.
+**Java Swing — selected:** Use [JPL](https://github.com/SWI-Prolog/packages-jpl) to call Prolog and map results and traces into Swing UI models. JPL uses native integration, so a Java runtime alone is insufficient. Use [Oracle's jpackage guidance](https://docs.oracle.com/en/java/javase/25/jpackage/packaging-overview.html) to create an application image or installer with the Java runtime, then include compatible Prolog/JPL libraries and verify library loading. JavaFX remains an alternative; Swing is selected for the initial application.
 
 **C++/Qt:** Build forms and explanation views in Qt, initialize an embedded Prolog engine, and call reasoning predicates through the [SWI-Prolog C++ interface](https://www.swi-prolog.org/pldoc/man?section=cpp2). Configure the compiler and linker for Prolog, deploy Qt and Prolog runtime dependencies, and verify their discovery on a clean target machine.
 
@@ -211,10 +211,10 @@ The full manual will be produced alongside the application and contain:
 | Domain | Agreed: tooth pain and gum symptoms across age groups. |
 | Reasoning and knowledge technology | Agreed: SWI-Prolog; no Python implementation. |
 | Knowledge-base target | Agreed: 25 meaningful rules and 40 authored domain facts. |
-| Interface | Pending; local web interface recommended. |
-| Delivery platform and executable format | Pending; verify lecturer expectations before selecting. |
+| Interface | Selected: Java Swing with JPL integration. |
+| Delivery platform and executable format | Planned: macOS `.app` and Windows application with an `.exe` launcher, bundling Java and Prolog/JPL dependencies; optional Windows installer. Exact supported versions and architectures remain pending. |
 | Human expert and clinical review | Pending. |
 | Exact conditions, age boundaries, and rules | Pending source research and expert review. |
 | Application, executable, full manual, and test results | Not implemented. |
 
-Next, select the interface and delivery platform, establish the reviewed condition catalogue and age/dentition model, acquire the knowledge, and then implement and validate the system. This proposal introduces no implemented API or clinical rule set.
+Next, verify Java/JPL integration and packaging on the target platforms, establish the reviewed condition catalogue and age/dentition model, acquire the knowledge, and then implement and validate the system. This proposal introduces no implemented API or clinical rule set.
