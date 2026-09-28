@@ -13,7 +13,7 @@ The checks below establish software behavior on the development Mac. They do not
 | Prolog/JPL | Official SWI-Prolog 10.0.2 universal macOS distribution and matching vendor JPL |
 | Knowledge catalogue | 44 questions, 30 authored domain facts, 25 production rules |
 | Development artifact | `build/stage/DentalExplain.jar`, accompanied by `jpl.jar` and the local Prolog runtime |
-| Final timestamped image | `dist/release-20260928-232038/DentalExplain.app` |
+| Final timestamped image | `dist/release-20260928-234553/DentalExplain.app` |
 | Convenient local copy | `dist/DentalExplain.app` |
 | Signing | Local ad-hoc signing; not Developer ID signed or notarized |
 
@@ -92,3 +92,9 @@ The generic SansSerif family was replaced by bundled Inter 4.1 Regular and Bold 
 The supplied reference resembles Computer Modern Sans. Bundled [Latin Modern Sans](https://ctan.org/pkg/lm), based on Computer Modern, now replaces Inter throughout app-owned controls. Page headings use regular weight to match the reference; section and question labels retain bold weight. Original Regular and Bold OpenType files, attribution, the GUST Font License and LPPL 1.3c are included in source resources and the JAR.
 
 A headless check of the rebuilt JAR resolved `LMSans10-Regular` and `LMSans10-Bold` and verified glyph coverage for the application's title punctuation and age-range symbols. Clean builds remove generated classes before copying resources; inspection confirmed the JAR contains the new fonts with no stale Inter resources. The packaged app passed bundled-runtime and signature checks. The consultation setup was visually inspected at 1180×850 with readable headings, labels, dropdowns and buttons; screenshot evidence is `build/ui-screenshots/latin-modern-setup.png`. Clinical tests were not rerun for this typography change.
+
+## Setup spacing and background update
+
+The setup form and scroll viewport now use white backgrounds matching the page, with 20 px internal padding and no outer scroll-pane border. Setup dropdowns, reasoning mode and the backward candidate selector also use white backgrounds. The two-column layout, 28 px column gap, 22 px row gap, fonts and navy actions are preserved; questionnaire section colors remain unchanged.
+
+The rebuilt packaged app was inspected in forward and backward modes at 1180×850 and the 960×680 minimum. Fields and actions remain readable without horizontal clipping; the lowest backward candidate field is fully reachable by vertical scrolling at minimum height. A synthetic age of 6, backward mode and the caries target remained selected after navigating to the questionnaire and back. Screenshot evidence is in `build/ui-screenshots/setup-white-*.png`. Packaging, the bundled Java/Prolog runtime check and strict signature verification passed. Clinical inference tests were not rerun for this setup-only styling change.

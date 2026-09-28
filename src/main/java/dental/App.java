@@ -95,11 +95,13 @@ public final class App extends JFrame {
     private JPanel setup(){
         JPanel p=page("01 / Consultation setup","Record age and the affected dentition. Choose how the engine will reason.");
         JPanel grid=new JPanel(new GridLayout(0,2,28,22));grid.setOpaque(false);
-        fields.values().stream().filter(f->f.question.section().equals("setup")).forEach(grid::add);
+        fields.values().stream().filter(f->f.question.section().equals("setup")).forEach(f->{f.combo.setBackground(Color.WHITE);grid.add(f);});
+        mode.setBackground(Color.WHITE);goal.setBackground(Color.WHITE);
         JPanel reasoning=new JPanel(new BorderLayout(8,8));reasoning.setOpaque(false);reasoning.add(new JLabel("Reasoning mode"),BorderLayout.NORTH);reasoning.add(mode,BorderLayout.CENTER);grid.add(reasoning);
         goalRow.setOpaque(false);goalRow.add(new JLabel("Candidate to investigate"),BorderLayout.NORTH);goalRow.add(goal,BorderLayout.CENTER);grid.add(goalRow);
         mode.addActionListener(e->{goalRow.setVisible(mode.getSelectedIndex()==1);invalidateAssessment();});
-        JPanel holder=new JPanel(new BorderLayout());holder.setOpaque(false);holder.add(grid,BorderLayout.NORTH);p.add(new JScrollPane(holder),BorderLayout.CENTER);
+        JPanel holder=new JPanel(new BorderLayout());holder.setBackground(Color.WHITE);holder.setBorder(new EmptyBorder(20,20,20,20));holder.add(grid,BorderLayout.NORTH);
+        JScrollPane scroll=new JScrollPane(holder);scroll.setBorder(BorderFactory.createEmptyBorder());scroll.setBackground(Color.WHITE);scroll.getViewport().setBackground(Color.WHITE);scroll.getVerticalScrollBar().setUnitIncrement(24);p.add(scroll,BorderLayout.CENTER);
         JButton back=button("Welcome",'W');back.addActionListener(e->show("welcome"));JButton next=button("Continue to questionnaire",'C');next.addActionListener(e->{refreshVisibility();show("questionnaire");});p.add(actions(back,next),BorderLayout.SOUTH);return p;
     }
     private JPanel questionnaire(){
