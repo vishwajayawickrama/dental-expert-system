@@ -9,6 +9,6 @@ rm -rf "$ROOT/build/classes"
 mkdir -p "$ROOT/build/classes" "$ROOT/build/stage"
 "$JAVA_HOME/bin/javac" --release 21 -cp "$JPL" -d "$ROOT/build/classes" "$ROOT"/src/main/java/dental/*.java
 cp -R "$ROOT/src/main/resources/." "$ROOT/build/classes/"
-printf 'Manifest-Version: 1.0\nMain-Class: dental.App\nClass-Path: jpl.jar\n\n' > "$ROOT/build/manifest.mf"
+printf 'Manifest-Version: 1.0\nMain-Class: dental.App\nClass-Path: jpl.jar\nImplementation-Version: 1.3.0\n\n' > "$ROOT/build/manifest.mf"
 "$JAVA_HOME/bin/jar" --create --date=2026-01-01T00:00:00Z --file "$ROOT/build/stage/DentalExplain.jar" --manifest "$ROOT/build/manifest.mf" -C "$ROOT/build/classes" .
 cp "$JPL" "$ROOT/build/stage/jpl.jar"

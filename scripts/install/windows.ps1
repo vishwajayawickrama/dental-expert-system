@@ -1,5 +1,6 @@
 param([ValidateSet('Dependencies','Application','Launch','Check')][string]$Action='Check',[switch]$NoLaunch,[switch]$Elevated,[string[]]$AppArguments=@())
 $ErrorActionPreference='Stop'
+$ProgressPreference='SilentlyContinue'
 $base=$PSScriptRoot
 function Fail([string]$message){throw $message}
 function Get-Layout {
@@ -63,14 +64,15 @@ try {
                 Download-Verified $installer.link $installer.checksum "$work/java.msi"
                 $signed=Get-AuthenticodeSignature "$work/java.msi"
                 if($signed.Status -ne 'Valid'){Fail 'Java installer signature verification failed.'}
-                $p=Start-Process msiexec.exe -Wait -PassThru -ArgumentList @('/i',"`"$work/java.msi`"",'/qn','/norestart','ALLUSERS=1')
+                $msi=(Resolve-Path (Join-Path $work 'java.msi')).Path
+                $p=Start-Process msiexec.exe -Wait -PassThru -ArgumentList @('/i',"`"$msi`"",'/qn','/norestart','ALLUSERS=1')
                 if($p.ExitCode -notin @(0,3010)){Fail "Java installation failed: $($p.ExitCode)"}
             }
             if(!$layout.Jpl -or !(Test-Path $layout.Swipl)){
                 Write-Host 'Installing SWI-Prolog 10.0.2 for all users in its versioned folder.'
                 Download-Verified 'https://www.swi-prolog.org/download/stable/bin/swipl-10.0.2-1.x64.exe' '2ec1f25be0eafb92e559004782b130774c12573fb4b7e8a917e534754a641ad6' "$work/swipl.exe"
                 # NSIS requires /D to be the final argument, without surrounding quotes.
-                $p=Start-Process "$work/swipl.exe" -Wait -PassThru -ArgumentList "/S /D=$($layout.Prolog.Replace('/','\'))"
+                $p=Start-Process (Resolve-Path (Join-Path $work "swipl.exe")).Path -Wait -PassThru -ArgumentList "/S /D=$($layout.Prolog.Replace('/','\'))"
                 if($p.ExitCode -ne 0){Fail "Prolog installation failed: $($p.ExitCode)"}
             }
         }finally{Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue}
