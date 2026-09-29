@@ -47,7 +47,7 @@ public final class App extends JFrame {
         if(Arrays.asList(args).contains("--verify-runtime")){
             try {Bridge b=new Bridge();
                 if(b.questions.size()!=27||b.catalog("facts").length!=30||b.catalog("rules").length!=25)throw new IllegalStateException("Unexpected catalogue counts");
-                String report="Bundled runtime: Java "+System.getProperty("java.version")+"; SWI/JPL ready; KB "+b.version+"; "+b.questions.size()+" questions; 25 rules; 30 facts";
+                String report="Runtime: Java "+System.getProperty("java.version")+"; SWI/JPL ready; KB "+b.version+"; "+b.questions.size()+" questions; 25 rules; 30 facts";
                 System.out.println(report);
                 int position=Arrays.asList(args).indexOf("--verify-runtime");
                 if(position+1<args.length)java.nio.file.Files.writeString(java.nio.file.Path.of(args[position+1]),report+"\n");

@@ -1,0 +1,111 @@
+name: Lightweight external-runtime verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build shared JAR and runtime-free payload
+        run: |
+          scripts/bootstrap.sh
+          scripts/build.sh
+          scripts/install/package-lightweight.sh
+      - name: Install dependencies, install application and test
+        run: |
+          mkdir -p build/reports
+          build/lightweight/Install-Dependencies-macOS.command 2>&1 | tee build/reports/dependencies-macos.txt
+          build/lightweight/Install-Dependencies-macOS.command
+          build/lightweight/Install-Application-macOS.command --no-launch
+          build/lightweight/Install-Application-macOS.command --no-launch
+          scripts/install/test-unix.sh 2>&1 | tee build/reports/external-macos.txt
+          env -i HOME="$HOME" PATH=/usr/bin:/bin "$HOME/Applications/DentalExplain.app/Contents/Resources/application/launch.sh" --verify-runtime
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lightweight-shared
+          path: |
+            build/stage/DentalExplain.jar
+            build/DentalExplain.icns
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lightweight-macos-results
+          path: |
+            build/reports/*.txt
+            build/ui-screenshots/*.png
+  windows:
+    needs: macos
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lightweight-shared
+          path: build
+      - name: Stage shared payload and compile startup EXE
+        shell: bash
+        run: scripts/install/package-lightweight.sh
+      - name: Test installers using Windows PowerShell 5.1
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force build/reports | Out-Null
+          Start-Transcript build/reports/external-windows.txt
+          ./scripts/install/build-windows.ps1
+          $package="$PWD/build/Submission With Spaces"
+          Copy-Item build/lightweight $package -Recurse
+          & "$package/Install-Dependencies-Windows.cmd"
+          if($LASTEXITCODE -ne 0){throw 'Dependencies failed'}
+          & "$package/Install-Dependencies-Windows.cmd"
+          if($LASTEXITCODE -ne 0){throw 'Repeat dependencies failed'}
+          & "$package/Install-Application-Windows.cmd" -NoLaunch
+          if($LASTEXITCODE -ne 0){throw 'Application install failed'}
+          & "$package/Install-Application-Windows.cmd" -NoLaunch
+          if($LASTEXITCODE -ne 0){throw 'Repeat application install failed'}
+          ./scripts/install/test-windows.ps1
+          Stop-Transcript
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lightweight-windows
+          path: |
+            build/lightweight/application/windows/DentalExplain.exe
+            build/reports/*.txt
+            build/ui-screenshots/*.png
+  linux:
+    needs: macos
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: lightweight-shared
+          path: build
+      - name: Stage payload, install dependencies and application
+        run: |
+          mkdir -p build/reports
+          scripts/install/package-lightweight.sh
+          cp -R build/lightweight 'build/Submission With Spaces'
+          'build/Submission With Spaces/Install-Dependencies-Linux.sh' 2>&1 | tee build/reports/dependencies-linux.txt
+          'build/Submission With Spaces/Install-Dependencies-Linux.sh'
+          'build/Submission With Spaces/Install-Application-Linux.sh' --no-launch
+          'build/Submission With Spaces/Install-Application-Linux.sh' --no-launch
+      - name: Check clinical engine and Swing using virtual display
+        run: |
+          sudo apt-get install -y xvfb
+          xvfb-run -a scripts/install/test-unix.sh 2>&1 | tee build/reports/external-linux.txt
+          env -i HOME="$HOME" PATH=/usr/bin:/bin "$HOME/.local/share/DentalExplain/launch.sh" --verify-runtime
+          test -f "$HOME/.local/share/applications/dentalexplain.desktop"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lightweight-linux-results
+          path: |
+            build/reports/*.txt
+            build/ui-screenshots/*.png
