@@ -40,7 +40,7 @@ Build the Windows startup wrapper on Windows with `scripts/install/build-windows
 
 ## Documentation
 
-- [Academic report source and expert questionnaire](docs/report.md), [Word report](DentalExplain%20Report.docx) and [PDF report](cm3321-expert-system-224096B/DentalExplain%20Report.pdf). The Word report is at the repository root; the submission folder and ZIP include only the PDF report. The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
+- [Academic report source and expert questionnaire](docs/report.md), [Word report](cm3321-expert-system-224096B.docx) and [PDF report](cm3321-expert-system-224096B/cm3321-expert-system-224096B.pdf). The Word report is at the repository root; the submission folder and ZIP include only the PDF report. The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
 - [Project proposal and scope](docs/project-proposal.md)
 - [Architecture and interface decision](docs/architecture.md)
 - [20 acceptance cases and actual outcomes](docs/test-cases.md)

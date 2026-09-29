@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Report filenames renamed — 29 September 2026
+
+Renamed the root Word report to `cm3321-expert-system-224096B.docx` and the submission PDF to `cm3321-expert-system-224096B.pdf`. Canonical report copies, README links, report-generation output and packaging paths use the same names. Byte comparison with the previous commit confirms report contents are unchanged, including the native Word TOC and manual edits.
+
+The refreshed PDF-only ZIP is **1,371,249 bytes (1.37 MB)**, SHA-256 `f8e34c667cde8281deb41cb2d573b1069906f0d9f363f65257a978fbb3762454`. Archive integrity, extracted-file correspondence, executable permissions, renamed PDF inclusion and exclusion of Word/old report filenames passed verification. Application behavior is unchanged.
+
 ## Native Word table of contents repaired — 29 September 2026
 
 Replaced the manually typed contents with a native Word Table of Contents content control and a `TOC` field for top-level headings. Its 12 cached entries retain current pagination and each links to a matching heading bookmark. Live `PAGEREF` fields provide page references, and automatic field updating on open is enabled. The Contents title uses its own style so it does not include itself when Word regenerates the table. Native TOC styles retain Times New Roman and the existing presentation. The report generator also emits a native TOC for future generation.
