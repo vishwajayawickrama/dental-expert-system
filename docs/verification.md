@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## PDF contents links repaired — 29 September 2026
+
+Expanded all **12 contents links** across their complete rows, including dotted leaders and page numbers, and encoded explicit internal `GoTo` actions. Each link was checked against the Word contents entry and corresponding PDF heading page. Clicking the first and final page-number links in native macOS Preview opened pages **3** and **22**, respectively. Added `scripts/link-report-pdf.py` to repeat this navigation fix after future exports.
+
+All **24 rendered pages are pixel-identical** to the previous report, and their content streams are unchanged. The contents page was visually inspected. Manual edits and the Word document are preserved; canonical and submission PDFs match. Archive integrity, extracted-file correspondence, executable permissions and PDF-only report inclusion passed. The refreshed ZIP is **1,370,504 bytes (1.37 MB)**, SHA-256 `3205a34df6f4456a19c2e8c884995de286486923c51b26fbe546c6caca1f6fc0`. Application behavior is unchanged.
+
 ## Report filenames renamed — 29 September 2026
 
 Renamed the root Word report to `cm3321-expert-system-224096B.docx` and the submission PDF to `cm3321-expert-system-224096B.pdf`. Canonical report copies, README links, report-generation output and packaging paths use the same names. Byte comparison with the previous commit confirms report contents are unchanged, including the native Word TOC and manual edits.
