@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Conclusion section removed — 29 September 2026
+
+Removed Section 9 Conclusion, its two paragraphs and its contents entry from the manually edited report. All other document content, styling, media and resources are preserved exactly. The matching PDF has **28 pages**, with all **12 contents entries** verified against actual pagination. Pages before the removed section are pixel-identical except the updated contents; later page content is unchanged apart from page numbers. The updated contents and all shifted pages were visually inspected.
+
+Both report copies and the submission ZIP were synchronized. The ZIP is **2,469,587 bytes (2.47 MB)**, SHA-256 `da8ed113fd9ac9927df4238c11c3b8f5c548b2fa9071455dff2e802eaafa471a`. Archive integrity, extracted-file correspondence and executable permissions passed; the Word lock file remains excluded. Application behavior is unchanged.
+
 ## Manual report edits preserved and paragraph formatting — 29 September 2026
 
 Formatted the manually edited Word report directly, preserving its cover, body text, tables, images and other document resources. Body paragraphs are justified with **1.5 line spacing** and **1.27 cm first-line indentation**. List indentation, headings, captions and table layouts are retained. The contents page was synchronized with the revised pagination.

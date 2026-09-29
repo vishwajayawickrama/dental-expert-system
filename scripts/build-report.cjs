@@ -57,7 +57,7 @@ async function main(){
    if(t.type==='heading'){
      if(t.text==='1 Introduction'&&!contentsInserted){
        heading('Contents');
-       const defaultPages={"Abstract":2,"1 Introduction":4,"2 Domain Definition and Scope":5,"3 Knowledge Acquisition":6,"4 Expert System Architecture":7,"5 Knowledge Representation":9,"6 Inference Method":10,"7 System Design and Implementation":11,"8 Testing and Evaluation":18,"9 Conclusion":20,"References":21,"Appendix A User Manual":22,"Appendix B Human Expert Questionnaire":23,"Appendix C Knowledge Catalogue":24};
+       const defaultPages={"Abstract":2,"1 Introduction":4,"2 Domain Definition and Scope":5,"3 Knowledge Acquisition":6,"4 Expert System Architecture":7,"5 Knowledge Representation":9,"6 Inference Method":10,"7 System Design and Implementation":11,"8 Testing and Evaluation":18,"References":21,"Appendix A User Manual":22,"Appendix B Human Expert Questionnaire":23,"Appendix C Knowledge Catalogue":24};
        const mapFile=path.join(ROOT,'build/report/page-map.json');
        const pageMap=fs.existsSync(mapFile)?JSON.parse(fs.readFileSync(mapFile,'utf8')):defaultPages;
        if(Object.keys(pageMap).length!==Object.keys(defaultPages).length)throw Error('Contents pagination is incomplete; regenerate the page map.');

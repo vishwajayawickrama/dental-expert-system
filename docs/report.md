@@ -248,12 +248,6 @@ Manual desktop verification on macOS includes consultation navigation, result di
 
 The submission assembly verifies source inclusion, report files, six root installation scripts, runtime-free application files, executable permissions and SHA-256 checksums. Launch checks use extracted folders containing spaces. Recorded software results do not establish diagnostic accuracy in real patients; clinical knowledge and expectations remain pending review.
 
-# 9 Conclusion
-
-DentalExplain implements a runnable native expert system combining Java Swing with embedded SWI-Prolog through JPL. Its 27-question adaptive consultation collects controlled evidence in two steps, while 25 production rules and 30 authored domain facts support five candidate conditions through forward chaining.
-
-The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, runtime-free application files, six installation scripts and a launch-only user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the conducted questionnaire is supplied in Appendix B; clinical review remains pending.
-
 # References
 
 [1] National Institute of Dental and Craniofacial Research. Tooth Decay. https://www.nidcr.nih.gov/health-info/tooth-decay
