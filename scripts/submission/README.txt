@@ -1,32 +1,30 @@
 DentalExplain submission
-Application 1.2.0 | Knowledge 0.4.0
+Application 1.3.0 | Knowledge 0.4.0
 
-Extract this ZIP completely. Do not run an executable from inside the ZIP.
-Keep the applications folders and their runtime files together.
+Extract the complete ZIP. Run the two scripts for your operating system, in order:
 
-Windows x64: double-click Open-Windows.cmd.
-Alternative: applications/windows/DentalExplain/DentalExplain.exe.
+Windows x64:
+1. Install-Dependencies-Windows.cmd
+2. Install-Application-Windows.cmd
+Later: open the DentalExplain desktop or Start-menu shortcut.
 
-Apple Silicon macOS: double-click Open-macOS.command.
-Alternative: open applications/macos/DentalExplain.app.
-The complete app can be copied to Applications.
+Apple Silicon macOS:
+1. Install-Dependencies-macOS.command
+2. Install-Application-macOS.command
+Later: open DentalExplain.app from your home Applications folder.
 
-Ubuntu 24.04 x64 desktop: in a terminal in this folder, run ./Open-Linux.sh.
-A graphical desktop is needed. If permissions were lost during extraction:
-  chmod +x Open-Linux.sh applications/linux/DentalExplain/runtime/java/bin/java
-On macOS, restore the root script permission with:
-  chmod +x Open-macOS.command
+Ubuntu 24.04 x64 desktop:
+1. bash Install-Dependencies-Linux.sh
+2. bash Install-Application-Linux.sh
+Later: open DentalExplain from the application menu.
 
-Java and SWI-Prolog/JPL are bundled. No compilation or separate runtime
-installation is needed. Intel Macs, Windows ARM and Linux ARM are not supported.
-Windows signing and macOS notarization remain pending.
+Initial setup needs internet and administrator permission. Java 21 and SWI-Prolog/JPL 10.0.2 are installed machine-wide; DentalExplain is installed for the current user. Ubuntu compiles the pinned Prolog source and can take several minutes. Existing unrelated dependency installations are retained. Ordinary consultations work offline once installation completes.
 
-report/ contains the Word report and matching PDF. Appendix A is the user manual.
-source/ contains the Java interface, resources, tests, Prolog knowledge/inference
-modules and development scripts, with no development build output.
-SHA256SUMS.txt contains hashes of regular files; keep ZIP symlinks intact.
+The application/ folder contains one shared JAR, knowledge and small platform wrappers. It contains no Java/Prolog runtimes. A JAR alone cannot launch the ES without matching dependencies. Keep all extracted files together until installation is complete.
 
-Only synthetic consultation data is used in the report. Clinical review remains
-pending. The named human expert's interview questionnaire was conducted with Kushala. Results are candidate conditions, not treatment prescriptions.
+report/: Word/PDF report and launch-only manual in Appendix A.
+source/: Java interface source, Prolog knowledge and development scripts.
+scripts/install/: dependency and application installer helpers.
+SHA256SUMS.txt: checksums of all regular files, except the checksum file itself.
 
-For launch problems and use of the consultation, read Appendix A in the report.
+If setup fails, read its displayed error, check your internet connection and retry the dependency script. Checksum failures stop installation. Windows signing and macOS notarization remain pending; follow your computer owner's software policy. Clinical validation remains pending dentist review.

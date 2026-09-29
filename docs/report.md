@@ -4,7 +4,7 @@ DentalExplain is a native desktop expert system for assessing common tooth-pain 
 
 The knowledge base contains 30 authored domain facts and 25 production rules. A separate catalogue defines 27 questions: two setup fields, eight reported-symptom questions and 17 examination questions. The consultation uses two adaptive questionnaire steps, preserves applicable answers during Back navigation and excludes answers when their parent makes them inapplicable. Inference evaluates the complete condition catalogue and permits coexisting candidates. Unknown information remains distinct from explicit absence.
 
-Twenty synthetic acceptance cases and 51 Prolog checks pass. Java integration and interface checks, together with bundled-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The submission includes runnable platform packages and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The questionnaire was conducted with her, and her input together with published dental sources informed the facts and rules. Clinical validation remains pending.
+Twenty synthetic acceptance cases and 51 Prolog checks pass. Java integration and interface checks, together with external-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The lightweight submission includes installation scripts, runtime-free application files, and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The questionnaire was conducted with her, and her input together with published dental sources informed the facts and rules. Clinical validation remains pending.
 
 # 1 Introduction
 
@@ -147,7 +147,7 @@ Input validation, contradiction checks and outside-scope checks precede ordinary
 
 ## 7.1 Technology and execution boundary
 
-Java 21 and Swing provide the native desktop interface. SWI-Prolog 10.0.2 performs reasoning through matching JPL Java/JNI libraries. Java Swing was selected for standard controls and a shared interface codebase. JPL still requires platform-specific native dependencies [7]. Windows and macOS application images use Java packaging tools [8]. The expert-system implementation uses Java, Prolog and shell scripts, with no Python inference or interface implementation.
+Java 21 and Swing provide the native desktop interface. SWI-Prolog 10.0.2 performs reasoning through matching JPL Java/JNI libraries. Java Swing was selected for standard controls and a shared interface codebase. JPL still requires platform-specific native dependencies [7]. Runtime-free launchers use explicitly installed Java and matching Prolog/JPL dependencies [7,8]. The expert-system implementation uses Java, Prolog and shell scripts, with no Python inference or interface implementation.
 
 The Java bridge constructs typed terms instead of concatenating user text into Prolog queries. The public assessment and routing interfaces are:
 
@@ -171,9 +171,11 @@ The 27-question catalogue is not a fixed questionnaire shown in full. Routing re
 
 ## 7.3 Executable and runtime dependencies
 
-Application version 1.2.0 uses knowledge version 0.4.0. The submission contains a Windows x64 executable image, an Apple Silicon macOS app and a bundled Java package for Ubuntu 24.04 x64 desktops. Each retains Java, SWI-Prolog/JPL, knowledge files and legal notices. Users must keep complete application folders together.
+Application version 1.3.0 uses knowledge version 0.4.0. The submission contains one shared application JAR, a small Windows x64 startup executable and an Apple Silicon macOS app wrapper. Java and SWI-Prolog runtimes are installed separately rather than included in the ZIP. Two root scripts per operating system perform dependency installation and current-user application installation. Appendix A gives the launch instructions.
 
-The root launchers open those packages without compilation or separate Java/Prolog installation. The Java application JAR is shared code, but cannot run alone without its accompanying dependencies. Windows signing and macOS notarization remain pending; native platform packages are distinct from an installer.
+Dependency scripts verify official download checksums, retain unrelated installations and use matching JPL libraries from SWI-Prolog 10.0.2. Java 21 is installed machine-wide using Temurin vendor installers on Windows/macOS and OpenJDK through APT on Ubuntu. Prolog uses a versioned location: Program Files on Windows, /Applications/SWI-Prolog-10.0.2.app on macOS and /opt/dentalexplain-dependencies/swipl-10.0.2 on Linux. Ubuntu builds the verified 10.0.2 source with JPL; initial compilation takes longer [7,8].
+
+DentalExplain itself is installed for the current user. Windows provides desktop and Start-menu shortcuts to DentalExplain.exe; macOS installs DentalExplain.app in the user’s Applications folder; Linux provides an application-menu shortcut. Startup resolves knowledge and dependency paths explicitly and reports missing dependencies. Initial setup needs internet access and administrator permission; ordinary consultations work offline afterward. Windows signing and macOS notarization remain pending. Archived distributions can still use bundled runtimes.
 
 ## 7.4 Welcome and consultation setup
 
@@ -221,10 +223,10 @@ Additional Prolog checks cover valid choices, malformed/removed identifiers, che
 | 51 Prolog checks | PASS | PASS | PASS |
 | 20 JPL cases and 14 routed diagnostic cases | PASS | PASS | PASS |
 | Controlled inputs and consultation lifecycle checks | PASS | PASS | PASS under Xvfb |
-| Bundled Java launch from a path with spaces | PASS | PASS | PASS |
-| Native launcher initialization | PASS app | PASS exe | Java launcher used |
+| External-runtime launch from a path with spaces | PASS | PASS | PASS |
+| Installed application startup | PASS app | PASS exe | PASS launcher and menu entry |
 
-These results are recorded in the successful cross-platform workflow on 29 September 2026 [10]. The current source retains the tested engine and application behavior. The report-data export separately reassesses all 20 fixtures. Full case records remain in the separate acceptance-test document.
+These results are recorded in the successful cross-platform workflow on 29 September 2026 [10]. The workflow uses machine-wide external dependencies and runtime-free current-user installations. Repeated installation and missing-dependency/checksum failures were checked. The report-data export separately reassesses all 20 fixtures. Full case records remain in the separate acceptance-test document.
 
 ### Measured consultation lengths
 
@@ -244,13 +246,13 @@ Caries and gingivitis meet the 10-15 target in these fixtures. TC04-TC09 and TC1
 
 Manual desktop verification on macOS includes consultation navigation, result display, knowledge viewing and New consultation. Windows and Linux desktop behavior was checked automatically on hosted runners; a separate manual Windows/Linux consultation is not claimed. Screenshots in this report were captured from the current installed macOS application using synthetic selections. Native window capture excludes the mouse pointer and computer-use cursor overlays.
 
-The submission assembly verifies source inclusion, report files, three root launch scripts, complete runtime directories, executable permissions and SHA-256 checksums. Launch checks use extracted folders containing spaces. Recorded software results do not establish diagnostic accuracy in real patients; clinical knowledge and expectations remain pending review.
+The submission assembly verifies source inclusion, report files, six root installation scripts, runtime-free application files, executable permissions and SHA-256 checksums. Launch checks use extracted folders containing spaces. Recorded software results do not establish diagnostic accuracy in real patients; clinical knowledge and expectations remain pending review.
 
 # 9 Conclusion
 
 DentalExplain implements a runnable native expert system combining Java Swing with embedded SWI-Prolog through JPL. Its 27-question adaptive consultation collects controlled evidence in two steps, while 25 production rules and 30 authored domain facts support five candidate conditions through forward chaining.
 
-The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, a platform-specific runnable package for each supported operating system and a user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the conducted questionnaire is supplied in Appendix B; clinical review remains pending.
+The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, runtime-free application files, six installation scripts and a launch-only user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the conducted questionnaire is supplied in Appendix B; clinical review remains pending.
 
 # References
 
@@ -268,38 +270,42 @@ The implementation preserves uncertainty, supports coexisting candidates and ret
 
 [7] JPL. Deploying for users. https://jpl7.org/Deployment
 
-[8] Oracle. Java 21 jpackage Packaging Overview. https://docs.oracle.com/en/java/javase/21/jpackage/packaging-overview.html
+[8] Eclipse Adoptium. Installing Temurin. https://adoptium.net/installation/
 
 [9] Oracle. Concurrency in Swing. https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html
 
-[10] DentalExplain. Verified cross-platform workflow run, 29 September 2026, source commit 3309824. https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36566312964
+[10] DentalExplain. Verified lightweight external-runtime workflow, 29 September 2026, source commit 0f346be. https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36574386759
 
 References accessed on 29 September 2026. Source identifiers used in Appendix C map as follows: nidcr [1], aae [2], aapd [3], aap [4], efp [5], efp_g [6].
 
 # Appendix A User Manual
 
-Application **1.2.0**; knowledge **0.4.0**. Extract the complete submission ZIP before opening the application. Keep the applications folder and all accompanying runtime files together. Java and SWI-Prolog are bundled; no separate installation or compilation is needed.
+Application **1.3.0**; knowledge **0.4.0**. Extract the complete DentalExplain-submission.zip first. Initial dependency installation needs internet access and administrator permission. It installs Java 21 and SWI-Prolog/JPL 10.0.2 machine-wide; the second script installs DentalExplain for your current user. Keep the extracted folders together until setup completes. Ordinary consultations then work offline.
 
 ## A.1 Windows x64
 
-1. Right-click DentalExplain-submission.zip and choose **Extract All**.
-2. Open the extracted folder and double-click **Open-Windows.cmd**.
-3. Alternatively, open **DentalExplain.exe** inside applications/windows/DentalExplain.
+1. Right-click the ZIP and choose **Extract All**.
+2. Double-click **Install-Dependencies-Windows.cmd**. Allow the administrator prompt and wait for “Dependencies ready”.
+3. Double-click **Install-Application-Windows.cmd**. The app opens after installation.
+4. On later runs, open **DentalExplain** from the desktop or Start menu. The shortcut starts the installed DentalExplain.exe.
 
 ## A.2 Apple Silicon macOS
 
-1. Double-click DentalExplain-submission.zip to extract it.
-2. Open the extracted folder and double-click **Open-macOS.command**.
-3. Alternatively, open **DentalExplain.app** inside applications/macos. You may copy the complete app to Applications.
+1. Double-click the ZIP to extract it.
+2. Double-click **Install-Dependencies-macOS.command**. Enter your administrator password if requested; wait for “Dependencies ready”.
+3. Double-click **Install-Application-macOS.command**. The app opens after installation.
+4. On later runs, open **DentalExplain.app** in your home folder’s **Applications** folder.
 
 ## A.3 Ubuntu 24.04 x64 desktop
 
-1. Extract DentalExplain-submission.zip and open a terminal in the extracted folder.
-2. Run `./Open-Linux.sh`. A graphical desktop is required.
+1. Extract the ZIP and open a terminal in the extracted folder.
+2. Run `bash Install-Dependencies-Linux.sh`. Enter your administrator password if requested. The first run compiles SWI-Prolog 10.0.2 with JPL and can take several minutes.
+3. Run `bash Install-Application-Linux.sh`. The app opens after installation; a graphical desktop is required.
+4. On later runs, open **DentalExplain** from the application menu.
 
 ## A.4 Launch troubleshooting
 
-If a Unix extraction tool removed executable permissions, run `chmod +x Open-macOS.command` on macOS, or `chmod +x Open-Linux.sh applications/linux/DentalExplain/runtime/java/bin/java` on Linux. If runtime files are missing, extract the complete ZIP again. Use the package matching your operating system and architecture. Windows code signing and macOS notarization remain pending; follow your computer owner's software policy if the operating system blocks a downloaded application.
+If dependencies are missing, rerun the dependency script, then the application script. Check your internet connection if downloading fails; a checksum mismatch stops installation, so retry with a fresh official download. Existing unrelated Java/Prolog installations are retained. Use the supported operating system and architecture. For missing extracted files, extract the complete ZIP again. If macOS executable permissions were lost during extraction, run `chmod +x Install-*.command`. Windows signing and macOS notarization remain pending; follow your computer owner’s software policy if downloaded software is blocked.
 
 # Appendix B Human Expert Questionnaire
 

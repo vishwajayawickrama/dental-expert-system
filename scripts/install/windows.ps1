@@ -36,7 +36,7 @@ function Download-Verified([string]$url,[string]$hash,[string]$file){
         Invoke-WebRequest -Uri $url -OutFile "$file.part" -UseBasicParsing
         Move-Item "$file.part" $file
     }
-    if((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne $hash.ToLower()){Fail 'Download checksum mismatch; nothing was installed.'}
+    if((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne $hash.ToLower()){Fail 'Download checksum mismatch; this download was not installed.'}
 }
 function Launch-Java([string]$app,[string[]]$arguments){
     $layout=Check-Dependencies

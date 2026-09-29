@@ -95,15 +95,16 @@ Unknown or Not applicable findings do not satisfy required premises. A known fai
 
 Java Swing is selected for its built-in native controls and reusable Java source, with JPL embedding SWI-Prolog. The [architecture comparison](architecture.md#1-technology-decision) records Java, C++/Qt, web, XPCE and terminal alternatives and their dependencies.
 
-The development JAR requires the matching runtime files. The macOS application image bundles Java 21, Prolog 10.0.2/JPL, knowledge files and an icon. Application 1.2.0 provides a portable Windows x64 .exe image and Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Native dependencies are bundled per platform; the same JAR is reused. A single JAR does not contain all required native runtimes.
+Application 1.3.0 provides a shared Java 21 JAR and small macOS/Windows launchers. Six scripts install Java and SWI-Prolog/JPL 10.0.2 machine-wide, then install DentalExplain for the current user on macOS ARM64, Windows x64 or Ubuntu 24.04 x64. The under-20 MB submission excludes runtimes and installers; initial setup requires internet and administrator permission. Consultations work offline after installation. Existing unrelated dependency versions are retained, and prior self-contained packages remain archived.
 
-## 7. Test and acceptance plan
+## 7. Test
+ and acceptance plan
 
 The [20-case catalogue](test-cases.md) retains concrete reported symptoms and supplied findings, source references, expected/prohibited outcomes and review status. Its automated fixtures map checkbox selections and measurements to permitted values without introducing arbitrary age-based conclusions.
 
 Forward chaining must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover all five age groups, Unknown/missing groups, invalid boundary values, contradictory inputs, incomplete evidence, blocked rules, unsupported presentations, coexisting findings, termination, duplicate prevention and reset. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
 
-Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, display results and reset. Another-machine verification, Developer ID signing/notarization and Windows signing remain follow-up work.
+Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve external dependencies and application resources from a path with spaces, complete consultations, display results and reset. Another-machine verification, Developer ID signing/notarization and Windows signing remain follow-up work.
 
 ## 8. User manual
 

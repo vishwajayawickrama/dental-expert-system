@@ -2,7 +2,7 @@
 # Shared installation helpers; no clinical inference is implemented here.
 set -euo pipefail
 fail(){ printf '%s\n' "$*" >&2; exit 1; }
-verify_hash(){ printf '%s  %s\n' "$1" "$2" | shasum -a 256 -c - >/dev/null || fail 'Download checksum mismatch; nothing was installed.'; }
+verify_hash(){ printf '%s  %s\n' "$1" "$2" | shasum -a 256 -c - >/dev/null || fail 'Download checksum mismatch; this download was not installed.'; }
 fetch(){
   local url="$1" hash="$2" destination="$3"
   if [[ -n "${DENTAL_DOWNLOAD_CACHE:-}" && -f "$DENTAL_DOWNLOAD_CACHE/$(basename "$destination")" ]]; then

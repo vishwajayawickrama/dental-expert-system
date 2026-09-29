@@ -49,7 +49,7 @@ async function main(){
  children.push(new d.Paragraph({text:'DentalExplain',style:'Title',spacing:{before:2300,after:280},alignment:d.AlignmentType.CENTER}));
  p('A Dental Diagnosis Expert System',{alignment:d.AlignmentType.CENTER,spacing:{after:1500},children:[new d.TextRun({text:'A Dental Diagnosis Expert System',font:'Times New Roman',size:32})]});
  for(const t of ['Vishwa Jayawickrama','CM3321','Logic Programming and Artificial Cognitive Systems','29 September 2026'])p(t,{alignment:d.AlignmentType.CENTER});
- p('Application 1.2.0   Knowledge 0.4.0',{alignment:d.AlignmentType.CENTER,spacing:{before:700,after:120}});
+ p('Application 1.3.0   Knowledge 0.4.0',{alignment:d.AlignmentType.CENTER,spacing:{before:700,after:120}});
  const text=fs.readFileSync(path.join(ROOT,'docs/report.md'),'utf8');
  const tokens=require('marked').lexer(text);
  let contentsInserted=false;

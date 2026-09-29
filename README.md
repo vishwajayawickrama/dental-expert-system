@@ -6,35 +6,33 @@ Setup has two fields, followed by two adaptive steps: **Reported symptoms** and 
 
 Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledge version 0.4.0 contains 27 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining evaluates the full condition catalogue to a fixed point. Age uses five predefined groups; no diagnosis target or assessment focus is selected. All clinical knowledge and expected outcomes await dentist review.
 
-## Distributions
+## Lightweight submission
 
-Application 1.2.0 provides a portable Windows x64 application image and bundled Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Download the complete ZIP for your platform and extract it before launch:
+Application **1.3.0** installs Java 21 and SWI-Prolog/JPL **10.0.2** separately. The submission ZIP stays under **20 MB** and contains one shared JAR, small macOS/Windows launchers, source, knowledge, reports and checksums. Initial setup needs internet access and administrator permission; normal consultations work offline afterward.
 
-| Package | Launch |
-| --- | --- |
-| `DentalExplain-windows-x64.zip` | `DentalExplain/DentalExplain.exe` |
-| `DentalExplain-java-windows-x64.zip` | `Launch.cmd` |
-| `DentalExplain-java-macos-arm64.zip` | `Launch.command` |
-| `DentalExplain-java-linux-x64.zip` | `./launch.sh` |
-| `DentalExplain-macos-arm64.zip` | `DentalExplain.app` |
+| Platform | First install dependencies | Then install application |
+| --- | --- | --- |
+| Windows x64 | `Install-Dependencies-Windows.cmd` | `Install-Application-Windows.cmd` |
+| Apple Silicon macOS | `Install-Dependencies-macOS.command` | `Install-Application-macOS.command` |
+| Ubuntu 24.04 x64 | `bash Install-Dependencies-Linux.sh` | `bash Install-Application-Linux.sh` |
 
-The Java packages contain the same executable `DentalExplain.jar`, matching `jpl.jar`, knowledge files and platform-specific Java/Prolog runtimes. A JAR alone is not a complete distribution. Launch scripts select bundled Java; double-clicking a JAR may select system Java. No global Java/Prolog install or Windows installer is required. See [actual verification](docs/verification.md) before treating a platform as verified.
+Dependencies are machine-wide and existing unrelated versions are retained. DentalExplain installs for the current user and creates a Windows desktop/Start-menu shortcut, a macOS app in `~/Applications`, or a Linux application-menu entry. The shared JAR needs matching external JPL Java/native libraries; it cannot run alone. See the [launch-only manual](docs/user-manual.md) and [actual verification](docs/verification.md).
 
-GitHub Actions builds native artifacts on their respective platforms; workflow artifacts include packages, SHA-256 checksums, logs and screenshots. Generated files remain excluded from Git. Windows code signing, macOS notarization and additional architectures remain follow-up work.
+The prior self-contained ZIP remains archived in ignored `dist/archive/`. Its bundled-runtime loading is still supported. Windows signing and macOS notarization remain pending.
 
 ## Develop on Apple Silicon macOS
 
-Requires Java 21 and Apple's command-line tools for development. No Python or Maven is used.
+Requires installed Java 21 and SWI-Prolog/JPL 10.0.2. No Python or Maven is used for the application.
 
 ```sh
-./scripts/bootstrap.sh
+export JAVA_HOME="$(/usr/libexec/java_home -F -v 21)"
+export DENTAL_JPL_JAR="/Applications/SWI-Prolog-10.0.2.app/Contents/Resources/swipl/lib/jpl.jar"
 ./scripts/build.sh
-./scripts/test.sh
-./scripts/run.sh
-./scripts/package.sh
+./scripts/install/test-unix.sh
+./scripts/install/package-lightweight.sh
 ```
 
-Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use the bundled application without separate Java/Prolog installation. Mac packages are locally ad-hoc signed; notarization and manual another-machine verification remain follow-up work. Generated runtime/build/package files and the reference report are excluded from Git.
+Build the Windows startup wrapper on Windows with `scripts/install/build-windows.ps1`. The lightweight workflow produces the shared JAR and verified startup EXE. Report assembly uses `scripts/package-submission.sh` after both report formats and verified payload files are available. Legacy bootstrap/jpackage scripts remain available for archived self-contained packages; they are not the lightweight submission route. Generated dependency/build/distribution files and the reference report remain excluded from Git.
 
 ## Documentation
 
@@ -49,8 +47,9 @@ Results offer New consultation only; answers can be revised using Back before as
 
 The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. The report's 15-question expert questionnaire was conducted with Kushala, as confirmed by the project author; clinical review remains pending.
 
-## Combined submission
+## Build the submission
 
-`DentalExplain-submission.zip` includes the report in Word and PDF, interface/Prolog source, complete macOS/Windows/Linux application packages, checksums and exactly three root launch scripts: `Open-macOS.command`, `Open-Windows.cmd` and `Open-Linux.sh`. Extract the full ZIP, then use the launcher for your platform. No development build output, runtime-download cache or CI artifact archive is included; required application runtime files are retained. See report Appendix A or the [user manual](docs/user-manual.md).
+`scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, report formats, source and six installation scripts, generates checksums and enforces a 20 MB ZIP maximum. Generated files remain ignored. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
 
-The 10–15-question goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).
+The 10–15-question
+ goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).

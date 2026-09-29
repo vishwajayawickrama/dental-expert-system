@@ -1,39 +1,33 @@
 #!/bin/bash
 set -euo pipefail
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-DEST="${1:-$ROOT/build/submission}"
-if [[ -e "$DEST" ]]; then
-  printf '%s\n' "Staging directory already exists: $DEST. Choose a fresh directory." >&2
-  exit 1
-fi
-for file in DentalExplain-macos-arm64.zip DentalExplain-windows-x64.zip DentalExplain-java-linux-x64.zip; do
-  [[ -f "$ROOT/dist/$file" ]] || { printf '%s\n' "Missing verified distribution: $file" >&2; exit 1; }
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+DEST=${1:-$ROOT/build/submission-lightweight}
+[[ ! -e "$DEST" ]] || { echo 'Choose a fresh staging directory.' >&2; exit 1; }
+PAYLOAD="$ROOT/build/lightweight"
+for file in "$PAYLOAD/application/DentalExplain.jar" "$PAYLOAD/application/windows/DentalExplain.exe" "$ROOT/docs/report/DentalExplain Report.docx" "$ROOT/docs/report/DentalExplain Report.pdf"; do
+ [[ -s "$file" ]] || { printf 'Missing verified file: %s\n' "$file" >&2; exit 1; }
 done
-for ext in docx pdf; do
-  [[ -s "$ROOT/docs/report/DentalExplain Report.$ext" ]] || { printf '%s\n' "Missing report: $ext" >&2; exit 1; }
-done
-mkdir -p "$DEST/report" "$DEST/source/scripts" "$DEST/applications/"{macos,windows,linux}
-cp "$ROOT/scripts/submission/"Open-* "$DEST/"
-chmod +x "$DEST/Open-macOS.command" "$DEST/Open-Linux.sh"
+mkdir -p "$DEST/report" "$DEST/source/scripts" "$ROOT/dist"
+cp -R "$PAYLOAD/." "$DEST/"
+cp "$ROOT/scripts/submission/README.txt" "$DEST/"
 cp "$ROOT/docs/report/DentalExplain Report."{docx,pdf} "$DEST/report/"
 cp -R "$ROOT/src" "$ROOT/knowledge" "$DEST/source/"
-for file in bootstrap.sh build.sh test.sh run.sh package.sh IconBuilder.java; do
-  cp "$ROOT/scripts/$file" "$DEST/source/scripts/"
-done
-cp -R "$ROOT/scripts/distribution" "$DEST/source/scripts/"
 cp "$ROOT/scripts/submission/source-README.md" "$DEST/source/README.md"
-cp "$ROOT/scripts/submission/README.txt" "$DEST/README.txt"
-unzip -q "$ROOT/dist/DentalExplain-macos-arm64.zip" -d "$DEST/applications/macos"
-unzip -q "$ROOT/dist/DentalExplain-windows-x64.zip" -d "$DEST/applications/windows"
-unzip -q "$ROOT/dist/DentalExplain-java-linux-x64.zip" -d "$DEST/applications/linux"
-mv "$DEST/applications/linux/DentalExplain-java-linux-x64" "$DEST/applications/linux/DentalExplain"
-# Hash regular files; ZIP -y preserves the symlinks and Unix executable modes.
-(cd "$DEST" && find . -type f ! -name SHA256SUMS.txt ! -name .DS_Store ! -path '*/__MACOSX/*' -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 > SHA256SUMS.txt)
+cp "$ROOT/scripts/build.sh" "$ROOT/scripts/IconBuilder.java" "$DEST/source/scripts/"
+cp -R "$ROOT/scripts/install" "$DEST/source/scripts/"
+mkdir -p "$DEST/source/scripts/submission"
+cp "$ROOT/scripts/submission/"Install-* "$DEST/source/scripts/submission/"
+cp "$ROOT/scripts/submission/THIRD-PARTY-NOTICES.txt" "$DEST/"
+# All required dependencies are installed separately; reject accidental runtime inclusion.
+if find "$DEST" -type d \( -name runtime -o -name .runtime -o -name .git -o -name node_modules \) | grep -q .; then echo 'Unexpected runtime or development directory' >&2; exit 1; fi
+(cd "$DEST" && find . -type f ! -name SHA256SUMS.txt ! -name .DS_Store -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 > SHA256SUMS.txt)
 ARCHIVE="$ROOT/dist/DentalExplain-submission.zip"
 if [[ -e "$ARCHIVE" ]]; then
-  printf '%s\n' 'Submission ZIP already exists; preserving it. Rename it before repackaging.' >&2
-  exit 1
+ mkdir -p "$ROOT/dist/archive"
+ mv "$ARCHIVE" "$ROOT/dist/archive/DentalExplain-submission-before-1.3.0-$(date +%Y%m%d-%H%M%S).zip"
 fi
 (cd "$DEST" && zip -q -r -y "$ARCHIVE" . -x '*.DS_Store' '*/__MACOSX/*')
+SIZE=$(wc -c < "$ARCHIVE" | tr -d ' ')
+[[ "$SIZE" -lt 20000000 ]] || { echo "Submission exceeds 20 MB: $SIZE bytes" >&2; exit 1; }
 shasum -a 256 "$ARCHIVE" > "$ROOT/dist/DentalExplain-submission.sha256"
-printf '%s\n' "$ARCHIVE"
+printf '%s (%s bytes)\n' "$ARCHIVE" "$SIZE"

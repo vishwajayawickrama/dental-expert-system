@@ -1,6 +1,39 @@
 # DentalExplain verification record
 
-## Current release: shortened consultations and revised report — 29 September 2026
+## Current release 1.3.0 lightweight external-runtime delivery — 29 September 2026
+
+Application **1.3.0**, knowledge **0.4.0**. Consultation behavior remains unchanged: **27 questions, 25 rules, 30 facts**, forward chaining and five supported targets. The submission omits Java/Prolog runtimes and downloads; six scripts install machine-wide dependencies followed by a current-user application.
+
+The [external-runtime workflow](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36574386759), source commit `0f346be`, passed on **macOS ARM64, Windows x64 and Ubuntu 24.04 x64**. Every platform passed **20 acceptance cases, 51 Prolog checks, 20 JPL assessments, 14 routed diagnostic cases and all 27 control schemas**, including navigation, hidden clearing, checkbox exclusivity, reset and stale callbacks. Linux uses Xvfb. These are software passes; clinical validation remains pending.
+
+| Installation/startup check | Actual outcome |
+| --- | --- |
+| Machine-wide dependencies | PASS: Java 21 plus exact SWI-Prolog/JPL 10.0.2. Windows exercised the verified Temurin MSI and Prolog vendor installer; Linux compiled the verified source into `/opt`; macOS installed the verified DMG app in its versioned `/Applications` location. Existing Java 21 was reused on macOS. |
+| Repeated installation | PASS: dependency and current-user application installers ran twice on each platform. |
+| Matching Java/native JPL | PASS: runtime initialization compares JPL versions and initializes the selected installation's boot resources. |
+| Paths with spaces | PASS: Windows/Linux install from `Submission With Spaces`; local macOS submission path contains spaces. |
+| Windows executable | PASS: installed startup EXE independently invoked runtime verification and produced its report. Windows PowerShell 5.1 was used. |
+| Missing dependencies | PASS: deliberately absent Prolog locations rejected on Windows and Unix without clinical assessment. |
+| Corrupt downloads | PASS: checksum failures rejected before use on Windows and Unix. |
+| Interrupted download/retry | PASS Unix: failed local endpoint produced no completed download; a verified retry ignored the incomplete `.part` file. Windows uses temporary download staging and cleanup; a real interrupted Windows network transfer was not simulated. |
+| Linux shortcut | PASS: current-user application-menu desktop entry created; installed launcher initialized successfully with only system PATH. |
+| Native macOS | PASS: current-user app installed in `~/Applications`; clean-environment launch initialized system Java 21.0.11 and versioned Prolog. Native welcome/setup, adaptive steps, missing-age result and New consultation reset were inspected. Candidate and full lifecycle coverage is also automated. |
+
+No manual Windows/Linux desktop walkthrough is claimed. Java/Prolog installer elevation prompts and a fresh Temurin PKG installation on another Mac remain untested locally; the existing valid Java 21 installation was retained. Windows signing and macOS notarization remain pending. Historical records below describe previous self-contained releases.
+
+
+### Final report and submission archive
+
+The regenerated Word/PDF report contains **26 pages**, all visually inspected. Embedded PDF fonts are Times New Roman; the five tables retain white cells and black borders. Contents pagination, six retained screenshots, 15 conducted expert questions, 30 facts and 25 rules were checked. Appendix A contains the two installation steps for each OS; no Appendix D is present.
+
+`dist/DentalExplain-submission.zip` is **2,438,253 bytes (2.44 MB / 2.33 MiB)**, below the enforced 20,000,000-byte maximum. It contains **87 entries, 60 checksum-verified regular files, six root installation scripts and one shared JAR**, with the small Windows EXE and macOS app wrapper. No Java/Prolog runtimes, installers, native dependency libraries, build directories or Git metadata are included. ZIP CRC checks passed and executable permissions were retained. The previous **237,712,582-byte** ZIP is preserved as `dist/archive/DentalExplain-submission-before-1.3.0-20260929-190148.zip`.
+
+Final ZIP SHA-256: `defce661e0c11f5dc609b7861520fbae7272177fe6975a2c240766ae5c4c4915`.
+
+Shared JAR SHA-256: `e71b6721a905095519ed3a33bb0d695b7ed71ca0420ecd04db30338aab0087c9`. The canonical CI-built JAR matches the ZIP and installed Mac app. The extracted final submission was tested from `build/Final Submission With Spaces`: all 60 file hashes passed; both Mac root installers and the installed launcher passed with an empty development environment and system-only PATH. The user app initializes external Java 21.0.11 and SWI-Prolog/JPL 10.0.2. Windows/Linux generated UI captures were inspected for spacing, scrolling, controls and results; their native desktop verification remains automated.
+
+
+## Historical release: shortened consultations and revised report — 29 September 2026
 
 Application **1.2.0**, knowledge **0.4.0**, with **27 questions (2 setup, 8 symptom, 17 findings), 25 rules and 30 authored domain facts**. Whole-mouth dentition, region and biting-pain fields are removed and rejected at the boundary. The five supported conditions and their diagnostic premises are retained. Forward-computed deductions and unresolved prerequisites skip unanswered questions for blocked rules and already-supported candidates; explicit applicable evidence remains present. Parent changes still clear dependent answers.
 

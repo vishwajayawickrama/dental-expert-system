@@ -578,3 +578,7 @@ Procedure: complete TC11, choose New consultation, then assess the blank state. 
 ## Additional verification
 
 The Prolog suite contains 51 checks, including allowed values, removed identifiers, duplicate inputs, checkbox exclusivity, uncertainty, fixed-point termination, missing prerequisites, blocked rules, supported-condition question skipping and all ordered walkthroughs. Java/JPL assesses all 20 fixtures and 14 routed diagnostic cases. Swing checks all 27 controls, Back navigation, conditional clearing, scope bypass, result readability, New consultation and discarded delayed callbacks. Native screenshots and platform packaging results are recorded separately in the verification document.
+
+## External-runtime release 1.3.0 verification — 29 September 2026
+
+All 20 cases and the existing routing/interface checks passed with externally installed Java 21 and SWI-Prolog/JPL 10.0.2 on macOS ARM64, Windows x64 and Ubuntu 24.04 x64. [Workflow evidence](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36574386759). Inputs, target candidates, question counts and clinical-review status are unchanged.
