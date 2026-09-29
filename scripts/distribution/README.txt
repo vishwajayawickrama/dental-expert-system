@@ -1,4 +1,4 @@
-DentalExplain 1.1.0 — Dental Expert System
+DentalExplain 1.2.0 — Dental Expert System
 
 Keep this complete folder together. The Java application is DentalExplain.jar.
 Java 21 and matching SWI-Prolog 10.0.2/JPL dependencies are bundled in runtime.

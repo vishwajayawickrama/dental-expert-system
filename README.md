@@ -1,14 +1,14 @@
 # DentalExplain
 
-A dentist-only Java Swing desktop expert system using SWI-Prolog 10.0.2 through JPL. Supports candidate dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis across supplied age/dentition groups.
+A dentist-only Java Swing desktop expert system using SWI-Prolog 10.0.2 through JPL. Supports candidate dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis across age groups and supplied tooth types.
 
-Setup has four fields, followed by two adaptive steps: **Reported symptoms** and **Relevant dental findings**. Prolog determines applicable follow-ups; each question offers its own predefined wording. The catalogue has 4 setup, 9 symptom and 17 examination questions.
+Setup has two fields, followed by two adaptive steps: **Reported symptoms** and **Relevant dental findings**. Prolog determines applicable follow-ups; each question offers its own predefined wording. The catalogue has 2 setup, 8 symptom and 17 examination questions.
 
-Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledge version 0.3.0 contains 30 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining evaluates the full condition catalogue to a fixed point. Age uses five predefined groups; no diagnosis target or assessment focus is selected. All clinical knowledge and expected outcomes await dentist review.
+Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledge version 0.4.0 contains 27 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining evaluates the full condition catalogue to a fixed point. Age uses five predefined groups; no diagnosis target or assessment focus is selected. All clinical knowledge and expected outcomes await dentist review.
 
 ## Distributions
 
-Application 1.1.0 provides a portable Windows x64 application image and bundled Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Download the complete ZIP for your platform and extract it before launch:
+Application 1.2.0 provides a portable Windows x64 application image and bundled Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Download the complete ZIP for your platform and extract it before launch:
 
 | Package | Launch |
 | --- | --- |
@@ -52,3 +52,5 @@ The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery u
 ## Combined submission
 
 `DentalExplain-submission.zip` includes the report in Word and PDF, interface/Prolog source, complete macOS/Windows/Linux application packages, checksums and exactly three root launch scripts: `Open-macOS.command`, `Open-Windows.cmd` and `Open-Linux.sh`. Extract the full ZIP, then use the launcher for your platform. No development build output, runtime-download cache or CI artifact archive is included; required application runtime files are retained. See report Appendix A or the [user manual](docs/user-manual.md).
+
+The 10–15-question goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).

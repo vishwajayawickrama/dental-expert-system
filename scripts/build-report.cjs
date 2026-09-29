@@ -10,7 +10,7 @@ const d = require('docx');
 const ROOT = path.resolve(__dirname,'..');
 const OUT = path.join(ROOT,'docs/report');
 const data = JSON.parse(fs.readFileSync(path.join(ROOT,'build/report/data.json'),'utf8'));
-if(data.facts.length!==30||data.rules.length!==25||data.questions.length!==30||data.cases.length!==20||data.cases.some(c=>!c.pass))throw Error('Knowledge or acceptance mismatch');
+if(data.facts.length!==30||data.rules.length!==25||data.questions.length!==27||data.cases.length!==20||data.cases.some(c=>!c.pass))throw Error('Knowledge or acceptance mismatch');
 fs.mkdirSync(OUT,{recursive:true});
 const children=[];
 const W=9360;
@@ -49,7 +49,7 @@ async function main(){
  children.push(new d.Paragraph({text:'DentalExplain',style:'Title',spacing:{before:2300,after:280},alignment:d.AlignmentType.CENTER}));
  p('A Dental Diagnosis Expert System',{alignment:d.AlignmentType.CENTER,spacing:{after:1500},children:[new d.TextRun({text:'A Dental Diagnosis Expert System',font:'Times New Roman',size:32})]});
  for(const t of ['Vishwa Jayawickrama','CM3321','Logic Programming and Artificial Cognitive Systems','29 September 2026'])p(t,{alignment:d.AlignmentType.CENTER});
- p('Application 1.1.0   Knowledge 0.3.0',{alignment:d.AlignmentType.CENTER,spacing:{before:700,after:120}});
+ p('Application 1.2.0   Knowledge 0.4.0',{alignment:d.AlignmentType.CENTER,spacing:{before:700,after:120}});
  const text=fs.readFileSync(path.join(ROOT,'docs/report.md'),'utf8');
  const tokens=require('marked').lexer(text);
  let contentsInserted=false;
@@ -57,7 +57,7 @@ async function main(){
    if(t.type==='heading'){
      if(t.text==='1 Introduction'&&!contentsInserted){
        heading('Contents');
-       const defaultPages={'Abstract':2,'1 Introduction':4,'2 Domain Definition and Scope':5,'3 Knowledge Acquisition':6,'4 Expert System Architecture':7,'5 Knowledge Representation':9,'6 Inference Method':10,'7 System Design and Implementation':11,'8 Testing and Evaluation':18,'9 Conclusion':19,'References':20,'Appendix A User Manual':21,'Appendix B Human Expert Questionnaire':24,'Appendix C Knowledge Catalogue':25,'Appendix D Acceptance Test Cases':28};
+       const defaultPages={"Abstract":2,"1 Introduction":4,"2 Domain Definition and Scope":5,"3 Knowledge Acquisition":6,"4 Expert System Architecture":7,"5 Knowledge Representation":9,"6 Inference Method":10,"7 System Design and Implementation":11,"8 Testing and Evaluation":18,"9 Conclusion":20,"References":21,"Appendix A User Manual":22,"Appendix B Human Expert Questionnaire":23,"Appendix C Knowledge Catalogue":24};
        const mapFile=path.join(ROOT,'build/report/page-map.json');
        const pageMap=fs.existsSync(mapFile)?JSON.parse(fs.readFileSync(mapFile,'utf8')):defaultPages;
        if(Object.keys(pageMap).length!==Object.keys(defaultPages).length)throw Error('Contents pagination is incomplete; regenerate the page map.');
@@ -87,28 +87,6 @@ async function main(){
    p('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{children:runs('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{size:20}),keepNext:true,spacing:{after:35,line:220}});
    p('Source: '+r.source+'; review: pending.',{spacing:{after:65,line:200},style:'Caption'});
  }
- heading('Appendix D Acceptance Test Cases');
- p('All cases are synthetic. Software results below were reassessed from the source fixtures on 29 September 2026. Clinical expectations remain pending review. TC01-TC14 have diagnostic targets; TC15-TC20 are edge cases. Raw boundary fixtures may deliberately contain child fields hidden by the UI. The routed diagnostic checks independently exclude those fields and preserve each target.');
- p('The tables give every explicitly supplied fixture input. Any omitted question is Unknown, never No. Values are the stable Prolog identifiers from the controlled catalogue; checkbox lists identify selected items, while none records explicit absence. Invalid or contradictory fixtures are programmatic boundary tests, not combinations users can freely type into the interface.');
- heading('D.1 Question identifiers and display labels',2);
- table(['Identifier','Question','Stage'],data.questions.map(q=>[q.id,q.label,q.section==='setup'?'Setup':q.section==='symptoms'?'Step 1':'Step 2']),[2300,6060,1000],true);
- const titles=['Caries in a primary tooth','Caries in a permanent tooth in the child group','Caries in an adult permanent tooth','Reversible pulpitis in a primary tooth','Reversible pulpitis in an immature permanent tooth','Reversible pulpitis in a mature permanent tooth','Irreversible pulpitis candidate in a primary tooth','Irreversible pulpitis in an adolescent permanent tooth','Irreversible pulpitis in an adult permanent tooth','Gingivitis in mixed dentition','Gingivitis in adolescent permanent dentition','Gingivitis in the adult group','Periodontitis in the adult group','Periodontitis in the older-adult group','Missing age group','Invalid numeric age-group input','Missing required tooth information','Contradictory tooth-pain inputs','Jaw-only presentation outside scope','Blank consultation after reset'];
- const names={caries:'Dental caries',reversible_pulpitis:'Reversible pulpitis',irreversible_pulpitis:'Symptomatic irreversible pulpitis',gingivitis:'Gingivitis',periodontitis:'Periodontitis'};
- const statusNames={candidates:'Supported candidate conditions',incomplete:'Additional information needed',invalid:'Invalid input',conflict:'Conflicting inputs',outside_scope:'Outside supported scope'};
- data.cases.forEach((c,i)=>{
-   children.push(new d.Paragraph({text:`D.${i+2} ${c.id.toUpperCase()} ${titles[i]}`,heading:d.HeadingLevel.HEADING_2,pageBreakBefore:true,keepNext:true,spacing:{after:140}}));
-   if(i===19)p('Procedure: complete TC11 in the UI, choose New consultation, then assess the blank reset state. This fixture represents the resulting empty observation list; Java lifecycle tests separately verify that previous selections and results were cleared.');
-   table(['Question identifier','Supplied value'],c.inputs.length?c.inputs.map(x=>[x.key,x.value]):[['All questions','Unknown after reset']],[3800,5560],true);
-   const expected=c.target==='none'?statusNames[c.expected_status]:names[c.target]+' must be included; coexisting candidates permitted';
-   p('Expected response: '+expected+'.',{keepNext:true,spacing:{after:80,line:240}});
-   p('Actual response: '+statusNames[c.status]+'. Candidates: '+(c.candidates.length?c.candidates.map(x=>names[x]).join('; '):'none')+'.',{spacing:{after:80,line:240}});
-   p('Missing requests: '+(c.missing.length?c.missing.join(', '):'none')+'.',{spacing:{after:80,line:240}});
-   p('Message: '+c.messages.join(' '),{spacing:{after:80,line:240}});
-   let prohibited=c.target==='none'?'Any supported candidate.':c.target==='caries'?'Unsupported pulpitis or periodontitis.':c.target==='reversible_pulpitis'?'Unsupported irreversible pulpitis or periodontitis.':c.target==='irreversible_pulpitis'?'Unsupported reversible pulpitis or periodontitis.':c.target==='gingivitis'?'Unsupported periodontitis or pulpitis.':'Unsupported intact-periodontium gingivitis or pulpitis.';
-   p('Prohibited outcomes: '+prohibited,{spacing:{after:80,line:240}});
-   p('Result: PASS software. Clinical review: pending.',{spacing:{after:80,line:240}});
-   p('Source references: '+(i<3?'[1] and [3]':i<9?'[2] and [3]':i<12?'[4] and [6]':i<14?'[5]':'Implemented boundary and lifecycle requirements'),{style:'Caption'});
- });
  const doc=new d.Document({creator:'Vishwa Jayawickrama',title:'DentalExplain Report',description:'Dental diagnosis expert system report and user manual',
    styles:{default:{document:{run:{font:'Times New Roman',size:22,color:'000000'},paragraph:{spacing:{line:270,after:120}}}},paragraphStyles:[
      {id:'Title',name:'Title',basedOn:'Normal',run:{font:'Times New Roman',size:48,bold:true,color:'000000'}},
@@ -117,6 +95,6 @@ async function main(){
      {id:'Caption',name:'Caption',basedOn:'Normal',run:{font:'Times New Roman',size:19,color:'000000'},paragraph:{spacing:{after:120,line:225}}}
    ]},features:{updateFields:true},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1100,right:1273,bottom:1100,left:1273}}},footers:{default:new d.Footer({children:[new d.Paragraph({alignment:d.AlignmentType.CENTER,children:[new d.TextRun({children:[d.PageNumber.CURRENT],font:'Times New Roman',size:18})]})]})},children}]});
  fs.writeFileSync(path.join(OUT,'DentalExplain Report.docx'),await d.Packer.toBuffer(doc));
- console.log('Report authored with 30 facts, 25 rules, 20 executed cases and 7 figures.');
+ console.log('Report authored with 30 facts, 25 rules, 20 executed cases and 7 figures; acceptance details remain outside the report.');
 }
 main().catch(e=>{console.error(e);process.exit(1)});

@@ -22,18 +22,18 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 | Knowledge size | Exactly 25 meaningful production rules and 30 authored domain facts. |
 | Tests | 20 synthetic acceptance cases and additional boundary, engine and interface checks. |
 | Runnable deliverable | Bundled macOS `.app`, Windows x64 `.exe` image and Ubuntu x64 Java package, with three submission-root launchers. |
-| User manual | Installation, consultation, knowledge viewing, reset and troubleshooting. |
+| User manual | Extraction, launch on Windows/macOS/Linux and launch troubleshooting. |
 | No Python implementation | Java, Prolog and shell only. |
 
 ## 2. Specific domain and scope
 
 **Domain:** Dental diagnostic decision support for common tooth pain and gum symptoms in children, adolescents and adults. The interface is intended for dentists, who enter reported symptoms and explicitly supplied examination findings. This is not restricted to an educational or adult-only domain.
 
-The supported candidates are **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis**. Age is captured using five groups (0–5, 6–12, 13–17, 18–64 and 65–120 years, or Unknown); dentition, affected tooth type and root maturity are supplied independently. No diagnosis is inferred from chronological age alone. Primary/immature teeth use appropriate question applicability and separate rule branches; these clinical rules require dentist review. Age bands describe context and are not diagnostic thresholds.
+The supported candidates are **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis**. Age is captured using five groups (0–5, 6–12, 13–17, 18–64 and 65–120 years, or Unknown); affected tooth type and root maturity are supplied independently. No diagnosis is inferred from chronological age alone. Primary/immature teeth use appropriate question applicability and separate rule branches; these clinical rules require dentist review. Age bands describe context and are not diagnostic thresholds.
 
-Setup captures age group, dentition, affected tooth type and region. Step 1 collects reported pain, pain triggers/persistence, spontaneous/sleep/biting pain, combined gum symptoms, combined warning signs and jaw clicking. Step 2 collects applicable tooth findings, root maturity/thermal response, percussion/apical findings, plaque, periodontal measurements, previous-destruction history and loss-pattern follow-ups. Numeric findings use predefined measurement dropdowns. The dentist interprets examinations and images before entering their findings.
+Setup captures age group and affected tooth type. Step 1 collects reported pain, pain triggers/persistence, spontaneous and sleep-interrupting pain, combined gum symptoms, combined warning signs and jaw clicking. Step 2 collects applicable tooth findings, root maturity/thermal response, percussion/apical findings, plaque, periodontal measurements, previous-destruction history and loss-pattern follow-ups. Numeric findings use predefined measurement dropdowns. The dentist interprets examinations and images before entering their findings.
 
-The application returns supported candidates, requests missing inputs, identifies conflicts, or reports outside-scope/no-supported-conclusion outcomes. Supported findings may coexist. All clinical inputs use dropdowns, radio buttons or checkboxes; no free-text clinical entry is allowed. Unknown, No, None and Not applicable retain distinct meanings. The shared catalogue defines every permitted mapping and Prolog controls applicability through `active_questions/3`. It contains 30 questions: 4 setup, 9 symptoms and 17 examination findings. FDI selectors and unused questions have been removed.
+The application returns supported candidates, requests missing inputs, identifies conflicts, or reports outside-scope/no-supported-conclusion outcomes. Supported findings may coexist. All clinical inputs use dropdowns, radio buttons or checkboxes; no free-text clinical entry is allowed. Unknown, No, None and Not applicable retain distinct meanings. The shared catalogue defines every permitted mapping and Prolog controls applicability through `active_questions/3`. It contains 27 questions: 2 setup, 8 symptoms and 17 examination findings. FDI selectors and unused questions have been removed.
 
 Orthodontic planning, oral cancer diagnosis, treatment prescribing, image interpretation, knowledge editing, autonomous clinical diagnosis, patient-record persistence are outside this first implementation. Swelling, drainage or fever requires assessment beyond the five-condition catalogue. Full urgent-care and dental differential diagnosis are not implemented.
 
@@ -95,7 +95,7 @@ Unknown or Not applicable findings do not satisfy required premises. A known fai
 
 Java Swing is selected for its built-in native controls and reusable Java source, with JPL embedding SWI-Prolog. The [architecture comparison](architecture.md#1-technology-decision) records Java, C++/Qt, web, XPCE and terminal alternatives and their dependencies.
 
-The development JAR requires the matching runtime files. The macOS application image bundles Java 21, Prolog 10.0.2/JPL, knowledge files and an icon. Application 1.1.0 adds a portable Windows x64 .exe image and Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Native dependencies are bundled per platform; the same JAR is reused. A single JAR does not contain all required native runtimes.
+The development JAR requires the matching runtime files. The macOS application image bundles Java 21, Prolog 10.0.2/JPL, knowledge files and an icon. Application 1.2.0 provides a portable Windows x64 .exe image and Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Native dependencies are bundled per platform; the same JAR is reused. A single JAR does not contain all required native runtimes.
 
 ## 7. Test and acceptance plan
 
@@ -107,4 +107,6 @@ Actual outcomes are recorded in [verification.md](verification.md); software pas
 
 ## 8. User manual
 
-The [manual](user-manual.md) describes packaged launch and developer commands, four-field setup, two adaptive questionnaire steps, forward-only assessment, result interpretation, Back navigation before assessment, new consultations, knowledge browsing and troubleshooting.
+The [manual](user-manual.md) provides simple extraction and launch instructions for Windows x64, Apple Silicon macOS and Ubuntu 24.04 x64, plus launch troubleshooting. Consultation procedures and screenshots remain outside the manual.
+
+The 10–15-question goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](test-cases.md).

@@ -2,9 +2,9 @@
 
 DentalExplain is a native desktop expert system for assessing common tooth-pain and gum-symptom presentations from predefined consultation answers and dentist-supplied examination findings. The application supports five candidate conditions: dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis. Java Swing provides the interface, while SWI-Prolog 10.0.2 performs validation, adaptive question routing and explicit forward chaining through JPL.
 
-The knowledge base contains 30 authored domain facts and 25 production rules. A separate catalogue defines 30 questions: four setup fields, nine reported-symptom questions and 17 examination questions. The consultation uses two adaptive questionnaire steps, preserves applicable answers during Back navigation and excludes answers when their parent makes them inapplicable. Inference evaluates the complete condition catalogue and permits coexisting candidates. Unknown information remains distinct from explicit absence.
+The knowledge base contains 30 authored domain facts and 25 production rules. A separate catalogue defines 27 questions: two setup fields, eight reported-symptom questions and 17 examination questions. The consultation uses two adaptive questionnaire steps, preserves applicable answers during Back navigation and excludes answers when their parent makes them inapplicable. Inference evaluates the complete condition catalogue and permits coexisting candidates. Unknown information remains distinct from explicit absence.
 
-Twenty synthetic acceptance cases and 43 Prolog checks pass. Java integration and interface checks, together with bundled-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The submission includes runnable platform packages and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The questionnaire was conducted with her, and her input together with published dental sources informed the facts and rules. Clinical validation remains pending.
+Twenty synthetic acceptance cases and 51 Prolog checks pass. Java integration and interface checks, together with bundled-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The submission includes runnable platform packages and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The questionnaire was conducted with her, and her input together with published dental sources informed the facts and rules. Clinical validation remains pending.
 
 # 1 Introduction
 
@@ -24,13 +24,13 @@ DentalExplain addresses this problem through a shared Prolog question catalogue,
 
 ## 2.1 Specific domain
 
-The domain is dental diagnostic decision support for common tooth pain and gum symptoms across age groups, using reported symptoms, dentition and explicitly supplied dental examination findings. The supported targets are dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis.
+The domain is dental diagnostic decision support for common tooth pain and gum symptoms across age groups, using reported symptoms, affected tooth type and explicitly supplied dental examination findings. The supported targets are dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis.
 
-Age is selected as 0-5, 6-12, 13-17, 18-64 or 65-120 years. These are consultation context groups, not diagnostic thresholds. Dentition and root maturity are supplied independently; the engine does not infer them from age.
+Age is selected as 0-5, 6-12, 13-17, 18-64 or 65-120 years. These are consultation context groups, not diagnostic thresholds. Affected tooth type and root maturity are supplied independently; the engine does not infer them from age.
 
 ## 2.2 Included scope
 
-The consultation collects four setup fields, reported pain and gum symptoms, warning signs, caries observations, relevant pulp/apical findings and periodontal measurements. Pulpal branches distinguish supplied primary, immature permanent and mature permanent tooth findings. Periodontal rules use attachment-loss patterns and exclusion of other local causes [2-6].
+The consultation collects two setup fields, reported pain and gum symptoms, warning signs, caries observations, relevant pulp/apical findings and periodontal measurements. Pulpal branches distinguish supplied primary, immature permanent and mature permanent tooth findings. Periodontal rules use attachment-loss patterns and exclusion of other local causes [2-6].
 
 The system supports multiple candidates where their premises coexist. It can return missing-input requests, input conflicts, invalid-input status, an outside-scope response or no supported conclusion. A read-only workspace exposes the separate question, fact and rule catalogues.
 
@@ -65,21 +65,21 @@ The acquisition process is source review, authored Prolog records, expert discus
 
 ![Figure 1 Expert system block diagram](report-assets/architecture.png)
 
-The user supplies consultation inputs through the User Interface and receives assessment results through the same interface. The Inference Engine applies knowledge from the Knowledge Base to those inputs. Questionnaire data from the Human Expert and published Dental Reference Sources flow through Knowledge Acquisition into the Knowledge Base. These arrows describe information flow, rather than a knowledge-editing screen.
+The user supplies consultation inputs through the Java Swing User Interface and receives assessment results through the same interface. The SWI-Prolog Inference Engine applies knowledge from the SWI-Prolog Knowledge Base to those inputs. Questionnaire data from the Human Expert and published Dental Reference Sources flow through Knowledge Acquisition into the Knowledge Base. These arrows describe information flow, rather than a knowledge-editing screen.
 
 ## 4.2 Implemented components
 
 | Component | Responsibility |
 | --- | --- |
 | User | Supply reported symptoms and dentist-supplied findings; interpret the returned assessment. |
-| User Interface | Present setup, the two questionnaire steps, results and the read-only knowledge catalogue. |
-| Inference Engine | Validate consultation inputs, apply forward chaining and identify supported candidates or missing information. |
-| Knowledge Base | Store 30 domain facts, 25 production rules and a separate question catalogue with source and review metadata. |
+| Java Swing User Interface | Present setup, the two questionnaire steps, results and the read-only knowledge catalogue. |
+| SWI-Prolog Inference Engine | Validate consultation inputs, apply forward chaining and identify supported candidates or missing information. |
+| SWI-Prolog Knowledge Base | Store 30 domain facts, 25 production rules and a separate question catalogue with source and review metadata. |
 | Human Expert | Contribute domain knowledge through the conducted questionnaire; clinical validation remains pending. |
 | Dental Reference Sources | Supply published evidence for clinical concepts and diagnostic criteria. |
 | Knowledge Acquisition | Translate expert questionnaire input and published sources into structured facts and rules. |
 
-Consultation observations are passed into each assessment. Intermediate deductions remain within inference processing. The architecture includes no separate working-memory component, explanation facility or knowledge-editing interface. Implementation technologies are described in Section 7.
+Consultation observations are passed into each assessment. Intermediate deductions remain within inference processing. The architecture includes no separate working-memory component, explanation facility or knowledge-editing interface. Section 7 describes the integration and packaging details.
 
 # 5 Knowledge Representation
 
@@ -111,7 +111,7 @@ Rules r01-r04 concern caries. Rules r05-r17 form provoked-pain and pulpal patter
 
 ## 5.3 Questions and consultation observations
 
-The separate catalogue defines 30 questions with identifiers, stage membership, control types, labels, allowed values and applicability. Dropdowns are non-editable; radio and checkbox answers use question-specific wording. Labels map to stable Prolog atoms or predefined numbers. A submitted answer is represented as obs(Key,Value).
+The separate catalogue defines 27 questions with identifiers, stage membership, control types, labels, allowed values and applicability. Dropdowns are non-editable; radio and checkbox answers use question-specific wording. Labels map to stable Prolog atoms or predefined numbers. A submitted answer is represented as obs(Key,Value).
 
 Unknown is the default and is not treated as No. Not applicable is separate but cannot establish a required premise. For checkbox groups, None explicitly records absence of all listed items. Selecting an item establishes only that finding; other unchecked items remain Unknown. Combined gum and warning-sign answers expand to the internal clinical observation identifiers before inference.
 
@@ -161,15 +161,17 @@ Java calls Bridge.assess(answers) and Bridge.activeQuestions(answers,stage). Pro
 
 ## 7.2 Adaptive consultation and lifecycle
 
-Setup collects age group, dentition, tooth type and region. Step 1 collects reported symptoms; pain follow-ups appear when tooth pain is reported. Step 2 includes basic caries observations and periodontal measurements even without symptoms, then reveals follow-ups according to supplied findings. Mature-root thermal fields are shown only for an applicable painful permanent tooth with mature roots. Known warning signs or the jaw-only pattern bypass unnecessary examination questions.
+Setup collects age group and affected tooth type. Step 1 collects reported symptoms; pain follow-ups appear when tooth pain is reported. Step 2 includes basic caries observations and periodontal measurements even without symptoms, then reveals follow-ups according to supplied findings. Mature-root thermal fields are shown only for an applicable painful permanent tooth with mature roots. Known warning signs or the jaw-only pattern bypass unnecessary examination questions.
 
 Prolog controls applicability. Java clears and excludes inapplicable child answers, while preserving applicable selections across Back navigation. Initialization, routing and reasoning run on one background executor. Swing updates occur on the event-dispatch thread. Generation tokens discard callbacks from obsolete edits, navigation or reset [9].
 
 Results provide New consultation as the only action. It clears selections and results and restores defaults. Back navigation remains available before assessment. Knowledge viewing is read-only; no editing or result-saving dialog is provided.
 
+The 27-question catalogue is not a fixed questionnaire shown in full. Routing reuses forward deductions and unresolved prerequisites: unanswered questions disappear when their rules are blocked or a condition already has sufficient support. Explicit applicable answers remain present so the evidence supporting a candidate is retained. Age group, affected tooth type, tooth pain, gum symptoms, warning signs and jaw clicking remain available as consultation context and scope checks. The goal of 10-15 answers is met by straightforward cases, while pain-related or incomplete cases can require more. No separate measurements or clinical premises are merged.
+
 ## 7.3 Executable and runtime dependencies
 
-Application version 1.1.0 uses knowledge version 0.3.0. The submission contains a Windows x64 executable image, an Apple Silicon macOS app and a bundled Java package for Ubuntu 24.04 x64 desktops. Each retains Java, SWI-Prolog/JPL, knowledge files and legal notices. Users must keep complete application folders together.
+Application version 1.2.0 uses knowledge version 0.4.0. The submission contains a Windows x64 executable image, an Apple Silicon macOS app and a bundled Java package for Ubuntu 24.04 x64 desktops. Each retains Java, SWI-Prolog/JPL, knowledge files and legal notices. Users must keep complete application folders together.
 
 The root launchers open those packages without compilation or separate Java/Prolog installation. The Java application JAR is shared code, but cannot run alone without its accompanying dependencies. Windows signing and macOS notarization remain pending; native platform packages are distinct from an installer.
 
@@ -179,15 +181,15 @@ The root launchers open those packages without compilation or separate Java/Prol
 
 The welcome screen offers Start consultation and View knowledge base, identifies the supported conditions and describes the consultation flow.
 
-![Figure 3 Current setup with predefined age and dentition selections](report-assets/ui-setup.png)
+![Figure 3 Current setup with predefined age and affected-tooth selections](report-assets/ui-setup.png)
 
-Setup uses four non-editable dropdowns. Age group does not automatically determine dentition or diagnosis. The form retains its white background, internal padding and consistent Latin Modern Sans typography.
+Setup uses two non-editable dropdowns. Age group does not automatically determine tooth type or diagnosis. The form retains its white background, internal padding and consistent Latin Modern Sans typography.
 
 ## 7.5 Reported symptoms and relevant findings
 
 ![Figure 4 Pain selection reveals question-specific symptom follow-ups](report-assets/ui-symptoms.png)
 
-Step 1 separates reported symptoms from examination findings. Reporting tooth pain reveals trigger, persistence, spontaneous, sleep and biting questions. Checkbox special answers remain mutually exclusive with findings.
+Step 1 separates reported symptoms from examination findings. Reporting tooth pain reveals trigger, persistence, spontaneous and sleep-interruption questions. Checkbox special answers remain mutually exclusive with findings.
 
 ![Figure 5 Dentist-supplied findings in the second questionnaire step](report-assets/ui-findings.png)
 
@@ -195,9 +197,9 @@ Step 2 presents applicable caries, pulp/apical and periodontal findings. Long fo
 
 ## 7.6 Results and knowledge workspace
 
-![Figure 6 Supported caries candidate from a synthetic consultation](report-assets/ui-results.png)
+![Figure 6 Coexisting supported candidates from a synthetic consultation](report-assets/ui-results.png)
 
-Results display supported candidates and any additional requested findings. New consultation is the only result action. The screenshot represents a synthetic symptom-free caries assessment, separate from the pain-follow-up illustration.
+Results display supported candidates and any additional requested findings. New consultation is the only result action. The screenshot shows coexisting caries and reversible-pulpitis candidates from the illustrated synthetic pain consultation.
 
 ![Figure 7 Read-only knowledge workspace with separate catalogue tabs](report-assets/ui-knowledge.png)
 
@@ -207,32 +209,46 @@ Questions, Facts and Rules have separate counts. Search filters the active table
 
 ## 8.1 Testing strategy
 
-The acceptance catalogue contains 14 diagnostic cases and six edge cases. Inputs are synthetic and mapped to predefined selections. Diagnostic cases require the target candidate without forcing mutually exclusive diagnoses. Edge cases cover missing age, invalid numeric age-group input, incomplete evidence, contradictory pain inputs, outside-scope presentation and reset. Full case inputs, expected responses and actual engine results appear in Appendix D.
+The acceptance catalogue contains 14 diagnostic cases and six edge cases. Inputs are synthetic and mapped to predefined selections. Diagnostic cases require the target candidate without forcing mutually exclusive diagnoses. Edge cases cover missing age, invalid numeric age-group input, incomplete evidence, contradictory pain inputs, outside-scope presentation and reset. The separate acceptance-test document records the full inputs, expected responses and actual software outcomes.
 
-Additional Prolog checks cover valid choices, malformed/removed identifiers, checkbox exclusivity, uncertainty, age groups, termination, duplicate prevention, blocked rules, routing and coexisting candidates. Java/JPL checks assess the same cases and 14 routed diagnostic cases. Swing checks cover 30 control schemas, Back navigation, hidden-answer clearing, results, reset and stale callbacks.
+Additional Prolog checks cover valid choices, malformed/removed identifiers, checkbox exclusivity, uncertainty, age groups, termination, duplicate prevention, blocked rules, routing and coexisting candidates. Java/JPL checks assess the same cases and 14 routed diagnostic cases. Swing checks cover 27 control schemas, Back navigation, hidden-answer clearing, results, reset and stale callbacks.
 
 ## 8.2 Automated results
 
 | Check | macOS ARM64 | Windows x64 | Ubuntu 24.04 x64 |
 | --- | --- | --- | --- |
 | 20 forward acceptance cases | PASS | PASS | PASS |
-| 43 Prolog checks | PASS | PASS | PASS |
+| 51 Prolog checks | PASS | PASS | PASS |
 | 20 JPL cases and 14 routed diagnostic cases | PASS | PASS | PASS |
 | Controlled inputs and consultation lifecycle checks | PASS | PASS | PASS under Xvfb |
 | Bundled Java launch from a path with spaces | PASS | PASS | PASS |
 | Native launcher initialization | PASS app | PASS exe | Java launcher used |
 
-These results are recorded in the successful cross-platform workflow on 29 September 2026 [10]. The current source retains the tested engine and application behavior. The report-data export separately assesses all 20 fixtures and records the actual candidates, messages and missing identifiers in Appendix D.
+These results are recorded in the successful cross-platform workflow on 29 September 2026 [10]. The current source retains the tested engine and application behavior. The report-data export separately reassesses all 20 fixtures. Full case records remain in the separate acceptance-test document.
+
+### Measured consultation lengths
+
+A scripted walkthrough answers questions in catalogue order and reevaluates routing after each answer. Counts include setup and Unknown answers. Final visible questions are reported separately; this avoids mistaking the last screen for the total consultation length.
+
+| Cases | Scenario | Individually answered questions | Final visible questions |
+| --- | --- | --- | --- |
+| TC01-TC03 | Caries | 13 | 12 |
+| TC04-TC06 | Reversible pulpitis | 21-23 | 18-20 |
+| TC07-TC09 | Irreversible pulpitis | 19-20 | 15-17 |
+| TC10-TC12 | Gingivitis | 14 | 14 |
+| TC13-TC14 | Periodontitis | 18 | 16 |
+
+Caries and gingivitis meet the 10-15 target in these fixtures. TC04-TC09 and TC13-TC14 exceed 15 because all five conditions and separate findings are retained. TC15-TC20 are validation/reset edge cases, not completed diagnostic walkthroughs. The separate acceptance-test document records every count.
 
 ## 8.3 Desktop and submission verification
 
-Manual desktop verification on macOS includes consultation navigation, result display, knowledge viewing and New consultation. Windows and Linux desktop behavior was checked automatically on hosted runners; a separate manual Windows/Linux consultation is not claimed. Screenshots in this report were captured from the current installed macOS application using synthetic selections.
+Manual desktop verification on macOS includes consultation navigation, result display, knowledge viewing and New consultation. Windows and Linux desktop behavior was checked automatically on hosted runners; a separate manual Windows/Linux consultation is not claimed. Screenshots in this report were captured from the current installed macOS application using synthetic selections. Native window capture excludes the mouse pointer and computer-use cursor overlays.
 
 The submission assembly verifies source inclusion, report files, three root launch scripts, complete runtime directories, executable permissions and SHA-256 checksums. Launch checks use extracted folders containing spaces. Recorded software results do not establish diagnostic accuracy in real patients; clinical knowledge and expectations remain pending review.
 
 # 9 Conclusion
 
-DentalExplain implements a runnable native expert system combining Java Swing with embedded SWI-Prolog through JPL. Its 30-question adaptive consultation collects controlled evidence in two steps, while 25 production rules and 30 authored domain facts support five candidate conditions through forward chaining.
+DentalExplain implements a runnable native expert system combining Java Swing with embedded SWI-Prolog through JPL. Its 27-question adaptive consultation collects controlled evidence in two steps, while 25 production rules and 30 authored domain facts support five candidate conditions through forward chaining.
 
 The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, a platform-specific runnable package for each supported operating system and a user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the conducted questionnaire is supplied in Appendix B; clinical review remains pending.
 
@@ -256,72 +272,34 @@ The implementation preserves uncertainty, supports coexisting candidates and ret
 
 [9] Oracle. Concurrency in Swing. https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html
 
-[10] DentalExplain. Verified cross-platform workflow run, 29 September 2026, source commit 777ab83. https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36535968417
+[10] DentalExplain. Verified cross-platform workflow run, 29 September 2026, source commit 3309824. https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36566312964
 
 References accessed on 29 September 2026. Source identifiers used in Appendix C map as follows: nidcr [1], aae [2], aapd [3], aap [4], efp [5], efp_g [6].
 
 # Appendix A User Manual
 
-## A.1 Starting the distributed application
+Application **1.2.0**; knowledge **0.4.0**. Extract the complete submission ZIP before opening the application. Keep the applications folder and all accompanying runtime files together. Java and SWI-Prolog are bundled; no separate installation or compilation is needed.
 
-Extract DentalExplain-submission.zip completely before opening the app. Choose the launcher for your computer. The bundled runtimes mean Java and SWI-Prolog do not need separate installation. Keep the applications folder and all its contents intact; do not move only the executable or JAR.
+## A.1 Windows x64
 
-| Computer | Launch from the extracted ZIP root |
-| --- | --- |
-| Windows x64 | Double-click Open-Windows.cmd. Alternatively, open DentalExplain.exe inside the applications/windows/DentalExplain folder. |
-| Apple Silicon macOS | Double-click Open-macOS.command, or open applications/macos/DentalExplain.app. The app may be copied intact to Applications. |
-| Ubuntu 24.04 x64 desktop | Open a terminal in the extracted folder and run ./Open-Linux.sh. A graphical desktop is required. |
+1. Right-click DentalExplain-submission.zip and choose **Extract All**.
+2. Open the extracted folder and double-click **Open-Windows.cmd**.
+3. Alternatively, open **DentalExplain.exe** inside applications/windows/DentalExplain.
 
-If a Unix extraction tool removes executable permissions, run chmod +x Open-macOS.command on macOS. On Linux run chmod +x Open-Linux.sh applications/linux/DentalExplain/runtime/java/bin/java. Windows packages target x64; Intel Macs and other ARM targets are not provided. Windows signing and macOS notarization are pending; follow the computer owner's software policy if the operating system blocks a downloaded application.
+## A.2 Apple Silicon macOS
 
-Wait for the welcome screen before starting. An initialization error means the application runtime is unavailable; it is not a clinical result. The root scripts report missing application files. Restore the complete extracted package rather than replacing individual libraries.
+1. Double-click DentalExplain-submission.zip to extract it.
+2. Open the extracted folder and double-click **Open-macOS.command**.
+3. Alternatively, open **DentalExplain.app** inside applications/macos. You may copy the complete app to Applications.
 
-## A.2 General consultation procedure
+## A.3 Ubuntu 24.04 x64 desktop
 
-Choose Start consultation, supply setup details, complete Reported symptoms, then Relevant dental findings, and choose Assess presentation. Back to setup and Back to symptoms allow changes before assessment. Applicable selections remain; changing a parent clears dependent answers that become inapplicable.
+1. Extract DentalExplain-submission.zip and open a terminal in the extracted folder.
+2. Run `./Open-Linux.sh`. A graphical desktop is required.
 
-Use Unknown for unavailable information. A negative answer explicitly records absence, while Not applicable cannot establish a diagnostic premise. In checkbox groups, None reported excludes every listed finding. An unchecked item remains Unknown unless None is selected. Use Tab and Shift-Tab to move between controls, arrows for predefined choices and Space for radio/checkbox controls.
+## A.4 Launch troubleshooting
 
-## A.3 Example consultation for symptom-free caries
-
-This example is synthetic. Choose age group 18-64 years, Permanent dentition, Permanent tooth and Single tooth. Continue to symptoms. Select No tooth pain reported, None reported for gum symptoms and warning signs, and No jaw clicking reported. Pain follow-ups stay hidden.
-
-Continue to findings and select Cavity observed and Softened tissue observed. Record other findings only if actually supplied; leave unavailable information Unknown. Assess presentation. These findings support Dental caries under the implemented rules, and unresolved other conditions may produce additional missing-field requests.
-
-![Figure A1 Setup for the synthetic consultation](report-assets/ui-setup.png)
-
-## A.4 Example consultation with pain follow-ups
-
-For a painful permanent tooth, report Tooth pain reported in Step 1. Trigger, persistence, spontaneous, sleep and biting questions appear. Select only the supplied findings. In Step 2, provide root maturity; a recorded thermal response becomes available for mature roots. The TC06 values in Appendix D support coexisting caries and reversible pulpitis candidates.
-
-Measurements use predefined dropdowns: depth and attachment loss range from 0 to 15 mm in 0.5 mm steps, and bleeding on probing from 0% to 100% in 5% steps. Do not invent or round a finding just to select a rule-supporting value. Use Unknown for unavailable or unrepresentable measurements.
-
-## A.5 Interpreting results and starting again
-
-| Outcome | User action |
-| --- | --- |
-| Supported candidate conditions | Interpret the candidates with clinical judgement; more than one can be supported. |
-| Additional information needed | Review the requested findings and start a fresh consultation with available evidence. |
-| Conflicting or invalid selections | Start again with consistent predefined values. |
-| Outside supported scope | Assess the presentation beyond the five-condition catalogue. |
-| No supported conclusion | No rule-supported candidate follows; this does not exclude other dental conditions. |
-
-The results screen offers New consultation only. It clears selections and the displayed result. Results cannot be edited or saved from this screen. Closing the app does not store the consultation.
-
-![Figure A2 Supported candidate and the New consultation action](report-assets/ui-results.png)
-
-## A.6 Knowledge viewing and troubleshooting
-
-Choose View knowledge base from Welcome. Questions (30), Facts (30) and Rules (25) are separate read-only tabs. Search filters the active table. Select a row to inspect its content, source and review status; scroll to view long entries.
-
-| Problem | Action |
-| --- | --- |
-| Missing runtime or native library | Restore the complete package, keeping application folders together. |
-| Unsupported architecture | Use the supplied macOS ARM64, Windows x64 or Ubuntu x64 package. |
-| Launcher cannot execute on Unix | Restore the executable permissions described in A.1. |
-| Missing age group | Choose one of the five predefined groups before assessment. |
-| Missing findings | Use only available evidence; do not turn Unknown into a negative answer. |
-| Unexpectedly empty knowledge table | Clear the search filter and select the relevant tab. |
+If a Unix extraction tool removed executable permissions, run `chmod +x Open-macOS.command` on macOS, or `chmod +x Open-Linux.sh applications/linux/DentalExplain/runtime/java/bin/java` on Linux. If runtime files are missing, extract the complete ZIP again. Use the package matching your operating system and architecture. Windows code signing and macOS notarization remain pending; follow your computer owner's software policy if the operating system blocks a downloaded application.
 
 # Appendix B Human Expert Questionnaire
 
@@ -343,4 +321,4 @@ Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergr
 12. How should buccal/oral attachment loss, pocket depth, affected-tooth count and alternative local causes be combined? Relevant rules: r22-r24.
 13. How should missing, Unknown, Not applicable and contradictory findings affect the assessment and requests for further information? Relevant processing: boundary validation and forward missing-prerequisite propagation.
 14. Which warning signs or jaw-only presentations should leave the supported scope, and is the current routing appropriate? Relevant processing: outside_scope checks.
-15. Do the 20 synthetic cases and their expected coexisting candidates match the intended rule behavior, and which facts, premises or questions require revision before clinical validation? Relevant evidence: Appendices C and D.
+15. Do the 20 synthetic cases and their expected coexisting candidates match the intended rule behavior, and which facts, premises or questions require revision before clinical validation? Relevant evidence: Appendix C and Section 8.

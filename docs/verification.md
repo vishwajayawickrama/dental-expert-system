@@ -1,5 +1,46 @@
 # DentalExplain verification record
 
+## Current release: shortened consultations and revised report — 29 September 2026
+
+Application **1.2.0**, knowledge **0.4.0**, with **27 questions (2 setup, 8 symptom, 17 findings), 25 rules and 30 authored domain facts**. Whole-mouth dentition, region and biting-pain fields are removed and rejected at the boundary. The five supported conditions and their diagnostic premises are retained. Forward-computed deductions and unresolved prerequisites skip unanswered questions for blocked rules and already-supported candidates; explicit applicable evidence remains present. Parent changes still clear dependent answers.
+
+The [cross-platform build](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36566312964), from implementation commit `3309824`, passed on macOS ARM64, Windows x64 and Ubuntu 24.04 x64. Each platform passed **20 acceptance cases, 51 Prolog checks, 20 direct JPL assessments, 14 routed diagnostic cases and all 27 control schemas**, including checkbox exclusivity, uncertainty, hidden clearing, navigation, scope bypass, coexisting candidates, result actions, reset and stale callbacks. Linux Swing checks used Xvfb. Windows independently verified the executable and bundled-Java launcher. All platforms verified relocated packages with bundled dependencies. These are software checks; clinical expectations remain pending dentist review.
+
+The [root-launcher verification](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36567419574) also passed on all three platforms from paths containing spaces and with system-only PATH. Each reported Java 21.0.11, knowledge 0.4.0, 27 questions, 25 rules and 30 facts. Windows/Linux inspection uses automated screenshots and hosted checks; no manual Windows/Linux desktop walkthrough is claimed.
+
+### Actual consultation lengths
+
+Catalogue-order walkthrough counts include setup and explicit Unknown answers. They differ from the final visible-control count. All 14 walkthroughs retain the expected target candidate; full per-case records are in [test-cases.md](test-cases.md).
+
+| Cases | Ordered answers | Final visible questions |
+| --- | --- | --- |
+| TC01–TC03, caries | 13 | 12 |
+| TC04, reversible pulpitis / primary tooth | 21 | 18 |
+| TC05, reversible pulpitis / immature permanent tooth | 22 | 19 |
+| TC06, reversible pulpitis / mature permanent tooth | 23 | 20 |
+| TC07, irreversible pulpitis / primary tooth | 19 | 15 |
+| TC08–TC09, irreversible pulpitis / permanent tooth | 20 | 17 |
+| TC10–TC12, gingivitis | 14 | 14 |
+| TC13–TC14, periodontitis | 18 | 16 |
+
+The straightforward caries and gingivitis cases meet the 10–15 target. TC04–TC09 and TC13–TC14 exceed it because separate measurements and all five conditions take priority. TC15–TC20 exercise validation and reset, rather than completed diagnostic walkthroughs.
+
+### Native interface and report
+
+Native macOS checks covered setup, both questionnaire steps, results and reset at 1180×850 and 960×680. The two setup fields retain white backgrounds and padding. Long forms scroll and navigation/result actions remain visible. Coexisting caries and reversible-pulpitis candidates display correctly; reset returns both setup controls to Unknown and clears results. Component tests verify Back preservation and stale-callback handling. Six implementation screenshots were recaptured from the actual application classes loaded from the installed bundle using native window capture, without the mouse pointer or computer-use overlays. Automated Windows/Linux screenshots were also inspected.
+
+The Word report and matching PDF now contain **26 pages**, with every rendered page inspected. All text styles use Times New Roman; PDF fonts are embedded TimesNewRomanPSMT/TimesNewRomanPS-BoldMT. All **five tables** have white cells, black text, bold headings and black borders. The TikZ diagram uses Java Swing User Interface, SWI-Prolog Inference Engine and SWI-Prolog Knowledge Base labels, retaining black arrows and the seven requested nodes. Local XeLaTeX compilation passed; the built-in preview still cannot access the installed system font. The 14 contents entries match actual pagination. Appendix A and the separate manual are launch-only; Appendix D is removed. All 15 conducted expert questions, 30 facts and 25 rules remain present. Clinical validation remains pending, without invented expert responses or dates.
+
+### Submission and installed application
+
+Downloaded CI artifacts matched their GitHub SHA-256 digests. The final packages retain the tested application payload; four external distribution README files were refreshed to 1.2.0 and package checksums regenerated. The shared application JAR SHA-256 is `4e3c4e90551f43d7046d273382805cf7660344066fae741987ba831b4e8f5607` across all platform packages and the installed application.
+
+The rebuilt submission ZIP passed CRC verification and all **6,678 regular-file checksums**, with **7,448 archive entries**, exactly three root scripts, matching Word/PDF reports, source and complete application/runtime folders. Source contains no build outputs, caches, Git metadata or reference report. Vendor runtime resources and notices remain intact. Knowledge modules match the source after normalizing Windows line endings. Extraction to `build/Final Submission 1.2 With Spaces` preserved executable modes and symlinks. The macOS root script initialized successfully with no inherited development configuration; deep/strict signature verification passed. The same verified bundle was copied into `/Applications/DentalExplain.app`, initialized successfully and opened through its native launcher.
+
+Submission ZIP SHA-256: `8f985ddafad6e5fda6eb6dd1d581170d1dccf7d1f4c722079dca46fbd042db7b`.
+
+Earlier dated records below describe previous versions and are retained as historical evidence.
+
 ## Report presentation revision — 29 September 2026
 
 Application **1.1.0**, knowledge **0.3.0** and all application behavior are unchanged. The revised Word report explicitly uses Times New Roman in body text, headings, tables, captions, contents, footers and code examples. PDF font inspection confirms embedded **TimesNewRomanPSMT** and **TimesNewRomanPS-BoldMT**, with no substituted report text fonts. Conversion used an isolated Fontconfig configuration pointing to temporary copies of the Mac's installed Times New Roman fonts; those font files are neither committed nor distributed. All **28 tables** have white cells, black text, bold headings and black borders, verified in the DOCX XML.
@@ -28,7 +69,7 @@ All three packaged application JARs share SHA-256 `b0b969abaf2f1651be6dbdc587ba1
 
 The separate [submission root launcher workflow](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36541917021) passed on macOS ARM64, Windows x64 and Ubuntu 24.04 x64 using the verified application distributions. Each root script launched its matching bundled runtime from a path containing spaces with system-only PATH and reported Java 21.0.11, knowledge 0.3.0, 30 questions, 25 rules and 30 facts. Windows used the packaged `.exe`; Linux used its bundled Java launcher. No manual Windows/Linux walkthrough is claimed.
 
-## Current release: cross-platform application 1.1.0 — 29 September 2026
+## Historical release: cross-platform application 1.1.0 — 29 September 2026
 
 Knowledge remains **0.3.0**, with 30 questions, 25 rules and 30 authored domain facts. Clinical expert review remains pending. All verification presentations are synthetic.
 

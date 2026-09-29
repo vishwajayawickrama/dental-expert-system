@@ -22,4 +22,6 @@ export_report_data :-
        maplist(observation_data,O,Inputs),
        catch(findall(K,(member(Stage,[setup,symptoms,findings]),active_questions(O,Stage,Ks),member(K,Ks)),Raw),_,Raw=[]),sort(Raw,Active),
        (dental_acceptance:verify(Status,Target,result(Actual,C,M,Messages))->Passed=true;Passed=false)),Cases),
-    json_write_dict(current_output,_{version:'0.3.0',facts:Facts,rules:Rules,questions:Questions,sources:Sources,cases:Cases},[width(0)]),nl.
+    findall(_{id:I,ordered_questions:N,final_visible:V},
+      (dental_acceptance:case(I,_,_,Target),Target\==none,walkthrough(I,N,V,_)),Counts),
+    json_write_dict(current_output,_{version:'0.4.0',facts:Facts,rules:Rules,questions:Questions,sources:Sources,cases:Cases,question_counts:Counts},[width(0)]),nl.
