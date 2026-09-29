@@ -242,12 +242,6 @@ A scripted walkthrough answers questions in catalogue order and reevaluates rout
 
 Caries and gingivitis meet the 10-15 target in these fixtures. TC04-TC09 and TC13-TC14 exceed 15 because all five conditions and separate findings are retained. TC15-TC20 are validation/reset edge cases, not completed diagnostic walkthroughs. The separate acceptance-test document records every count.
 
-## 8.3 Desktop and submission verification
-
-Manual desktop verification on macOS includes consultation navigation, result display, knowledge viewing and New consultation. Windows and Linux desktop behavior was checked automatically on hosted runners; a separate manual Windows/Linux consultation is not claimed. Screenshots in this report were captured from the current installed macOS application using synthetic selections. Native window capture excludes the mouse pointer and computer-use cursor overlays.
-
-The submission assembly verifies source inclusion, report files, six root installation scripts, runtime-free application files, executable permissions and SHA-256 checksums. Launch checks use extracted folders containing spaces. Recorded software results do not establish diagnostic accuracy in real patients; clinical knowledge and expectations remain pending review.
-
 # References
 
 [1] National Institute of Dental and Craniofacial Research. Tooth Decay. https://www.nidcr.nih.gov/health-info/tooth-decay

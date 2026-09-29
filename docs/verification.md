@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Desktop and submission report subsection removed — 29 September 2026
+
+Removed Section 8.3 Desktop and submission verification and both associated paragraphs. Exact structural comparison confirms preservation of all other report content, formatting and resources. The updated PDF remains **28 pages** and all **12 contents entries** retain correct pagination. Only page 19 differs from the previously reviewed rendering; that page was visually inspected, with all other pages pixel-identical.
+
+The Word/PDF copies and submission ZIP are synchronized. Archive integrity, extracted-file correspondence and executable permissions passed. The ZIP is **2,468,139 bytes (2.47 MB)**, SHA-256 `6767516e8b055a8533af1e4b7e03761799ef4bae48554fef44e095dcc6f7b6e6`, with the Word lock file excluded. Application behavior is unchanged.
+
 ## Conclusion section removed — 29 September 2026
 
 Removed Section 9 Conclusion, its two paragraphs and its contents entry from the manually edited report. All other document content, styling, media and resources are preserved exactly. The matching PDF has **28 pages**, with all **12 contents entries** verified against actual pagination. Pages before the removed section are pixel-identical except the updated contents; later page content is unchanged apart from page numbers. The updated contents and all shifted pages were visually inspected.
