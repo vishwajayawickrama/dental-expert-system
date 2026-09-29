@@ -1,5 +1,13 @@
 # DentalExplain verification record
 
+## Native Word table of contents repaired — 29 September 2026
+
+Replaced the manually typed contents with a native Word Table of Contents content control and a `TOC` field for top-level headings. Its 12 cached entries retain current pagination and each links to a matching heading bookmark. Live `PAGEREF` fields provide page references, and automatic field updating on open is enabled. The Contents title uses its own style so it does not include itself when Word regenerates the table. Native TOC styles retain Times New Roman and the existing presentation. The report generator also emits a native TOC for future generation.
+
+Verified the content-control gallery, TOC field, 12 page-reference fields, all hyperlink/bookmark targets and update settings. Structural comparison confirms preservation of report content outside navigation and invisible bookmarks. The rendered PDF remains **24 pages**, with every page pixel-identical to the previously reviewed report; the contents page was visually inspected and all 12 page numbers checked. Native Word desktop field updating was not exercised in this check.
+
+Root and canonical Word reports are synchronized. Matching PDFs and the PDF-only submission ZIP were updated. Archive integrity, correspondence and executable permissions passed; the ZIP is **1,371,233 bytes (1.37 MB)**, SHA-256 `2833172c45deaec48e54df0bd4a38da096a2085848fff18f7c509da0aee2f7d9`. No Word documents or active lock files are packaged. Application behavior is unchanged.
+
 ## Word report moved outside submission — 29 September 2026
 
 Moved the submission's Word report to repository-root `DentalExplain Report.docx`, preserving its contents byte-for-byte. The submission directory and ZIP now contain only the PDF report; `User-manual.md`, source, applications and installation scripts remain present. Future package assembly includes only the PDF. The canonical documentation copy remains in `docs/report/`.

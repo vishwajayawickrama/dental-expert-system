@@ -56,12 +56,8 @@ async function main(){
  for(const t of tokens){
    if(t.type==='heading'){
      if(t.text==='1 Introduction'&&!contentsInserted){
-       heading('Contents');
-       const defaultPages={"Abstract":2,"1 Introduction":4,"2 Domain Definition and Scope":5,"3 Knowledge Acquisition":6,"4 Expert System Architecture":7,"5 Knowledge Representation":9,"6 Inference Method":10,"7 System Design and Implementation":11,"8 Testing and Evaluation":18,"References":21,"Appendix A User Manual":22,"Appendix B Human Expert Questionnaire":23,"Appendix C Knowledge Catalogue":24};
-       const mapFile=path.join(ROOT,'build/report/page-map.json');
-       const pageMap=fs.existsSync(mapFile)?JSON.parse(fs.readFileSync(mapFile,'utf8')):defaultPages;
-       if(Object.keys(pageMap).length!==Object.keys(defaultPages).length)throw Error('Contents pagination is incomplete; regenerate the page map.');
-       for(const [title,page] of Object.entries(pageMap))children.push(new d.Paragraph({tabStops:[{type:d.TabStopType.RIGHT,position:W,leader:d.LeaderType.DOT}],spacing:{after:155},children:[new d.TextRun({text:title+'\t'+page,font:'Times New Roman'})]}));
+       children.push(new d.Paragraph({text:'Contents',style:'TOCHeading',pageBreakBefore:true,keepNext:true,spacing:{after:140}}));
+       children.push(new d.TableOfContents('Table of Contents',{headingStyleRange:'1-1',hyperlink:true}));
        contentsInserted=true;
      }
      heading(t.text,t.depth);
@@ -91,6 +87,8 @@ async function main(){
      {id:'Title',name:'Title',basedOn:'Normal',run:{font:'Times New Roman',size:48,bold:true,color:'000000'}},
      {id:'Heading1',name:'Heading 1',basedOn:'Normal',next:'Normal',run:{font:'Times New Roman',size:30,bold:true,color:'000000'},paragraph:{outlineLevel:0}},
      {id:'Heading2',name:'Heading 2',basedOn:'Normal',next:'Normal',run:{font:'Times New Roman',size:24,bold:true,color:'000000'},paragraph:{outlineLevel:1}},
+     {id:'TOCHeading',name:'TOC Heading',basedOn:'Normal',next:'Normal',run:{font:'Times New Roman',size:30,bold:true,color:'000000'},paragraph:{outlineLevel:9}},
+     {id:'TOC1',name:'toc 1',basedOn:'Normal',next:'Normal',run:{font:'Times New Roman',size:22,color:'000000'},paragraph:{spacing:{after:155},tabStops:[{type:d.TabStopType.RIGHT,position:W,leader:d.LeaderType.DOT}]}},
      {id:'Caption',name:'Caption',basedOn:'Normal',run:{font:'Times New Roman',size:19,color:'000000'},paragraph:{spacing:{after:120,line:225}}}
    ]},features:{updateFields:true},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1100,right:1273,bottom:1100,left:1273}}},footers:{default:new d.Footer({children:[new d.Paragraph({alignment:d.AlignmentType.CENTER,children:[new d.TextRun({children:[d.PageNumber.CURRENT],font:'Times New Roman',size:18})]})]})},children}]});
  fs.writeFileSync(path.join(OUT,'DentalExplain Report.docx'),await d.Packer.toBuffer(doc));
