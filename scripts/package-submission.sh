@@ -7,19 +7,15 @@ PAYLOAD="$ROOT/build/lightweight"
 for file in "$PAYLOAD/application/DentalExplain.jar" "$PAYLOAD/application/windows/DentalExplain.exe" "$ROOT/docs/report/DentalExplain Report.docx" "$ROOT/docs/report/DentalExplain Report.pdf"; do
  [[ -s "$file" ]] || { printf 'Missing verified file: %s\n' "$file" >&2; exit 1; }
 done
-mkdir -p "$DEST/script" "$DEST/helpers" "$DEST/source/scripts" "$ROOT/dist"
+mkdir -p "$DEST/scripts/helpers" "$DEST/source/scripts" "$ROOT/dist"
 cp -R "$PAYLOAD/." "$DEST/"
-mv "$DEST/"Install-* "$DEST/script/"
-mv "$DEST/scripts/install/"* "$DEST/helpers/"
-rmdir "$DEST/scripts/install" "$DEST/scripts"
-# Installer entrypoints are now one level below the submission root; helpers
-# are directly below it. Installed application launch paths are unchanged.
-for file in "$DEST/script/"*; do
- sed -e 's|$ROOT/scripts/install/|$ROOT/../helpers/|g' -e 's|%~dp0scripts\\install\\|%~dp0..\\helpers\\|g' "$file" > "$file.tmp"
- cat "$file.tmp" > "$file"; rm "$file.tmp"
-done
-for file in "$DEST/helpers/"*; do
- sed -e 's|/../../application|/../application|g' -e "s|'../../application'|'../application'|g" "$file" > "$file.tmp"
+mv "$DEST/"Install-* "$DEST/scripts/"
+mv "$DEST/scripts/install/"* "$DEST/scripts/helpers/"
+rmdir "$DEST/scripts/install"
+# Entry scripts call adjacent helpers; the helper-to-application paths retain
+# their original depth. Installed application launch paths are unchanged.
+for file in "$DEST/scripts/"Install-*; do
+ sed -e 's|$ROOT/scripts/install/|$ROOT/helpers/|g' -e 's|%~dp0scripts\\install\\|%~dp0helpers\\|g' "$file" > "$file.tmp"
  cat "$file.tmp" > "$file"; rm "$file.tmp"
 done
 cp "$ROOT/docs/report/DentalExplain Report."{docx,pdf} "$DEST/"

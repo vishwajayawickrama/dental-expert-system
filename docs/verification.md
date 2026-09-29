@@ -1,5 +1,9 @@
 # DentalExplain verification record
 
+## Helpers nested inside scripts — 29 September 2026
+
+The current submission uses `scripts/` for its six installation entrypoints and `scripts/helpers/` for support files. Manuals and package-generation paths were updated. The ZIP is **2,435,813 bytes**, SHA-256 `ff71f38cc4b9a55f00bece15e03ad04a0f6fe3d7746127df2d24c2d070b5bd53`. Archive integrity, exact folder/archive correspondence, executable permissions and entrypoint paths passed checks. Helpers match the original tested implementation byte-for-byte. Both Mac installation scripts passed from `build/Nested Helpers Submission With Spaces` with existing system dependencies and an empty development environment. Windows/Linux relocated paths were checked statically. The reports, application behavior and absence of root README/checksum files are unchanged.
+
 ## Submission folder reorganization — 29 September 2026
 
 The tracked `cm3321-expert-system-224096B/` submission now puts its six installation entrypoints in `script/` and their support files in `helpers/`. Both report formats and `User-manual.md` sit directly at its root. The previous root `README.txt` and `SHA256SUMS.txt` are removed. Redistribution notices and source-development scripts remain present; dependency downloads still undergo checksum verification.

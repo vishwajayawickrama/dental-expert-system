@@ -25,5 +25,5 @@ if [[ ! -x "$DENTAL_SWIPL" || ! -f "$DENTAL_PROLOG/Resources/swipl/lib/jpl.jar" 
   if [[ -w /Applications ]]; then ditto "$MOUNT/SWI-Prolog.app" /Applications/SWI-Prolog-10.0.2.app; else sudo ditto "$MOUNT/SWI-Prolog.app" /Applications/SWI-Prolog-10.0.2.app; fi
 fi
 check_dependencies
-launch_java "$DENTAL_BASE/../application" --verify-runtime
+launch_java "$DENTAL_BASE/../../application" --verify-runtime
 printf '%s\n' 'Dependencies ready. Run Install-Application-macOS.command next.'

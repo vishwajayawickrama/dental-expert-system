@@ -24,5 +24,5 @@ if [[ ! -x "$DENTAL_SWIPL" ]]; then
   sudo cmake --install "$WORK/build"
 fi
 check_dependencies
-launch_java "$DENTAL_BASE/../application" --verify-runtime
+launch_java "$DENTAL_BASE/../../application" --verify-runtime
 printf '%s\n' 'Dependencies ready. Run Install-Application-Linux.sh next.'
