@@ -1,5 +1,13 @@
 # DentalExplain verification record
 
+## Manual report edits preserved and paragraph formatting — 29 September 2026
+
+Formatted the manually edited Word report directly, preserving its cover, body text, tables, images and other document resources. Body paragraphs are justified with **1.5 line spacing** and **1.27 cm first-line indentation**. List indentation, headings, captions and table layouts are retained. The contents page was synchronized with the revised pagination.
+
+All **29 rendered pages** were visually inspected for typography, spacing, readable figures and tables, and clipping. Structural comparison confirmed that non-navigation content and all unchanged document parts were preserved; all **13 contents entries** match their PDF page numbers. The matching Word/PDF reports are synchronized between the submission and `docs/report/`.
+
+The rebuilt ZIP is **2,471,381 bytes (2.47 MB)**, SHA-256 `acd373e184530f03d2af2c7c9bf06b0ab3940adf545be0be1c099515effec9fc`. Archive integrity, correspondence with extracted files and executable permissions passed. The active Word lock file is excluded. Application behavior remains unchanged; no new clinical validation is claimed.
+
 ## Root third-party notice removed — 29 September 2026
 
 Removed `THIRD-PARTY-NOTICES.txt` from the submission, its packaging template and future package assembly. Font license files embedded with the font resources remain intact. The regenerated ZIP is **2,435,188 bytes**, SHA-256 `3cff86ca09e67fe7a79ff8876d531f7276026a063f846745bcd545b648b60aba`. Archive integrity and exact correspondence with submission files passed; the removed notice and an untracked Word lock file are absent from the ZIP. Installation paths and application behavior are unchanged.
