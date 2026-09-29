@@ -1,5 +1,13 @@
 # DentalExplain verification record
 
+## Per-rule source labels removed — 29 September 2026
+
+Removed the 25 source/review footnote paragraphs beneath individual rules in Appendix C. All **25 rule definitions** remain unchanged; the catalogue-wide pending clinical-review statement, fact-source table and References remain present. Rule headings stay with their rule bodies, and each body stays together across pagination. All other content, typography, images and manual edits are preserved.
+
+The revised report has **24 pages**. The two affected rule pages were visually inspected; the preceding **22 pages are pixel-identical** to the reviewed report. All **12 contents entries** retain correct page numbers. Word/PDF copies and the ZIP were synchronized, and the report generator no longer emits individual rule-source labels.
+
+Archive integrity, extracted-file correspondence and executable permissions passed. The ZIP is **2,331,504 bytes (2.33 MB)**, SHA-256 `4d811c039220d4026514e1806047b3fab300a73b107766b70df74624f9a5c35b`, with the active Word lock file excluded. Application knowledge metadata and behavior are unchanged.
+
 ## Paired implementation screenshots — 29 September 2026
 
 The six screenshots in Sections 7.4–7.6 now occupy **three pages, two screenshots per page**, with proportional widths reduced from 6.5 to **5.4 inches**. Captions and descriptions were shortened while retaining their essential screen behavior. Existing screenshot assets are unchanged. Justification, 1.5 paragraph spacing and indentation are retained; all report elements outside these subsections and the contents page are preserved exactly.

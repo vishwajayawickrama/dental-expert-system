@@ -84,8 +84,7 @@ async function main(){
  p('Premise notation: eq is equality; gt/gte/lte compare numeric findings; derived requires an intermediate deduction; kb refers to a domain fact. Every listed premise must hold. Internal gum, trigger and warning identifiers come from checkbox expansion.');
  for(const r of data.rules){
    children.push(new d.Paragraph({keepNext:true,spacing:{before:80,after:45},children:[new d.TextRun({text:r.id.toUpperCase()+'   '+r.conclusion,bold:true,font:'Times New Roman',size:21})]}));
-   p('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{children:runs('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{size:20}),keepNext:true,spacing:{after:35,line:220}});
-   p('Source: '+r.source+'; review: pending.',{spacing:{after:65,line:200},style:'Caption'});
+   p('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{children:runs('IF '+r.premises.join(' AND ')+' THEN '+r.conclusion+'.',{size:20}),keepLines:true,spacing:{after:35,line:220}});
  }
  const doc=new d.Document({creator:'Vishwa Jayawickrama',title:'DentalExplain Report',description:'Dental diagnosis expert system report and user manual',
    styles:{default:{document:{run:{font:'Times New Roman',size:22,color:'000000'},paragraph:{spacing:{line:270,after:120}}}},paragraphStyles:[
