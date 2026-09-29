@@ -26,7 +26,6 @@ cp "$ROOT/scripts/build.sh" "$ROOT/scripts/IconBuilder.java" "$DEST/source/scrip
 cp -R "$ROOT/scripts/install" "$DEST/source/scripts/"
 mkdir -p "$DEST/source/scripts/submission"
 cp "$ROOT/scripts/submission/"Install-* "$DEST/source/scripts/submission/"
-cp "$ROOT/scripts/submission/THIRD-PARTY-NOTICES.txt" "$DEST/"
 # All required dependencies are installed separately; reject accidental runtime inclusion.
 if find "$DEST" -type d \( -name runtime -o -name .runtime -o -name .git -o -name node_modules \) | grep -q .; then echo 'Unexpected runtime or development directory' >&2; exit 1; fi
 ARCHIVE="$ROOT/dist/DentalExplain-submission.zip"

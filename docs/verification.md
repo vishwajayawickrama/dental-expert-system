@@ -1,5 +1,9 @@
 # DentalExplain verification record
 
+## Root third-party notice removed — 29 September 2026
+
+Removed `THIRD-PARTY-NOTICES.txt` from the submission, its packaging template and future package assembly. Font license files embedded with the font resources remain intact. The regenerated ZIP is **2,435,188 bytes**, SHA-256 `3cff86ca09e67fe7a79ff8876d531f7276026a063f846745bcd545b648b60aba`. Archive integrity and exact correspondence with submission files passed; the removed notice and an untracked Word lock file are absent from the ZIP. Installation paths and application behavior are unchanged.
+
 ## Helpers nested inside scripts — 29 September 2026
 
 The current submission uses `scripts/` for its six installation entrypoints and `scripts/helpers/` for support files. Manuals and package-generation paths were updated. The ZIP is **2,435,813 bytes**, SHA-256 `ff71f38cc4b9a55f00bece15e03ad04a0f6fe3d7746127df2d24c2d070b5bd53`. Archive integrity, exact folder/archive correspondence, executable permissions and entrypoint paths passed checks. Helpers match the original tested implementation byte-for-byte. Both Mac installation scripts passed from `build/Nested Helpers Submission With Spaces` with existing system dependencies and an empty development environment. Windows/Linux relocated paths were checked statically. The reports, application behavior and absence of root README/checksum files are unchanged.

@@ -1,8 +1,0 @@
-DentalExplain dependency and asset notices
-
-This runtime-free submission does not redistribute Java, SWI-Prolog or JPL binaries. Dependency scripts obtain official vendor packages or verified source; their licenses and notices remain with those installed distributions. Java/Prolog installations are not removed when installing DentalExplain.
-
-Eclipse Temurin/OpenJDK: GPL version 2 with the Classpath Exception.
-SWI-Prolog/JPL: BSD-style licensing; individual packages/dependencies have their own notices. Refer to the installed distribution's license files.
-
-Latin Modern Sans font files are included in the application JAR and source resources under the accompanying GUST Font License and LaTeX Project Public License 1.3c. The font license is retained in source/src/main/resources/fonts/ and in the application JAR.
