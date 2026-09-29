@@ -8,9 +8,11 @@ Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledg
 
 ## Lightweight submission
 
-Application **1.3.0** installs Java 21 and SWI-Prolog/JPL **10.0.2** separately. The submission ZIP stays under **20 MB** and contains one shared JAR, small macOS/Windows launchers, source, knowledge, reports and checksums. Initial setup needs internet access and administrator permission; normal consultations work offline afterward.
+Application **1.3.0** installs Java 21 and SWI-Prolog/JPL **10.0.2** separately. The submission ZIP stays under **20 MB** and contains one shared JAR, small macOS/Windows launchers, source, knowledge and reports. Initial setup needs internet access and administrator permission; normal consultations work offline afterward.
 
 Download [cm3321-expert-system-224096B.zip](cm3321-expert-system-224096B.zip) (**2.44 MB**) or browse the matching [extracted submission folder](cm3321-expert-system-224096B/). Both are tracked in this repository. Extract the ZIP before running its installation scripts.
+
+The submission puts the six installation scripts in `script/`, their support files in `helpers/`, and the Word/PDF reports directly beside [User-manual.md](cm3321-expert-system-224096B/User-manual.md). Open `script/` and run the two scripts for your OS in order. No `README.txt` or checksum manifest is included; dependency downloads are still checksum-verified before installation.
 
 | Platform | First install dependencies | Then install application |
 | --- | --- | --- |
@@ -51,7 +53,7 @@ The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery u
 
 ## Build the submission
 
-`scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, report formats, source and six installation scripts, generates checksums and enforces a 20 MB ZIP maximum. Generated build/distribution copies remain ignored; the verified root submission ZIP and folder are explicitly tracked. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
+`scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, report formats, source, six installation scripts and the launch-only manual, arranges `script/` and `helpers/`, and enforces a 20 MB ZIP maximum. Generated build/distribution copies remain ignored; the verified root submission ZIP and folder are explicitly tracked. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
 
 The 10–15-question
  goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).

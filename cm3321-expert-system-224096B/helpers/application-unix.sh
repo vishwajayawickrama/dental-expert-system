@@ -3,7 +3,7 @@ set -euo pipefail
 DENTAL_BASE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 source "$DENTAL_BASE/common-unix.sh"
 check_dependencies
-PAYLOAD="$DENTAL_BASE/../../application"
+PAYLOAD="$DENTAL_BASE/../application"
 [[ -f "$PAYLOAD/DentalExplain.jar" ]] || fail 'Extract the complete submission before installation.'
 if [[ "$DENTAL_PLATFORM" == macos ]]; then
   DEST="$HOME/Applications/DentalExplain.app"

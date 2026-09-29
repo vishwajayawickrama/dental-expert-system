@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Submission folder reorganization — 29 September 2026
+
+The tracked `cm3321-expert-system-224096B/` submission now puts its six installation entrypoints in `script/` and their support files in `helpers/`. Both report formats and `User-manual.md` sit directly at its root. The previous root `README.txt` and `SHA256SUMS.txt` are removed. Redistribution notices and source-development scripts remain present; dependency downloads still undergo checksum verification.
+
+The matching ZIP is **2,435,696 bytes (2.44 MB)**, SHA-256 `239553a3015acd2e09e2b0e20ea652e0b84cec5645a13d6f46480d81ff4c3edd`. CRC verification passed; all regular files in its **85 entries** match the extracted folder, executable permissions are retained and the application JAR is unchanged. Relocated Unix scripts passed syntax checks; all six entrypoints and helper payload paths were checked. Both macOS installation scripts and the installed runtime preflight passed from `build/Reorganized Submission With Spaces` with no inherited development configuration. Windows/Linux path updates were checked statically; their relocated installers were not executed in this reorganization check. Application and clinical behavior remain unchanged.
+
 ## Current release 1.3.0 lightweight external-runtime delivery — 29 September 2026
 
 Application **1.3.0**, knowledge **0.4.0**. Consultation behavior remains unchanged: **27 questions, 25 rules, 30 facts**, forward chaining and five supported targets. The submission omits Java/Prolog runtimes and downloads; six scripts install machine-wide dependencies followed by a current-user application.

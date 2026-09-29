@@ -7,10 +7,23 @@ PAYLOAD="$ROOT/build/lightweight"
 for file in "$PAYLOAD/application/DentalExplain.jar" "$PAYLOAD/application/windows/DentalExplain.exe" "$ROOT/docs/report/DentalExplain Report.docx" "$ROOT/docs/report/DentalExplain Report.pdf"; do
  [[ -s "$file" ]] || { printf 'Missing verified file: %s\n' "$file" >&2; exit 1; }
 done
-mkdir -p "$DEST/report" "$DEST/source/scripts" "$ROOT/dist"
+mkdir -p "$DEST/script" "$DEST/helpers" "$DEST/source/scripts" "$ROOT/dist"
 cp -R "$PAYLOAD/." "$DEST/"
-cp "$ROOT/scripts/submission/README.txt" "$DEST/"
-cp "$ROOT/docs/report/DentalExplain Report."{docx,pdf} "$DEST/report/"
+mv "$DEST/"Install-* "$DEST/script/"
+mv "$DEST/scripts/install/"* "$DEST/helpers/"
+rmdir "$DEST/scripts/install" "$DEST/scripts"
+# Installer entrypoints are now one level below the submission root; helpers
+# are directly below it. Installed application launch paths are unchanged.
+for file in "$DEST/script/"*; do
+ sed -e 's|$ROOT/scripts/install/|$ROOT/../helpers/|g' -e 's|%~dp0scripts\\install\\|%~dp0..\\helpers\\|g' "$file" > "$file.tmp"
+ cat "$file.tmp" > "$file"; rm "$file.tmp"
+done
+for file in "$DEST/helpers/"*; do
+ sed -e 's|/../../application|/../application|g' -e "s|'../../application'|'../application'|g" "$file" > "$file.tmp"
+ cat "$file.tmp" > "$file"; rm "$file.tmp"
+done
+cp "$ROOT/docs/report/DentalExplain Report."{docx,pdf} "$DEST/"
+cp "$ROOT/docs/user-manual.md" "$DEST/User-manual.md"
 cp -R "$ROOT/src" "$ROOT/knowledge" "$DEST/source/"
 cp "$ROOT/scripts/submission/source-README.md" "$DEST/source/README.md"
 cp "$ROOT/scripts/build.sh" "$ROOT/scripts/IconBuilder.java" "$DEST/source/scripts/"
@@ -20,7 +33,6 @@ cp "$ROOT/scripts/submission/"Install-* "$DEST/source/scripts/submission/"
 cp "$ROOT/scripts/submission/THIRD-PARTY-NOTICES.txt" "$DEST/"
 # All required dependencies are installed separately; reject accidental runtime inclusion.
 if find "$DEST" -type d \( -name runtime -o -name .runtime -o -name .git -o -name node_modules \) | grep -q .; then echo 'Unexpected runtime or development directory' >&2; exit 1; fi
-(cd "$DEST" && find . -type f ! -name SHA256SUMS.txt ! -name .DS_Store -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 > SHA256SUMS.txt)
 ARCHIVE="$ROOT/dist/DentalExplain-submission.zip"
 if [[ -e "$ARCHIVE" ]]; then
  mkdir -p "$ROOT/dist/archive"

@@ -76,12 +76,12 @@ try {
                 if($p.ExitCode -ne 0){Fail "Prolog installation failed: $($p.ExitCode)"}
             }
         }finally{Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue}
-        Launch-Java (Join-Path $base '../../application') @('--verify-runtime')
+        Launch-Java (Join-Path $base '../application') @('--verify-runtime')
         Write-Host 'Dependencies ready. Run Install-Application-Windows.cmd next.'
     }elseif($Action -eq 'Application'){
         $null=Check-Dependencies
         $app=Join-Path $env:LOCALAPPDATA 'Programs/DentalExplain'
-        $payload=Join-Path $base '../../application'
+        $payload=Join-Path $base '../application'
         New-Item -ItemType Directory -Force "$app/knowledge" | Out-Null
         Copy-Item "$payload/DentalExplain.jar" $app -Force
         Copy-Item "$payload/knowledge/*.pl" "$app/knowledge" -Force
