@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home -v 21)}"
 "$ROOT/scripts/build.sh"
 mkdir -p "$ROOT/build/DentalExplain.iconset" "$ROOT/dist"
 "$JAVA_HOME/bin/javac" -cp "$ROOT/build/classes" -d "$ROOT/build/classes" "$ROOT/scripts/IconBuilder.java"
