@@ -1,5 +1,21 @@
 # DentalExplain verification record
 
+## Current check: result actions removed — 29 September 2026
+
+The results screen now offers **New consultation** only. Edit answers, Save result, result snapshot construction and file dialogs have been removed. Back navigation remains available before assessment. Knowledge remains version 0.3.0 with 30 questions, 25 rules and 30 domain facts; clinical review remains pending.
+
+- **PASS:** all 20 Prolog acceptance cases, 43 Prolog unit tests and 20 Java/JPL acceptance assessments. Existing routing, controlled-input, navigation and delayed-callback checks pass.
+- **PASS:** Swing tests inspect displayed caries results directly, confirm both removed buttons are absent, and click New consultation to verify all answers become Unknown and displayed results clear.
+- **PASS:** result layouts inspected at 1180×850 and 960×680; text remains readable and the sole action is unclipped. Screenshots are in ignored `build/ui-screenshots/component-results-*.png`.
+- **PASS:** installed native app walkthrough completed setup → symptoms → findings → results with Unknown inputs. The missing-age result displayed only New consultation; clicking it returned to cleared setup. Evidence: ignored `build/ui-screenshots/result-actions-native.png`.
+- **PASS:** rebuilt `dist/release-20260929-121613/DentalExplain.app`, updated `dist/DentalExplain.app` and `/Applications/DentalExplain.app`, verified installed deep/strict signing and launched the installed app. An empty-environment runtime check reported Java 21.0.11, SWI/JPL ready, KB 0.3.0 and 30 questions. The build path contains spaces.
+
+The previous installation is preserved at `/private/tmp/DentalExplain-before-result-actions-removal.app`. Package output is recorded in ignored `build/reports/result-actions-package.txt`; test output is in `prolog-tests.txt` and `java-tests.txt` in the same directory.
+
+## Historical check: adaptive questionnaire before result-action removal
+
+The dated records below describe the earlier build. Editing and saving checks are historical evidence; those actions are no longer available in the current app.
+
 **Run date:** 29 September 2026. **Application:** 1.0.0. **Knowledge:** 0.3.0. **Clinical review:** pending dentist review.
 
 This record covers the compact adaptive two-step questionnaire, replacing the 43-question form with 30 questions. Forward chaining and all five candidate conditions remain unchanged. The checks establish software behavior on the development Mac, not clinical accuracy. All patient presentations used for verification are synthetic.

@@ -17,7 +17,7 @@ Wait for the welcome screen. The window title is DentalExplain • Expert system
 
 ## Questionnaire
 
-All clinical entries use predefined choices. Dropdowns cannot be edited. Keyboard type-ahead only chooses an existing option. Use Tab/Shift-Tab to move between controls, arrow keys for dropdown/radio choices, and Space to toggle buttons/checkboxes. Buttons also have underlined mnemonics. Search and save filenames support Mac Command-A/C/V/X shortcuts.
+All clinical entries use predefined choices. Dropdowns cannot be edited. Keyboard type-ahead only chooses an existing option. Use Tab/Shift-Tab to move between controls, arrow keys for dropdown/radio choices, and Space to toggle buttons/checkboxes. Buttons also have underlined mnemonics. Knowledge search supports Mac Command-A/C/V/X shortcuts.
 
 | Selection | Meaning |
 | --- | --- |
@@ -45,17 +45,17 @@ Choose **Assess presentation**. The Assess button displays Assessing… while re
 | Outcome | Interpretation |
 | --- | --- |
 | Supported candidate conditions | One or more rule-supported candidates. Coexisting caries and pulpitis are permitted. |
-| Additional information needed | No target can yet be supported; select the requested predefined findings and reassess. |
-| Clarify conflicting selections | Correct contradictory pain answers or incompatible tooth selections before assessment. |
+| Additional information needed | No target can yet be supported; start a new consultation with the requested predefined findings. |
+| Clarify conflicting selections | Start a new consultation and supply consistent answers. |
 | Correct invalid inputs | Boundary validation rejected an invalid identifier/value. Numeric age-group values (including −2) and unrecognized identifiers are rejected at the Prolog boundary. |
 | Outside supported scope | The presentation requires assessment beyond the limited catalogue. |
 | No supported conclusion | No supported rule combination follows; this does not exclude other dental conditions. |
 
 These are candidate outputs, not confirmed diagnoses, certainty scores or treatment prescriptions. Primary-tooth irreversible-pulpitis symptoms can overlap with necrosis. All clinical rules and acceptance expectations await dentist review.
 
-**Edit answers** returns to step 2. Use Back to symptoms to revise step 1, then Back to setup to revise setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels including the selected age group, method (Forward chaining), knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
+Before assessment, use Back to symptoms and Back to setup to revise selections. The results screen provides only **New consultation**. To change answers after assessment, start a new consultation; results are not saved or exported.
 
-**New consultation** clears all selections and the result, restores defaults, and rejects delayed responses from the previous consultation. Saved text files remain on disk. Exiting closes the app; consultation selections are not restored on relaunch.
+**New consultation** clears all selections and the result, restores defaults, and rejects delayed responses from the previous consultation. Exiting closes the app; consultation selections are not restored on relaunch.
 
 ## Knowledge workspace
 
@@ -87,7 +87,6 @@ The bootstrap needs internet access. Build/launch/tests use the local runtime. `
 | Blank/Unknown age group | Select a predefined age group before assessment. |
 | Missing evidence request | Enter only findings actually supplied. Unknown must not be changed to No to force an answer. |
 | Contradictory answers | Correct the specifically reported contradiction and reassess. |
-| Cannot save | Choose a writable destination and valid filename; retry. The app reports filesystem errors. |
 | Search appears empty | Clear the search filter or select the appropriate catalogue tab. |
 | macOS refuses an external download | This first artifact is a local development image. A signed/notarized distribution build is pending. |
 

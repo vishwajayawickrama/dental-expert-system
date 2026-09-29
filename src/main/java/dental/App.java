@@ -9,8 +9,6 @@ import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
-import java.nio.file.*;
-import java.time.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
@@ -35,10 +33,8 @@ public final class App extends JFrame {
     private final JPanel screens=new JPanel(new CardLayout());
     private final JTextArea resultText=new JTextArea();
     private final JButton assessButton=button("Assess presentation",'A');
-    private final JButton saveButton=button("Save result",'S');
     private final ExecutorService worker=Executors.newSingleThreadExecutor(r->{Thread t=new Thread(r,"dental-inference");t.setDaemon(true);return t;});
     long generation;
-    private String savedResult;
     private final JLabel resultTitle=new JLabel("Assessment");
     private final List<JPanel> questionnaires=new ArrayList<>();
     private final Set<String> activeKeys=new LinkedHashSet<>();
@@ -125,7 +121,7 @@ public final class App extends JFrame {
         JPanel p=page("04 / Assessment result","Candidate conditions can coexist. Results do not establish an autonomous diagnosis.");
         JPanel body=new JPanel(new BorderLayout(0,18));body.setOpaque(false);resultTitle.setForeground(TEAL);resultTitle.setFont(DISPLAY.deriveFont(25f));body.add(resultTitle,BorderLayout.NORTH);
         resultText.setEditable(false);resultText.setLineWrap(true);resultText.setWrapStyleWord(true);resultText.setFont(BODY.deriveFont(16f));resultText.setMargin(new Insets(18,18,18,18));resultText.setBackground(BLUE);body.add(new JScrollPane(resultText),BorderLayout.CENTER);p.add(body,BorderLayout.CENTER);
-        JButton edit=button("Edit answers",'E');edit.addActionListener(e->navigate("findings"));saveButton.addActionListener(e->save());JButton fresh=button("New consultation",'N');fresh.addActionListener(e->{reset();show("setup");});p.add(actions(edit,saveButton,fresh),BorderLayout.SOUTH);return p;
+        JButton fresh=button("New consultation",'N');fresh.addActionListener(e->{reset();show("setup");});p.add(actions(fresh),BorderLayout.SOUTH);return p;
     }
     private JPanel knowledge(){
         JPanel p=page("Knowledge workspace","Read-only catalogue. Domain facts, production rules and consultation questions have separate counts.");
@@ -157,7 +153,7 @@ public final class App extends JFrame {
     Map<String,Term> answers(){
         Map<String,Term> a=new LinkedHashMap<>();fields.forEach((k,f)->{if(activeKeys.contains(k))a.put(k,f.value());});return a;
     }
-    void invalidateAssessment(){generation++;savedResult=null;saveButton.setEnabled(false);}
+    void invalidateAssessment(){generation++;}
     void refreshVisibility(){route(null,false,false);}
     void navigate(String destination){route(destination,false,false);}
     void continueToFindings(){route("findings",false,true);}
@@ -206,19 +202,9 @@ public final class App extends JFrame {
         if(!r.missing().isEmpty()){out.append("Missing or unusable findings:\n");for(String k:r.missing())out.append("• ").append(fields.containsKey(k)?fields.get(k).question.label():k).append("\n");}
         if(r.candidates().contains("irreversible_pulpitis")&&input.getOrDefault("tooth_type",new Atom("unknown")).name().equals("primary"))out.append("\nPrimary-tooth findings can overlap with pulp necrosis; this candidate requires dentist review.\n");
         resultText.setText(out.toString());resultText.setCaretPosition(0);
-        StringBuilder record=new StringBuilder("DentalExplain consultation\nSaved assessment: "+Instant.now()+"\nKnowledge version: "+bridge.version+"\nExpert review: pending\nMethod: Forward chaining\n\nINPUTS\n");
-        input.forEach((k,v)->record.append(k).append(" = ").append(v).append(" | ").append(fields.get(k).displayed()).append("\n"));record.append("\nSTATUS: ").append(r.status()).append("\n\n").append(out);savedResult=record.toString();saveButton.setEnabled(true);
     }
-    private void save(){
-        if(savedResult==null)return;
-        FileDialog chooser=new FileDialog(this,"Save consultation result",FileDialog.SAVE);
-        chooser.setFile("DentalExplain-result.txt");chooser.setVisible(true);
-        String file=chooser.getFile(),directory=chooser.getDirectory();chooser.dispose();
-        if(file==null)return;Path path=Path.of(directory,file);
-        if(Files.exists(path)&&JOptionPane.showConfirmDialog(this,"Replace the existing result file?","Save result",JOptionPane.YES_NO_OPTION)!=JOptionPane.YES_OPTION)return;
-        try{Files.writeString(path,savedResult);JOptionPane.showMessageDialog(this,"Saved result to "+path.getFileName(),"Result saved",JOptionPane.INFORMATION_MESSAGE);}catch(Exception e){JOptionPane.showMessageDialog(this,e.getMessage(),"Save failed",JOptionPane.ERROR_MESSAGE);}
-    }
-    String savedResultForTest(){return savedResult;}
+    String displayedResultForTest(){return resultText.getText();}
+    String resultTitleForTest(){return resultTitle.getText();}
     void show(String card){currentScreen=card;((CardLayout)screens.getLayout()).show(screens,card);}
     static void installEditingKeys(){
         if(!System.getProperty("os.name").startsWith("Mac"))return;

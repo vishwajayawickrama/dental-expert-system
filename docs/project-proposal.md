@@ -22,7 +22,7 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 | Knowledge size | Exactly 25 meaningful production rules and 30 authored domain facts. |
 | Tests | 20 synthetic acceptance cases and additional boundary, engine and interface checks. |
 | Runnable deliverable | Development JAR and bundled macOS `.app` with native launcher and icon. |
-| User manual | Installation, consultation, knowledge viewing, saving, reset and troubleshooting. |
+| User manual | Installation, consultation, knowledge viewing, reset and troubleshooting. |
 | No Python implementation | Java, Prolog and shell only. |
 
 ## 2. Specific domain and scope
@@ -101,8 +101,8 @@ The [20-case catalogue](test-cases.md) retains concrete reported symptoms and su
 
 Forward chaining must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover all five age groups, Unknown/missing groups, invalid boundary values, contradictory inputs, incomplete evidence, blocked rules, unsupported presentations, coexisting findings, termination, duplicate prevention and reset. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
 
-Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, save results and reset. Another-machine verification, Developer ID signing/notarization and Windows delivery remain follow-up work.
+Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, display results and reset. Another-machine verification, Developer ID signing/notarization and Windows delivery remain follow-up work.
 
 ## 8. User manual
 
-The [manual](user-manual.md) describes packaged launch and developer commands, four-field setup, two adaptive questionnaire steps, forward-only assessment, result interpretation, editing, saving, new consultations, knowledge browsing and troubleshooting.
+The [manual](user-manual.md) describes packaged launch and developer commands, four-field setup, two adaptive questionnaire steps, forward-only assessment, result interpretation, Back navigation before assessment, new consultations, knowledge browsing and troubleshooting.

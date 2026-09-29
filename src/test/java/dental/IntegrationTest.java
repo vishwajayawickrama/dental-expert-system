@@ -8,6 +8,12 @@ import java.nio.file.*;
 import javax.imageio.ImageIO;
 
 public final class IntegrationTest {
+    static JButton findButton(java.awt.Container root,String label){
+        for(java.awt.Component c:root.getComponents()){
+            if(c instanceof JButton button&&button.getText().equals(label))return button;
+            if(c instanceof java.awt.Container child){JButton found=findButton(child,label);if(found!=null)return found;}
+        }return null;
+    }
     static void require(boolean b,String message){if(!b)throw new AssertionError(message);}
     static Map<String,Term> observations(Term list){Map<String,Term> map=new LinkedHashMap<>();for(Term o:list.listToTermArray())map.put(o.arg(1).name(),o.arg(2));return map;}
     static void query(Term goal){Query q=new Query(goal);try{require(q.hasSolution(),"Query failed: "+goal);}finally{q.close();}}
@@ -92,22 +98,21 @@ public final class IntegrationTest {
             set(a,"radiographic_caries","yes");a.assess();
         });settled(a);
         SwingUtilities.invokeAndWait(()->{
-            String saved=a.savedResultForTest();require(saved!=null&&saved.contains("age_group = adolescent | 13-17 years")&&saved.contains("Method: Forward chaining")&&!saved.contains("Goal:")&&!saved.contains("sleep_pain ="),"Saved active answers and method");
-            require(saved.contains("Dental caries"),"Symptom-free caries result");
-            try{Files.writeString(Path.of("build/reports/adaptive-result.txt"),saved);}catch(Exception e){throw new AssertionError(e);}
+            require(a.displayedResultForTest().contains("Dental caries"),"Displayed symptom-free caries result");
+            require(findButton(a,"Edit answers")==null&&findButton(a,"Save result")==null,"Removed result actions");
             for(int[] size:List.of(new int[]{1180,850},new int[]{960,680}))render(a,"results",size[0],size[1]);
-            a.navigate("findings");
+            findButton(a,"New consultation").doClick();
         });settled(a);
-        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("findings"),"Editing opens step 2");set(a,"warning_signs","none");a.fields.get("warning_signs").setValue(Term.termArrayToList(new Term[]{new Atom("fever")}));a.continueToFindings();});settled(a);
-        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.savedResultForTest().contains("STATUS: outside_scope"),"Warning signs bypass examination");a.reset();a.show("setup");});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("setup")&&a.displayedResultForTest().isEmpty(),"New consultation clears displayed result");require(a.fields.values().stream().allMatch(f->f.value().isAtom()&&f.value().name().equals("unknown")),"New consultation clears all answers");set(a,"warning_signs","none");a.fields.get("warning_signs").setValue(Term.termArrayToList(new Term[]{new Atom("fever")}));a.continueToFindings();});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.resultTitleForTest().equals("Outside the supported scope"),"Warning signs bypass examination");a.reset();a.show("setup");});settled(a);
         SwingUtilities.invokeAndWait(()->{set(a,"age_group","adult");set(a,"tooth_pain","no");set(a,"gum_symptoms","none");set(a,"jaw_clicking","yes");a.continueToFindings();});settled(a);
-        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.savedResultForTest().contains("STATUS: outside_scope"),"Jaw-only bypasses examination");a.reset();});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.resultTitleForTest().equals("Outside the supported scope"),"Jaw-only bypasses examination");a.reset();});settled(a);
         // Queue edits, navigation and an assessment, then reset before any callback.
         SwingUtilities.invokeAndWait(()->{set(a,"age_group","adult");set(a,"tooth_pain","yes");a.refreshVisibility();a.navigate("symptoms");a.assess();a.reset();a.show("setup");});settled(a);
         SwingUtilities.invokeAndWait(()->{
-            require(a.savedResultForTest()==null&&a.currentScreen.equals("setup"),"No delayed result/navigation after reset");
+            require(a.displayedResultForTest().isEmpty()&&a.currentScreen.equals("setup"),"No delayed result/navigation after reset");
             require(a.fields.values().stream().allMatch(f->f.value().isAtom()&&f.value().name().equals("unknown")),"Reset all inputs");a.dispose();
         });
-        System.out.println("PASS: "+assessments+" JPL assessments; 30 control schemas; combined exclusivity, authoritative routing, two-step navigation, hidden clearing, scope bypass, saved output and delayed-callback reset.");System.exit(0);
+        System.out.println("PASS: "+assessments+" JPL assessments; 30 control schemas; combined exclusivity, authoritative routing, two-step navigation, hidden clearing, scope bypass, removed result actions, new-consultation reset and delayed-callback reset.");System.exit(0);
     }
 }

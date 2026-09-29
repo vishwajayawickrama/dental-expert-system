@@ -28,4 +28,4 @@ Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use t
 - [User manual](docs/user-manual.md)
 - [Verification record](docs/verification.md)
 
-No knowledge editor, treatment prescribing, patient database or autonomous diagnosis is provided.
+Results offer New consultation only; answers can be revised using Back before assessment. No result export, knowledge editor, treatment prescribing, patient database or autonomous diagnosis is provided.

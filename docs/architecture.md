@@ -44,7 +44,7 @@ flowchart TD
 
 `App.java` owns the welcome → setup → reported symptoms (step 1) → relevant findings (step 2) → results flow and read-only knowledge workspace. `AnswerControl.java` builds every clinical field from the shared Prolog question catalogue. Back navigation preserves active selections. Conditional fields reset to Unknown when hidden and are excluded from submitted observations. A new consultation clears fields and results.
 
-Clinical controls are non-editable dropdowns, radio groups or checkbox groups. Search in the knowledge workspace and file names in the save dialog are the only editable text inputs. Neither is clinical evidence. Dropdown keyboard type-ahead selects an existing option; it cannot create a new value. The form has accessible labels, focusable controls, button mnemonics, Tab traversal and native Mac editing shortcuts for search/save dialogs.
+Clinical controls are non-editable dropdowns, radio groups or checkbox groups. Search in the knowledge workspace is the only editable text input; it is not clinical evidence. Dropdown keyboard type-ahead selects an existing option; it cannot create a new value. The form has accessible labels, focusable controls, button mnemonics, Tab traversal and native Mac editing shortcuts for knowledge search.
 
 A single background executor initializes Prolog, routes questions and performs reasoning. The catalogue is loaded before the interface becomes ready; subsequent tab viewing reads cached records. Swing updates occur on the event-dispatch thread. A generation token invalidates pending callbacks after edits, navigation or reset, preventing delayed results from replacing a new consultation. See [Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
 
@@ -118,7 +118,7 @@ Exact premises, conclusions and source URLs are in the read-only Rules tab and `
 
 The catalogue has **4 setup + 9 symptom + 17 examination questions = 30**. It replaces 43 questions without removing any diagnostic production-rule premise. FDI tooth selectors and their consistency checks were removed, together with pain severity, symptom duration, gum tenderness, the history checklist, fracture, electric response, mobility and radiographic bone loss. These inputs were unused by the diagnostic rules. Dentition/type and programmatic pain contradiction checks remain.
 
-`active_questions/3` is authoritative; Java does not duplicate visibility predicates. Java requests all stages on its worker, clears values belonging to inactive questions to Unknown, reroutes until clearing settles, then applies only the latest generation's update on Swing's event thread. Only active answers reach assessment or saved output. Selections for the other step remain intact when applicable. Each question has tailored positive/negative wording; internal values remain `yes`, `no`, `unknown`, `na`, listed atoms or predefined numbers. No clinical free text is accepted.
+`active_questions/3` is authoritative; Java does not duplicate visibility predicates. Java requests all stages on its worker, clears values belonging to inactive questions to Unknown, reroutes until clearing settles, then applies only the latest generation's update on Swing's event thread. Only active answers reach assessment. Selections for the other step remain intact when applicable. Each question has tailored positive/negative wording; internal values remain `yes`, `no`, `unknown`, `na`, listed atoms or predefined numbers. No clinical free text is accepted.
 
 | Question group | Applicability |
 | --- | --- |
@@ -151,7 +151,7 @@ Selected items expand to `yes`; unselected items remain `unknown`. `none` record
 3. The dentist supplies four setup selections, then reported symptoms. Prolog routes relevant examination questions for step 2. Known warning signs or a jaw-only outside-scope presentation bypass examination and return the scope response.
 4. JPL sends structured observations to Prolog; the boundary validates them.
 5. The engine returns candidates, missing-input requests, conflicts, outside-scope or no-supported-conclusion status.
-6. Results can be saved as plain-text inputs and results. No patient database is maintained.
+6. Results are displayed on screen with New consultation as the only action. No result editing, export or patient database is provided.
 7. Reset clears the consultation and invalidates pending results. Reusable knowledge remains loaded.
 
 ## 4. macOS delivery
