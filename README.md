@@ -10,7 +10,7 @@ Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledg
 
 Application **1.3.0** installs Java 21 and SWI-Prolog/JPL **10.0.2** separately. The submission ZIP stays under **20 MB** and contains one shared JAR, small macOS/Windows launchers, source, knowledge and reports. Initial setup needs internet access and administrator permission; normal consultations work offline afterward.
 
-Download [cm3321-expert-system-224096B.zip](cm3321-expert-system-224096B.zip) (**2.47 MB**) or browse the matching [extracted submission folder](cm3321-expert-system-224096B/). Both are tracked in this repository. Extract the ZIP before running its installation scripts.
+Download [cm3321-expert-system-224096B.zip](cm3321-expert-system-224096B.zip) (**2.33 MB**) or browse the matching [extracted submission folder](cm3321-expert-system-224096B/). Both are tracked in this repository. Extract the ZIP before running its installation scripts.
 
 The submission puts the six installation scripts in `scripts/`, their support files in `scripts/helpers/`, and the Word/PDF reports directly beside [User-manual.md](cm3321-expert-system-224096B/User-manual.md). Open `scripts/` and run the two scripts for your OS in order. No `README.txt` or checksum manifest is included; dependency downloads are still checksum-verified before installation.
 

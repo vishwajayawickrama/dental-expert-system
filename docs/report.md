@@ -181,31 +181,31 @@ DentalExplain itself is installed for the current user. Windows provides desktop
 
 ![Figure 2 Current welcome screen](report-assets/ui-welcome.png)
 
-The welcome screen offers Start consultation and View knowledge base, identifies the supported conditions and describes the consultation flow.
+Start a consultation or open the read-only knowledge base from the welcome screen.
 
-![Figure 3 Current setup with predefined age and affected-tooth selections](report-assets/ui-setup.png)
+![Figure 3 Age group and affected tooth setup](report-assets/ui-setup.png)
 
-Setup uses two non-editable dropdowns. Age group does not automatically determine tooth type or diagnosis. The form retains its white background, internal padding and consistent Latin Modern Sans typography.
+Select an age group and affected tooth type using predefined dropdowns. Age alone does not determine diagnosis.
 
 ## 7.5 Reported symptoms and relevant findings
 
-![Figure 4 Pain selection reveals question-specific symptom follow-ups](report-assets/ui-symptoms.png)
+![Figure 4 Reported symptoms and conditional follow-ups](report-assets/ui-symptoms.png)
 
-Step 1 separates reported symptoms from examination findings. Reporting tooth pain reveals trigger, persistence, spontaneous and sleep-interruption questions. Checkbox special answers remain mutually exclusive with findings.
+Tooth pain reveals trigger, persistence, spontaneous-pain and sleep-interruption questions. Checkbox uncertainty options are mutually exclusive with findings.
 
-![Figure 5 Dentist-supplied findings in the second questionnaire step](report-assets/ui-findings.png)
+![Figure 5 Relevant dentist-supplied findings](report-assets/ui-findings.png)
 
-Step 2 presents applicable caries, pulp/apical and periodontal findings. Long forms scroll, while Back and Assess actions remain available outside the scroll area. Uncertainty keeps potentially relevant follow-ups available.
+Enter applicable caries, pulp/apical and periodontal findings. Unknown answers retain relevant follow-ups; Back and Assess remain available.
 
 ## 7.6 Results and knowledge workspace
 
-![Figure 6 Coexisting supported candidates from a synthetic consultation](report-assets/ui-results.png)
+![Figure 6 Coexisting supported candidates](report-assets/ui-results.png)
 
-Results display supported candidates and any additional requested findings. New consultation is the only result action. The screenshot shows coexisting caries and reversible-pulpitis candidates from the illustrated synthetic pain consultation.
+Results can include coexisting candidates, as shown for caries and reversible pulpitis. New consultation clears all answers.
 
-![Figure 7 Read-only knowledge workspace with separate catalogue tabs](report-assets/ui-knowledge.png)
+![Figure 7 Read-only knowledge workspace](report-assets/ui-knowledge.png)
 
-Questions, Facts and Rules have separate counts. Search filters the active table, and selecting a row displays its full content and source. The workspace provides inspection rather than knowledge editing.
+Search the read-only Questions, Facts and Rules tabs. Selecting a row shows its content and source.
 
 # 8 Testing and Evaluation
 

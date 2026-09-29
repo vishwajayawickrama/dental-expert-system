@@ -1,5 +1,13 @@
 # DentalExplain verification record
 
+## Paired implementation screenshots — 29 September 2026
+
+The six screenshots in Sections 7.4–7.6 now occupy **three pages, two screenshots per page**, with proportional widths reduced from 6.5 to **5.4 inches**. Captions and descriptions were shortened while retaining their essential screen behavior. Existing screenshot assets are unchanged. Justification, 1.5 paragraph spacing and indentation are retained; all report elements outside these subsections and the contents page are preserved exactly.
+
+The report now has **25 pages**. All three screenshot pages, the updated contents and subsequent pages were visually inspected for readability, caption pairing and clipping; preceding pages are pixel-identical to the previously reviewed report. All **12 contents entries** match actual pagination. The matching Word/PDF copies and submission ZIP were synchronized.
+
+Archive integrity, extracted-file correspondence and executable permissions passed. The ZIP is **2,333,927 bytes (2.33 MB)**, SHA-256 `9bf9e7a6e7ceb92cb6b1143d79a6f39ed545cc217ae19346b68fa84f2aea0d16`, below 20 MB; the Word lock file remains excluded. Application behavior is unchanged.
+
 ## Desktop and submission report subsection removed — 29 September 2026
 
 Removed Section 8.3 Desktop and submission verification and both associated paragraphs. Exact structural comparison confirms preservation of all other report content, formatting and resources. The updated PDF remains **28 pages** and all **12 contents entries** retain correct pagination. Only page 19 differs from the previously reviewed rendering; that page was visually inspected, with all other pages pixel-identical.
