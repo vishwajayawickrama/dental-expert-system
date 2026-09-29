@@ -40,7 +40,7 @@ Build the Windows startup wrapper on Windows with `scripts/install/build-windows
 
 ## Documentation
 
-- [Academic report source and expert questionnaire](docs/report.md), [Word report](cm3321-expert-system-224096B.docx) and [PDF report](cm3321-expert-system-224096B/cm3321-expert-system-224096B.pdf). The Word report is at the repository root; the submission folder and ZIP include only the PDF report. The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
+- [Academic report source and expert questionnaire](docs/report.md), [Word report](expert-system-report-224096B.docx) and [PDF report](cm3321-expert-system-224096B/expert-system-report-224096B.pdf). The Word report is at the repository root; the submission folder and ZIP include only the PDF report. The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
 - [Project proposal and scope](docs/project-proposal.md)
 - [Architecture and interface decision](docs/architecture.md)
 - [20 acceptance cases and actual outcomes](docs/test-cases.md)
@@ -55,7 +55,7 @@ The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery u
 
 `scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, the PDF report, source, six installation scripts and the launch-only manual, arranges `scripts/` and `scripts/helpers/`, and enforces a 20 MB ZIP maximum. Generated build/distribution copies remain ignored; the verified root submission ZIP and folder are explicitly tracked. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
 
-After exporting the Word report to PDF, run `python3 scripts/link-report-pdf.py docs/report/cm3321-expert-system-224096B.pdf --docx cm3321-expert-system-224096B.docx` to make the complete contents rows clickable, including dotted leaders and page numbers. This report-development helper requires `pypdf`, `pdfplumber` and `lxml`; it does not change the Java/Prolog application.
+After exporting the Word report to PDF, run `python3 scripts/link-report-pdf.py docs/report/expert-system-report-224096B.pdf --docx expert-system-report-224096B.docx` to make the complete contents rows clickable, including dotted leaders and page numbers. This report-development helper requires `pypdf`, `pdfplumber` and `lxml`; it does not change the Java/Prolog application.
 
 The 10–15-question
  goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).

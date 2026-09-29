@@ -91,7 +91,7 @@ async function main(){
      {id:'TOC1',name:'toc 1',basedOn:'Normal',next:'Normal',run:{font:'Times New Roman',size:22,color:'000000'},paragraph:{spacing:{after:155},tabStops:[{type:d.TabStopType.RIGHT,position:W,leader:d.LeaderType.DOT}]}},
      {id:'Caption',name:'Caption',basedOn:'Normal',run:{font:'Times New Roman',size:19,color:'000000'},paragraph:{spacing:{after:120,line:225}}}
    ]},features:{updateFields:true},sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1100,right:1273,bottom:1100,left:1273}}},footers:{default:new d.Footer({children:[new d.Paragraph({alignment:d.AlignmentType.CENTER,children:[new d.TextRun({children:[d.PageNumber.CURRENT],font:'Times New Roman',size:18})]})]})},children}]});
- fs.writeFileSync(path.join(OUT,'cm3321-expert-system-224096B.docx'),await d.Packer.toBuffer(doc));
+ fs.writeFileSync(path.join(OUT,'expert-system-report-224096B.docx'),await d.Packer.toBuffer(doc));
  console.log('Report authored with 30 facts, 25 rules, 20 executed cases and 7 figures; acceptance details remain outside the report.');
 }
 main().catch(e=>{console.error(e);process.exit(1)});

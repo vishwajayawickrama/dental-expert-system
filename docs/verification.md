@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Report renamed to expert-system-report-224096B — 29 September 2026
+
+Renamed the root Word document and canonical Word/PDF reports to `expert-system-report-224096B.docx` and `expert-system-report-224096B.pdf`. The submission folder and ZIP include the renamed PDF only. Updated README links, generation output and packaging paths; the outer submission directory and ZIP names remain unchanged.
+
+Byte comparison confirms report content and manual edits are unchanged. The PDF retains 24 pages and all 12 full-row internal contents links. ZIP integrity, complete extracted-file correspondence, executable permissions and absence of old report names/Word documents passed. The refreshed ZIP is **1,370,504 bytes (1.37 MB)**, SHA-256 `71e36a5890d6cd9a0cf901e8c1785be6cfd3567c05a7c641b75ae1c00561e0a4`.
+
 ## PDF contents links repaired — 29 September 2026
 
 Expanded all **12 contents links** across their complete rows, including dotted leaders and page numbers, and encoded explicit internal `GoTo` actions. Each link was checked against the Word contents entry and corresponding PDF heading page. Clicking the first and final page-number links in native macOS Preview opened pages **3** and **22**, respectively. Added `scripts/link-report-pdf.py` to repeat this navigation fix after future exports.
