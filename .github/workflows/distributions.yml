@@ -17,6 +17,7 @@ jobs:
           java-version: '21.0.11'
       - name: Bootstrap vendor runtime, build and test shared JAR
         run: |
+          mkdir -p build/reports
           scripts/bootstrap.sh
           scripts/test.sh | tee build/reports/macos-tests.txt
           scripts/package.sh | tee build/reports/macos-package.txt

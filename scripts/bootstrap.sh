@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 [ "$(uname -m)" = arm64 ] || { echo 'This release targets Apple Silicon macOS.' >&2; exit 1; }
 mkdir -p "$ROOT/.runtime"
 if [ ! -f "$ROOT/.runtime/SWI-Prolog.app/Contents/Resources/swipl/lib/jpl.jar" ]; then
-  curl --fail --location 'https://www.swi-prolog.org/download/stable/bin/swipl-10.0.2-1.universal.dmg' -o "$ROOT/.runtime/swipl.dmg"
+  curl --fail --location 'https://www.swi-prolog.org/download/stable/bin/swipl-10.0.2-1.fat.dmg' -o "$ROOT/.runtime/swipl.dmg"
   echo 'bf775f0b8d7880f4908dee513316013ef42a73793be392814fde2a0a8e9ddc5d  '"$ROOT/.runtime/swipl.dmg" | shasum -a 256 -c -
   MOUNT="$(mktemp -d /private/tmp/dental-swipl.XXXXXX)"
   hdiutil attach "$ROOT/.runtime/swipl.dmg" -readonly -nobrowse -mountpoint "$MOUNT"
