@@ -49,6 +49,9 @@ if ($Package) {
     Copy-Item "$dest/knowledge" "$image/app/knowledge" -Recurse
     New-Item -ItemType Directory -Force "$image/app/runtime" | Out-Null
     Copy-Item "$dest/runtime/prolog" "$image/app/runtime/prolog" -Recurse
-    Copy-Item "$PSScriptRoot/README.txt" $image
+# Windows searches the executable directory for transitive native DLLs.
+# The app-image launcher must work without vendor bin directories on PATH.
+Copy-Item "$prolog/bin/*.dll" $image -Force
+Copy-Item "$PSScriptRoot/README.txt" $image
     Invoke-Checked '7z' @('a',"$root/dist/DentalExplain-windows-x64.zip",$image)
 }

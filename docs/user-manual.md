@@ -85,7 +85,7 @@ From the repository directory, with an Apple Silicon Mac, a Java 21 JDK and Appl
 ./scripts/package.sh    # dist/release-<timestamp>/DentalExplain.app
 ```
 
-The bootstrap needs internet access. Build/launch/tests use the local runtime. `build/latest-app.txt` records the most recent timestamped package. The development JAR needs matching JPL/native resources and configured `dental.home`; it is not a standalone cross-platform bundle. The source commits exclude runtime directories, generated output and the reference report.
+The bootstrap needs internet access. Build/launch/tests use the local runtime. `build/latest-app.txt` records the most recent timestamped package. The development JAR needs matching JPL/native resources. Packaged JARs resolve resources beside the JAR; development launch scripts set `dental.home`. Use the complete platform package, not a JAR copied alone. The source commits exclude runtime directories, generated output and the reference report.
 
 `DentalExplain.app/Contents/MacOS/DentalExplain --verify-runtime` is a diagnostic launch that verifies bundled initialization without opening a consultation window. The documented acceptance fixtures are synthetic, not patient records. Test output is in `build/reports/`; see [verification](verification.md) for the recorded results.
 
@@ -94,7 +94,7 @@ The bootstrap needs internet access. Build/launch/tests use the local runtime. `
 | Problem | Action |
 | --- | --- |
 | Missing JPL or native library / initialization error | Use the complete application bundle, or rerun bootstrap/build for development. Match SWI 10.0.2, vendor JPL and Java 21; do not substitute individual libraries. |
-| Wrong CPU architecture | Use the Apple Silicon package. Windows and Intel-Mac packages have not been verified. |
+| Wrong CPU architecture | Choose macOS ARM64, Windows x64 or Ubuntu x64 as appropriate. Intel Mac and other ARM packages are not provided. |
 | Missing `boot.prc` or knowledge module | Restore/rebuild the intact bundle; do not move its internal resources individually. |
 | Blank/Unknown age group | Select a predefined age group before assessment. |
 | Missing evidence request | Enter only findings actually supplied. Unknown must not be changed to No to force an answer. |

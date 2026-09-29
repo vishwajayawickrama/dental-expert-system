@@ -16,8 +16,6 @@ cp "$ROOT/scripts/distribution/launch.sh" "$DEST/launch.sh"
 chmod +x "$DEST/launch.sh"
 if [ "$PLATFORM" = macos-arm64 ]; then
   cp "$DEST/launch.sh" "$DEST/Launch.command"
-  # Preserve vendor resources and license files, including Java redistribution notices.
-  cp -R "$JAVA_HOME/legal" "$DEST/runtime/java/" 2>/dev/null || true
 fi
 cp "$ROOT/scripts/distribution/README.txt" "$DEST/README.txt"
 cp "$ROOT/LICENSE" "$DEST/" 2>/dev/null || true
