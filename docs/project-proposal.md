@@ -35,7 +35,7 @@ Setup captures age group, dentition, affected tooth type and region. Step 1 coll
 
 The application returns supported candidates, requests missing inputs, identifies conflicts, or reports outside-scope/no-supported-conclusion outcomes. Supported findings may coexist. All clinical inputs use dropdowns, radio buttons or checkboxes; no free-text clinical entry is allowed. Unknown, No, None and Not applicable retain distinct meanings. The shared catalogue defines every permitted mapping and Prolog controls applicability through `active_questions/3`. It contains 30 questions: 4 setup, 9 symptoms and 17 examination findings. FDI selectors and unused questions have been removed.
 
-Orthodontic planning, oral cancer diagnosis, treatment prescribing, image interpretation, knowledge editing, autonomous clinical diagnosis, patient-record persistence and Windows packaging are outside this first implementation. Swelling, drainage or fever requires assessment beyond the five-condition catalogue. Full urgent-care and dental differential diagnosis are not implemented.
+Orthodontic planning, oral cancer diagnosis, treatment prescribing, image interpretation, knowledge editing, autonomous clinical diagnosis, patient-record persistence are outside this first implementation. Swelling, drainage or fever requires assessment beyond the five-condition catalogue. Full urgent-care and dental differential diagnosis are not implemented.
 
 Clinical sources include [NIDCR tooth decay](https://www.nidcr.nih.gov/health-info/tooth-decay), [AAE terminology](https://www.aae.org/specialty/wp-content/uploads/sites/2/2017/07/aaeconsensusconferencerecommendeddiagnosticterminology.pdf), [AAPD pulp guidance](https://www.aapd.org/media/Policies_Guidelines/BP_PulpTherapy.pdf), [AAP gum disease](https://www.perio.org/for-patients/gum-disease-information/), and [EFP classification guidance](https://www.efp.org/fileadmin/uploads/efp/Documents/Campaigns/New_Classification/Guidance_Notes/report-02.pdf). Sources inform the provisional patterns; they do not constitute approval of this software's rules.
 
@@ -93,7 +93,7 @@ Unknown or Not applicable findings do not satisfy required premises. A known fai
 
 Java Swing is selected for its built-in native controls and reusable Java source, with JPL embedding SWI-Prolog. The [architecture comparison](architecture.md#1-technology-decision) records Java, C++/Qt, web, XPCE and terminal alternatives and their dependencies.
 
-The development JAR requires the matching runtime files. The macOS application image bundles Java 21, Prolog 10.0.2/JPL, knowledge files and an icon. Windows requires a separate Windows build and native-dependency verification; cross-platform Java source does not make one dependency-free JAR.
+The development JAR requires the matching runtime files. The macOS application image bundles Java 21, Prolog 10.0.2/JPL, knowledge files and an icon. Application 1.1.0 adds a portable Windows x64 .exe image and Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Native dependencies are bundled per platform; the same JAR is reused. A single JAR does not contain all required native runtimes.
 
 ## 7. Test and acceptance plan
 
@@ -101,7 +101,7 @@ The [20-case catalogue](test-cases.md) retains concrete reported symptoms and su
 
 Forward chaining must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover all five age groups, Unknown/missing groups, invalid boundary values, contradictory inputs, incomplete evidence, blocked rules, unsupported presentations, coexisting findings, termination, duplicate prevention and reset. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
 
-Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, display results and reset. Another-machine verification, Developer ID signing/notarization and Windows delivery remain follow-up work.
+Actual outcomes are recorded in [verification.md](verification.md); software passes are separate from pending clinical approval. The delivered Mac image must launch by icon, resolve bundled resources from a path with spaces, complete consultations, display results and reset. Another-machine verification, Developer ID signing/notarization and Windows signing remain follow-up work.
 
 ## 8. User manual
 

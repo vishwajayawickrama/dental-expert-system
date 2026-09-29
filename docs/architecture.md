@@ -1,6 +1,6 @@
 # DentalExplain architecture
 
-**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.3.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
+**Status:** First Java Swing/JPL desktop implementation, application version 1.1.0, knowledge version 0.3.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
 
 See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
 
@@ -10,7 +10,7 @@ Java Swing supplies the native desktop interface. Java 21 calls SWI-Prolog 10.0.
 
 | Option | Integration, advantages and tradeoffs | Delivery |
 | --- | --- | --- |
-| **Java Swing — selected** | JPL structured terms; standard Java desktop controls; shared Java source across platforms. JNI and Prolog binaries still need platform-specific packaging. JavaFX would require an additional GUI runtime. | Development JAR plus native `jpackage` image. macOS verified; Windows follow-up. |
+| **Java Swing — selected** | JPL structured terms; standard Java desktop controls; shared Java source across platforms. JNI and Prolog binaries still need platform-specific packaging. JavaFX would require an additional GUI runtime. | Development JAR plus native `jpackage` image. macOS, Windows x64 and Ubuntu x64 packages; actual checks recorded separately. |
 | C++/Qt | Embed through SWI's C++ interface. Native UI and strong platform integration, but more C++/Qt/native build dependencies and deployment work. | Separate Qt/Prolog bundles per platform. |
 | Local web | SWI HTTP server with HTML/CSS/JavaScript. A launcher could start it and open a browser; an icon requirement does not technically exclude it. | Server, assets and runtime plus browser launcher. Not selected. |
 | Prolog XPCE | GUI and knowledge in Prolog; fewer language boundaries, but different GUI tooling and runtime resources. | XPCE/Prolog runtime bundle. |
@@ -154,13 +154,17 @@ Selected items expand to `yes`; unselected items remain `unknown`. `none` record
 6. Results are displayed on screen with New consultation as the only action. No result editing, export or patient database is provided.
 7. Reset clears the consultation and invalidates pending results. Reusable knowledge remains loaded.
 
-## 4. macOS delivery
+## 4. Cross-platform delivery
 
-Build requirements are an Apple Silicon Mac, Java 21, Apple's command-line tools and the official SWI-Prolog 10.0.2 universal distribution. `bootstrap.sh` downloads and checksum-verifies the vendor runtime into an ignored directory; no global Prolog installation is made. `build.sh`, `test.sh`, `run.sh` and `package.sh` provide shell commands without Python or Maven.
+The shared Java 21 application JAR is compiled once with deterministic archive timestamps and an executable manifest referencing adjacent `jpl.jar`. Each platform retains its matching SWI-Prolog 10.0.2 JPL Java/native files. `RuntimeLayout` resolves the application root from `dental.home` when supplied, otherwise from the JAR location; it locates native libraries and boot resources within the bundled runtime. It rejects unsupported OS/architecture combinations and reports absent dependencies before consultation.
 
-Packaging copies the vendor Prolog resources, frameworks and plugins into the application image, adds loader-relative rpaths for embedding, bundles matching `jpl.jar`, generates a tooth icon and re-signs the modified image locally. Prolog and Java redistribution notices are retained within the bundled runtimes. The initial package is ad-hoc signed; Developer ID signing/notarization and Windows packaging remain follow-up work. A second-machine clean-install test has not been performed.
+Supported combinations are macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktop. Windows uses `jpl.dll`/`libswipl.dll`, Linux uses `libjpl.so`/`libswipl.so`, and macOS uses vendor dylibs. Java and native libraries must have matching architectures. Explicit launch scripts configure process-local search paths and select bundled Java. These dependencies mean the JAR alone is not a complete cross-platform distribution. See [JPL deployment](https://jpl7.org/Deployment).
 
-Source commits exclude vendor runtimes, build outputs, application images and the reference report. The [manual](user-manual.md) explains developer and packaged launch steps.
+The Windows portable application image contains DentalExplain.exe and app/runtime folders. Java packages place the shared application JAR, JPL JAR and knowledge folder alongside runtime/java and runtime/prolog, plus platform launch scripts. The existing macOS .app remains supported. Resources resolve independently of the working directory, including paths containing spaces.
+
+The GitHub Actions workflow builds the canonical JAR and Mac packages on macOS ARM64, then reuses that JAR in Windows and Ubuntu jobs. Windows runs jpackage natively with type app-image; packages must be built on their target platform ([Oracle packaging guide](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf)). No Windows installer is produced. Mac/Windows vendor downloads and the Linux 10.0.2 source archive are SHA-256 verified. Linux builds clib, plunit and JPL with CMake, then bundles non-system native dependencies. Java images are built with jlink, retaining runtime redistribution notices.
+
+Artifacts include ZIPs, application-JAR hashes, ZIP checksums, tests and screenshots. Vendor runtimes, generated files and reference reports remain excluded from source commits. Windows signing, Mac notarization and manual testing on other computers remain pending. Actual outcomes are recorded in [verification](verification.md).
 
 ## 5. Failure handling and verification
 

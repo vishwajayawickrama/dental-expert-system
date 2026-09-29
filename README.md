@@ -6,7 +6,23 @@ Setup has four fields, followed by two adaptive steps: **Reported symptoms** and
 
 Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledge version 0.3.0 contains 30 questions, separate from **30 authored domain facts and 25 production rules**. Forward chaining evaluates the full condition catalogue to a fixed point. Age uses five predefined groups; no diagnosis target or assessment focus is selected. All clinical knowledge and expected outcomes await dentist review.
 
-## Run on Apple Silicon macOS
+## Distributions
+
+Application 1.1.0 provides a portable Windows x64 application image and bundled Java packages for macOS ARM64, Windows x64 and Ubuntu 24.04 x64 desktops. Download the complete ZIP for your platform and extract it before launch:
+
+| Package | Launch |
+| --- | --- |
+| `DentalExplain-windows-x64.zip` | `DentalExplain/DentalExplain.exe` |
+| `DentalExplain-java-windows-x64.zip` | `Launch.cmd` |
+| `DentalExplain-java-macos-arm64.zip` | `Launch.command` |
+| `DentalExplain-java-linux-x64.zip` | `./launch.sh` |
+| `DentalExplain-macos-arm64.zip` | `DentalExplain.app` |
+
+The Java packages contain the same executable `DentalExplain.jar`, matching `jpl.jar`, knowledge files and platform-specific Java/Prolog runtimes. A JAR alone is not a complete distribution. Launch scripts select bundled Java; double-clicking a JAR may select system Java. No global Java/Prolog install or Windows installer is required. See [actual verification](docs/verification.md) before treating a platform as verified.
+
+GitHub Actions builds native artifacts on their respective platforms; workflow artifacts include packages, SHA-256 checksums, logs and screenshots. Generated files remain excluded from Git. Windows code signing, macOS notarization and additional architectures remain follow-up work.
+
+## Develop on Apple Silicon macOS
 
 Requires Java 21 and Apple's command-line tools for development. No Python or Maven is used.
 
@@ -18,7 +34,7 @@ Requires Java 21 and Apple's command-line tools for development. No Python or Ma
 ./scripts/package.sh
 ```
 
-Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use the bundled application without separate Java/Prolog installation. Packages are locally ad-hoc signed; another-machine verification, notarization and Windows packaging remain follow-up work. Generated runtime/build/package files and the reference report are excluded from Git.
+Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use the bundled application without separate Java/Prolog installation. Mac packages are locally ad-hoc signed; notarization and manual another-machine verification remain follow-up work. Generated runtime/build/package files and the reference report are excluded from Git.
 
 ## Documentation
 

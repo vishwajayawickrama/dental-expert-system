@@ -1,10 +1,22 @@
 # DentalExplain user manual
 
-**Audience:** Dentists entering reported symptoms and findings they have already obtained and interpreted. Application bundle 1.0.0; knowledge 0.3.0; clinical expert review pending.
+**Audience:** Dentists entering reported symptoms and findings they have already obtained and interpreted. Application 1.1.0; knowledge 0.3.0; clinical expert review pending.
 
 ## Installation and launch
 
-The first package targets Apple Silicon macOS. Copy the complete `DentalExplain.app` to a location of your choice and double-click its tooth icon in Finder. The bundle contains Java and SWI-Prolog/JPL; no terminal configuration or separate Prolog installation is needed. Keep the bundle intact. It is locally ad-hoc signed, with no Developer ID notarization; broader distribution and another-Mac verification are follow-up work. No Windows executable is provided in this release.
+Choose the complete package for your computer and extract it before launching. Java 21 and matching SWI-Prolog 10.0.2/JPL are bundled; no separate installation is required.
+
+| Computer | Package and launch |
+| --- | --- |
+| Windows x64 | Extract `DentalExplain-windows-x64.zip` and double-click `DentalExplain.exe` inside the DentalExplain folder. Keep its app/runtime directories together. There is no installer. |
+| Apple Silicon macOS | Open `DentalExplain.app`; it may be copied to Applications. |
+| Windows x64 — Java package | Extract `DentalExplain-java-windows-x64.zip`; open `Launch.cmd`. |
+| Apple Silicon macOS — Java package | Extract `DentalExplain-java-macos-arm64.zip`; open `Launch.command`. |
+| Ubuntu 24.04 x64 desktop — Java package | Extract `DentalExplain-java-linux-x64.zip`; run `./launch.sh` in its folder. |
+
+Each Java package contains the same `DentalExplain.jar` plus matching dependencies. The scripts use bundled Java; a JAR double-click may instead use system Java. Moving the JAR alone is unsupported. Linux needs a graphical desktop and its normal system C/graphics libraries. If an extraction tool removes Unix executable permissions, run `chmod +x launch.sh runtime/java/bin/java` (and `Launch.command` on macOS).
+
+Packages are unsigned on Windows and locally ad-hoc signed on macOS; code signing/notarization remain pending. Follow institutional software policies. Additional architectures and Linux distributions are not verified. See the [verification record](verification.md) for actual automated and manual outcomes.
 
 Wait for the welcome screen. The window title is DentalExplain • Expert system; catalogue counts appear in the knowledge workspace. Initialization and reasoning run in a background worker. An initialization error means the application is unavailable; it is not a clinical assessment.
 
@@ -91,3 +103,9 @@ The bootstrap needs internet access. Build/launch/tests use the local runtime. `
 | macOS refuses an external download | This first artifact is a local development image. A signed/notarized distribution build is pending. |
 
 See the [scope and human expert requirements](project-proposal.md) and [architecture](architecture.md) for the system's limits.
+
+## Cross-platform builds
+
+The **Cross-platform distributions** GitHub Actions workflow builds and tests on macOS ARM64, Windows x64 and Ubuntu 24.04 x64. It can be run manually and also runs for implementation changes on main. Download workflow artifacts after successful completion; each contains ZIPs, checksums and verification output. Keep downloaded artifacts outside source commits.
+
+For reproducible platform scripts, use `scripts/distribution/windows.ps1 -Bootstrap -Test -Package` on Windows after obtaining the shared JAR, or `bootstrap-linux.sh`, `test-unix.sh` and `package-java.sh` on Ubuntu with Java 21 and the listed workflow build dependencies. The canonical application JAR is compiled on macOS once, then reused by the other jobs. Windows packaging uses `jpackage --type app-image`; WiX is not required because no installer is produced.

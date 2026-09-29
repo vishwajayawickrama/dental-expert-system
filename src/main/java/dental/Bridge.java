@@ -15,18 +15,8 @@ public final class Bridge {
     private final Map<String,Term[]> catalogue=new LinkedHashMap<>();
     public final Path root;
     public Bridge() throws Exception {
-        root=Path.of(System.getProperty("dental.home", ".")).toAbsolutePath().normalize();
-        Path runtime=root.resolve("runtime");
-        if(!Files.exists(runtime)) runtime=root.resolve(".runtime/SWI-Prolog.app/Contents");
-        Path jvm=Path.of(System.getProperty("java.home"),"lib/server/libjvm.dylib");
-        System.load(jvm.toString());
-        System.load(runtime.resolve("Frameworks/libgmp.10.dylib").toString());
-        System.load(runtime.resolve("Frameworks/libz.1.dylib").toString());
-        System.load(runtime.resolve("Frameworks/libswipl.10.dylib").toString());
-        JPL.setNativeLibraryPath(runtime.resolve("PlugIns/swipl/libjpl.dylib").toString());
-        String home=runtime.resolve("Resources/swipl").toString();
-        JPL.setDefaultInitArgs(new String[]{"swipl","--quiet","--nosignals","--home="+home,"-x",home+"/boot.prc"});
-        if(!JPL.init() && JPL.getActualInitArgs()==null) throw new IllegalStateException("SWI-Prolog initialization failed");
+        root=RuntimeLayout.applicationRoot();
+        RuntimeLayout.initialize(root);
         query(new Compound("consult",new Term[]{new Atom(root.resolve("knowledge/engine.pl").toString())}));
         for(String kind:List.of("questions","facts","rules","conditions","version","question_sources")) catalogue.put(kind,query(qualified("catalog",new Atom(kind),new Variable("Records"))).get("Records").listToTermArray());
         List<Question> qs=new ArrayList<>();

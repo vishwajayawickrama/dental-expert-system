@@ -33,7 +33,12 @@ public final class IntegrationTest {
 (String[] args)throws Exception{
         UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         for(Object key:new ArrayList<>(UIManager.getDefaults().keySet()))if(UIManager.get(key) instanceof java.awt.Font)UIManager.put(key,new javax.swing.plaf.FontUIResource(App.BODY));
-        Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.resolve("knowledge/acceptance.pl").toString())}));
+require(RuntimeLayout.platform("Windows 11","amd64").equals("windows-x64"),"Windows layout");
+require(RuntimeLayout.platform("Linux","x86_64").equals("linux-x64"),"Linux layout");
+require(RuntimeLayout.platform("Mac OS X","aarch64").equals("macos-arm64"),"Mac layout");
+try{RuntimeLayout.platform("Linux","aarch64");throw new AssertionError("Unsupported architecture accepted");}catch(IllegalStateException expected){}
+try{RuntimeLayout.find(Path.of("build"),"missing-dental-library");throw new AssertionError("Missing dependency accepted");}catch(IllegalStateException expected){}
+Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.resolve("knowledge/acceptance.pl").toString())}));
         Term all=new Compound(":",new Term[]{new Atom("dental_acceptance"),new Compound("case",new Term[]{new Variable("ID"),new Variable("O"),new Variable("Status"),new Variable("Target")})});
         Map<String,Term>[] cases;Query fixtureQuery=new Query(all);try{cases=fixtureQuery.allSolutions();}finally{fixtureQuery.close();}
         require(cases.length==20,"Exactly 20 acceptance fixtures");int assessments=0;

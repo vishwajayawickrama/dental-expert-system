@@ -1,0 +1,131 @@
+name: Cross-platform distributions
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/**', 'knowledge/**', 'scripts/**', '.github/workflows/distributions.yml']
+permissions:
+  contents: read
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21.0.11'
+      - name: Bootstrap vendor runtime, build and test shared JAR
+        run: |
+          scripts/bootstrap.sh
+          scripts/test.sh | tee build/reports/macos-tests.txt
+          scripts/package.sh | tee build/reports/macos-package.txt
+          scripts/distribution/package-java.sh macos-arm64 "$PWD/.runtime/SWI-Prolog.app/Contents"
+          ditto -c -k --sequesterRsrc --keepParent "$(cat build/latest-app.txt)" dist/DentalExplain-macos-arm64.zip
+      - name: Verify relocated Java package with clean environment
+        run: |
+          mkdir -p 'build/Extracted Packages'
+          unzip -q dist/DentalExplain-java-macos-arm64.zip -d 'build/Extracted Packages'
+          env -i PATH=/usr/bin:/bin 'build/Extracted Packages/DentalExplain-java-macos-arm64/Launch.command' --verify-runtime
+          shasum -a 256 dist/*.zip > dist/SHA256SUMS-macos.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-jar
+          path: build/stage/DentalExplain.jar
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-distributions
+          path: |
+            dist/*.zip
+            dist/*.sha256
+            dist/SHA256SUMS-*.txt
+            build/reports/*.txt
+            build/ui-screenshots/*.png
+  windows:
+    needs: macos
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21.0.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shared-jar
+          path: build/stage
+      - name: Vendor runtime, acceptance tests and portable packages
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build/reports | Out-Null
+          Start-Transcript build/reports/windows-build.txt
+          ./scripts/distribution/windows.ps1 -Bootstrap -Test -Package
+          Stop-Transcript
+      - name: Verify extracted packages without installed Java or Prolog
+        shell: pwsh
+        run: |
+          $destination="$PWD/build/Extracted Packages"
+          New-Item -ItemType Directory -Force $destination | Out-Null
+          Expand-Archive dist/DentalExplain-java-windows-x64.zip $destination
+          Expand-Archive dist/DentalExplain-windows-x64.zip $destination
+          $env:PATH="$env:SystemRoot/system32;$env:SystemRoot"
+          Remove-Item Env:JAVA_HOME -ErrorAction SilentlyContinue
+          Remove-Item Env:SWI_HOME_DIR -ErrorAction SilentlyContinue
+          $report="$PWD/build/reports/windows-exe-runtime.txt"
+          $process=Start-Process "$destination/DentalExplain/DentalExplain.exe" -ArgumentList @('--verify-runtime',"`"$report`"") -Wait -PassThru
+          if($process.ExitCode -ne 0 -or !(Test-Path $report)){throw 'Packaged .exe runtime verification failed'}
+          Get-Content $report
+          & "$destination/DentalExplain-java-windows-x64/Launch.cmd" --verify-runtime
+          if($LASTEXITCODE -ne 0){throw 'Bundled Java launcher failed'}
+          Get-ChildItem dist/*.zip | ForEach-Object { "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)" } | Set-Content dist/SHA256SUMS-windows.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-distributions
+          path: |
+            dist/*.zip
+            dist/*.sha256
+            dist/SHA256SUMS-*.txt
+            build/reports/*.txt
+            build/ui-screenshots/*.png
+  linux:
+    needs: macos
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21.0.11'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shared-jar
+          path: build/stage
+      - name: Build pinned vendor Prolog with JPL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libgmp-dev zlib1g-dev libedit-dev libncurses-dev libutf8proc-dev xvfb patchelf zip
+          scripts/distribution/bootstrap-linux.sh
+          cp "$(find .runtime/prolog -name jpl.jar -print -quit)" build/stage/jpl.jar
+      - name: Test and package
+        run: |
+          mkdir -p build/reports
+          export LD_LIBRARY_PATH="$PWD/.runtime/prolog/native:$JAVA_HOME/lib/server"
+          xvfb-run -a scripts/distribution/test-unix.sh "$PWD/.runtime/prolog" | tee build/reports/linux-tests.txt
+          scripts/distribution/package-java.sh linux-x64 "$PWD/.runtime/prolog"
+      - name: Verify extracted runtime from path containing spaces
+        run: |
+          mkdir -p 'build/Extracted Packages'
+          unzip -q dist/DentalExplain-java-linux-x64.zip -d 'build/Extracted Packages'
+          env -i PATH=/usr/bin:/bin 'build/Extracted Packages/DentalExplain-java-linux-x64/launch.sh' --verify-runtime
+          sha256sum dist/*.zip > dist/SHA256SUMS-linux.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-distributions
+          path: |
+            dist/*.zip
+            dist/*.sha256
+            dist/SHA256SUMS-*.txt
+            build/reports/*.txt
+            build/ui-screenshots/*.png

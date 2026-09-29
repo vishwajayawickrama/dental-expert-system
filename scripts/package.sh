@@ -11,7 +11,7 @@ iconutil -c icns "$ROOT/build/DentalExplain.iconset" -o "$ROOT/build/DentalExpla
 DEST="$ROOT/dist/release-$(date +%Y%m%d-%H%M%S)"
 "$JAVA_HOME/bin/jpackage" --type app-image --dest "$DEST" --name DentalExplain \
   --input "$ROOT/build/stage" --main-jar DentalExplain.jar --main-class dental.App \
-  --app-version 1.0.0 --vendor DentalExplain --mac-package-identifier dev.dentalexplain.desktop \
+  --app-version 1.1.0 --vendor DentalExplain --mac-package-identifier dev.dentalexplain.desktop \
   --icon "$ROOT/build/DentalExplain.icns" --java-options '-Ddental.home=$APPDIR'
 APP="$DEST/DentalExplain.app"
 mkdir -p "$APP/Contents/app/knowledge" "$APP/Contents/app/runtime"
