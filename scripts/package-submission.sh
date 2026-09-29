@@ -4,7 +4,7 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 DEST=${1:-$ROOT/build/submission-lightweight}
 [[ ! -e "$DEST" ]] || { echo 'Choose a fresh staging directory.' >&2; exit 1; }
 PAYLOAD="$ROOT/build/lightweight"
-for file in "$PAYLOAD/application/DentalExplain.jar" "$PAYLOAD/application/windows/DentalExplain.exe" "$ROOT/docs/report/DentalExplain Report.docx" "$ROOT/docs/report/DentalExplain Report.pdf"; do
+for file in "$PAYLOAD/application/DentalExplain.jar" "$PAYLOAD/application/windows/DentalExplain.exe" "$ROOT/docs/report/DentalExplain Report.pdf"; do
  [[ -s "$file" ]] || { printf 'Missing verified file: %s\n' "$file" >&2; exit 1; }
 done
 mkdir -p "$DEST/scripts/helpers" "$DEST/source/scripts" "$ROOT/dist"
@@ -18,7 +18,7 @@ for file in "$DEST/scripts/"Install-*; do
  sed -e 's|$ROOT/scripts/install/|$ROOT/helpers/|g' -e 's|%~dp0scripts\\install\\|%~dp0helpers\\|g' "$file" > "$file.tmp"
  cat "$file.tmp" > "$file"; rm "$file.tmp"
 done
-cp "$ROOT/docs/report/DentalExplain Report."{docx,pdf} "$DEST/"
+cp "$ROOT/docs/report/DentalExplain Report.pdf" "$DEST/"
 cp "$ROOT/docs/user-manual.md" "$DEST/User-manual.md"
 cp -R "$ROOT/src" "$ROOT/knowledge" "$DEST/source/"
 cp "$ROOT/scripts/submission/source-README.md" "$DEST/source/README.md"

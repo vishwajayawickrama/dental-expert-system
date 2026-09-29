@@ -10,7 +10,7 @@ Clinical inputs are predefined dropdowns, radio buttons and checkboxes. Knowledg
 
 Application **1.3.0** installs Java 21 and SWI-Prolog/JPL **10.0.2** separately. The submission ZIP stays under **20 MB** and contains one shared JAR, small macOS/Windows launchers, source, knowledge and reports. Initial setup needs internet access and administrator permission; normal consultations work offline afterward.
 
-Download [cm3321-expert-system-224096B.zip](cm3321-expert-system-224096B.zip) (**2.33 MB**) or browse the matching [extracted submission folder](cm3321-expert-system-224096B/). Both are tracked in this repository. Extract the ZIP before running its installation scripts.
+Download [cm3321-expert-system-224096B.zip](cm3321-expert-system-224096B.zip) (**1.37 MB**) or browse the matching [extracted submission folder](cm3321-expert-system-224096B/). Both are tracked in this repository. Extract the ZIP before running its installation scripts.
 
 The submission puts the six installation scripts in `scripts/`, their support files in `scripts/helpers/`, and the Word/PDF reports directly beside [User-manual.md](cm3321-expert-system-224096B/User-manual.md). Open `scripts/` and run the two scripts for your OS in order. No `README.txt` or checksum manifest is included; dependency downloads are still checksum-verified before installation.
 
@@ -40,7 +40,7 @@ Build the Windows startup wrapper on Windows with `scripts/install/build-windows
 
 ## Documentation
 
-- [Academic report source and expert questionnaire](docs/report.md), [Word report](docs/report/DentalExplain%20Report.docx) and [PDF report](docs/report/DentalExplain%20Report.pdf). The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
+- [Academic report source and expert questionnaire](docs/report.md), [Word report](DentalExplain%20Report.docx) and [PDF report](cm3321-expert-system-224096B/DentalExplain%20Report.pdf). The Word report is at the repository root; the submission folder and ZIP include only the PDF report. The verified [submission ZIP](cm3321-expert-system-224096B.zip) and [matching folder](cm3321-expert-system-224096B/) are available at the repository root; distribution copies remain in ignored `dist/`.
 - [Project proposal and scope](docs/project-proposal.md)
 - [Architecture and interface decision](docs/architecture.md)
 - [20 acceptance cases and actual outcomes](docs/test-cases.md)
@@ -53,7 +53,7 @@ The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery u
 
 ## Build the submission
 
-`scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, report formats, source, six installation scripts and the launch-only manual, arranges `scripts/` and `scripts/helpers/`, and enforces a 20 MB ZIP maximum. Generated build/distribution copies remain ignored; the verified root submission ZIP and folder are explicitly tracked. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
+`scripts/install/package-lightweight.sh` stages the runtime-free payload after `scripts/build.sh`. Windows builds the small C# startup wrapper with `scripts/install/build-windows.ps1`. `scripts/package-submission.sh` combines verified application files, the PDF report, source, six installation scripts and the launch-only manual, arranges `scripts/` and `scripts/helpers/`, and enforces a 20 MB ZIP maximum. Generated build/distribution copies remain ignored; the verified root submission ZIP and folder are explicitly tracked. The **Lightweight external-runtime verification** workflow tests the system installations and application on the three supported platforms.
 
 The 10–15-question
  goal is met by the straightforward synthetic caries and gingivitis walkthroughs. Pain-related and periodontitis cases may require more. Routing shares the forward fixed points, skips unanswered questions for blocked rules or already-supported candidates, and retains explicit applicable evidence. See [question-count records](docs/test-cases.md).

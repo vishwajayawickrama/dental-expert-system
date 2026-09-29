@@ -1,5 +1,11 @@
 # DentalExplain verification record
 
+## Word report moved outside submission — 29 September 2026
+
+Moved the submission's Word report to repository-root `DentalExplain Report.docx`, preserving its contents byte-for-byte. The submission directory and ZIP now contain only the PDF report; `User-manual.md`, source, applications and installation scripts remain present. Future package assembly includes only the PDF. The canonical documentation copy remains in `docs/report/`.
+
+The rebuilt ZIP is **1,370,058 bytes (1.37 MB)**, SHA-256 `ed955185b61ec29572eb2db17841ccd2e3424e1a4da01e71093cef8fa52a8c91`. Archive integrity, extracted-file correspondence, executable permissions and absence of Word documents passed verification. The active Word lock file is not packaged. Report content and application behavior are unchanged.
+
 ## Per-rule source labels removed — 29 September 2026
 
 Removed the 25 source/review footnote paragraphs beneath individual rules in Appendix C. All **25 rule definitions** remain unchanged; the catalogue-wide pending clinical-review statement, fact-source table and References remain present. Rule headings stay with their rule bodies, and each body stays together across pagination. All other content, typography, images and manual edits are preserved.
