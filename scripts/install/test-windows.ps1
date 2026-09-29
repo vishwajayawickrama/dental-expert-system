@@ -8,7 +8,7 @@ $env:PATH="$prolog/bin;$java/bin;$java/bin/server;$env:PATH"
 & "$prolog/bin/swipl.exe" -q -s "$root/knowledge/acceptance.pl" -g run_acceptance -t halt
 if($LASTEXITCODE -ne 0){throw 'Prolog tests failed'}
 New-Item -ItemType Directory -Force "$root/build/test-classes" | Out-Null
-$tests=(Get-ChildItem "$root/src/test/java/dental/*.java").FullName
+$tests=@(Get-ChildItem "$root/src/test/java/dental/*.java" | ForEach-Object FullName)
 & "$java/bin/javac.exe" --release 21 -cp "$root/build/stage/DentalExplain.jar;$jpl" -d "$root/build/test-classes" @tests
 if($LASTEXITCODE -ne 0){throw 'Test compilation failed'}
 & "$java/bin/java.exe" "-Ddental.home=$root" "-Ddental.prolog.home=$prolog" -cp "$root/build/stage/DentalExplain.jar;$root/build/test-classes;$jpl" dental.IntegrationTest
