@@ -46,7 +46,7 @@ public final class App extends JFrame {
     public static void main(String[] args){
         if(Arrays.asList(args).contains("--verify-runtime")){
             try {Bridge b=new Bridge();
-                if(b.questions.size()!=30||b.catalog("facts").length!=30||b.catalog("rules").length!=25)throw new IllegalStateException("Unexpected catalogue counts");
+                if(b.questions.size()!=27||b.catalog("facts").length!=30||b.catalog("rules").length!=25)throw new IllegalStateException("Unexpected catalogue counts");
                 String report="Bundled runtime: Java "+System.getProperty("java.version")+"; SWI/JPL ready; KB "+b.version+"; "+b.questions.size()+" questions; 25 rules; 30 facts";
                 System.out.println(report);
                 int position=Arrays.asList(args).indexOf("--verify-runtime");
@@ -95,7 +95,7 @@ public final class App extends JFrame {
         JButton kb=button("View knowledge base",'K');kb.addActionListener(e->navigate("knowledge"));page.add(actions(kb,start),BorderLayout.SOUTH);return page;
     }
     private JPanel setup(){
-        JPanel p=page("01 / Consultation setup","Record the age group and affected dentition for the assessment.");
+        JPanel p=page("01 / Consultation setup","Record the age group and affected tooth type for the assessment.");
         JPanel grid=new JPanel(new GridLayout(0,2,28,22));grid.setOpaque(false);
         fields.values().stream().filter(f->f.question.section().equals("setup")).forEach(f->{f.combo.setBackground(Color.WHITE);grid.add(f);});
         JPanel holder=new JPanel(new BorderLayout());holder.setBackground(Color.WHITE);holder.setBorder(new EmptyBorder(20,20,20,20));holder.add(grid,BorderLayout.NORTH);

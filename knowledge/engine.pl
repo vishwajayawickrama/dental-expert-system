@@ -20,10 +20,7 @@ invalid_input(Input,K) :- select(obs(K,_),Input,Rest),memberchk(obs(K,_),Rest),!
 
 value(Obs,Key,V) :- (memberchk(obs(Key,Found),Obs) -> V=Found ; V=unknown).
 conflict(Obs,'Tooth-pain answers conflict. Clarify whether pain is present.') :-
-    value(Obs,tooth_pain,no),member(Key,[spontaneous,sleep_pain,biting_pain]),value(Obs,Key,yes),!.
-conflict(Obs,'Dentition and affected tooth type conflict. Check both selections.') :-
-    value(Obs,dentition,D),value(Obs,tooth_type,T),
-    (D==primary,T==permanent ; D==permanent,T==primary),!.
+    value(Obs,tooth_pain,no),member(Key,[spontaneous,sleep_pain]),value(Obs,Key,yes),!.
 missing_setup(Obs,[age_group]) :- value(Obs,age_group,unknown),!.
 missing_setup(Obs,[tooth_type]) :- value(Obs,tooth_pain,yes),value(Obs,tooth_type,T),memberchk(T,[unknown,na]),!.
 outside_scope(Obs,'This jaw presentation is outside the supported tooth-pain and gum-symptom scope.') :-
@@ -100,4 +97,26 @@ active_questions(Input,Stage,Ids) :-
     (invalid_input(Input,K) -> throw(error(domain_error(consultation_input,K),active_questions/3)) ; true),
     expand_observations(Input,Obs),
     (Stage==findings,outside_scope(Obs,_) -> Ids=[]
-    ; findall(K,(question(K,Section,_,_,_,_),stage(Section,Stage),once(visible_question(Obs,K))),Ids)).
+    ; routing_requests(Obs,Needed),
+      findall(K,(question(K,Section,_,_,_,_),stage(Section,Stage),
+                 once(visible_question(Obs,K)),
+                 (mandatory_question(K) -> true
+                 ; value(Input,K,V),V\==unknown -> true
+                 ; memberchk(K,Needed))),Ids)).
+
+% Share the inference engine's forward fixed points, without proving goals
+% backwards. A supported candidate no longer needs alternative evidence;
+% unblocked rules for every other condition still contribute missing inputs.
+% Keep explicit answers while applicable so their support cannot disappear
+% merely because it completed a candidate. Parent changes still clear children.
+routing_requests(Obs,Requests) :-
+    forward_closure(Obs,Derived),pending_closure(Obs,Derived,Pending),
+    findall(K,(condition(C,_),\+memberchk(candidate(C),Derived),
+               member(pending(candidate(C),Keys),Pending),member(K,Keys)),Raw),
+    findall(R,(member(K,Raw),request_key(Obs,K,R)),Mapped),sort(Mapped,Requests).
+mandatory_question(age_group).
+mandatory_question(tooth_type).
+mandatory_question(tooth_pain).
+mandatory_question(gum_symptoms).
+mandatory_question(warning_signs).
+mandatory_question(jaw_clicking).

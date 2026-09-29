@@ -2,15 +2,12 @@
 
 % Shared UI schema. These records are not counted as domain facts.
 question(age_group,setup,select,'Age group',[option(unknown,'Unknown'),option(young_child,'0-5 years'),option(child,'6-12 years'),option(adolescent,'13-17 years'),option(adult,'18-64 years'),option(older_adult,'65-120 years')],always).
-question(dentition,setup,select,'Dentition',[option('unknown','Unknown'),option('primary','Primary'),option('mixed','Mixed'),option('permanent','Permanent'),option('na','Not applicable')],always).
 question(tooth_type,setup,select,'Affected tooth type',[option('unknown','Unknown'),option('primary','Primary tooth'),option('permanent','Permanent tooth'),option('na','Not applicable')],always).
-question(region,setup,select,'Affected region',[option('unknown','Unknown'),option('single_tooth','Single tooth'),option('multiple_teeth','Multiple teeth'),option('general_gums','Generalized gums'),option('anterior_gums','Anterior gums'),option('jaw_joint','Jaw joint'),option('na','Not applicable')],always).
 question(tooth_pain,symptoms,radio,'Is tooth pain present?',[option('unknown','Unknown'),option('yes','Tooth pain reported'),option('no','No tooth pain reported'),option('na','Not applicable')],always).
 question(triggers,symptoms,multi,'What triggers the tooth pain?',[option('unknown','Unknown'),option('cold','Cold'),option('sweet','Sweet'),option('hot','Hot'),option('biting','Biting'),option('none','None'),option('na','Not applicable')],when(tooth_pain,yes)).
 question(persistence,symptoms,select,'Pain after the trigger stops',[option('unknown','Unknown'),option('brief','Brief; stops promptly'),option('lingering','Lingering; continues'),option('episodic','Unprovoked episodes'),option('na','Not applicable')],when(tooth_pain,yes)).
 question(spontaneous,symptoms,radio,'Spontaneous tooth pain?',[option('unknown','Unknown'),option('yes','Pain starts without a trigger'),option('no','No spontaneous pain'),option('na','Not applicable')],when(tooth_pain,yes)).
 question(sleep_pain,symptoms,radio,'Tooth pain interrupts sleep?',[option('unknown','Unknown'),option('yes','Pain interrupts sleep'),option('no','No sleep interruption'),option('na','Not applicable')],when(tooth_pain,yes)).
-question(biting_pain,symptoms,radio,'Pain when biting?',[option('unknown','Unknown'),option('yes','Pain on biting'),option('no','No pain on biting'),option('na','Not applicable')],when(tooth_pain,yes)).
 question(gum_symptoms,symptoms,multi,'Gum symptoms',[option(unknown,'Unknown'),option(bleeding,'Bleeding when brushing or flossing'),option(redness,'Red or swollen gum margins'),option(none,'None reported'),option(na,'Not applicable')],always).
 question(warning_signs,symptoms,multi,'Warning signs',[option(unknown,'Unknown'),option(swelling,'Facial swelling'),option(drainage,'Pus or drainage'),option(fever,'Fever reported'),option(none,'None reported'),option(na,'Not applicable')],always).
 question(jaw_clicking,symptoms,radio,'Jaw clicking?',[option('unknown','Unknown'),option('yes','Jaw clicking reported'),option('no','No jaw clicking reported'),option('na','Not applicable')],always).

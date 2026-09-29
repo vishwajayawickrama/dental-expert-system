@@ -25,7 +25,7 @@ public final class IntegrationTest {
         catch(Exception e){throw new AssertionError("Layout capture",e);}
     }
     static void settled(App app)throws Exception{
-        for(int i=0;i<200;i++){boolean[] done={false};SwingUtilities.invokeAndWait(()->done[0]=app.fields.size()==30&&!app.routingPending);if(done[0])return;Thread.sleep(25);}
+        for(int i=0;i<200;i++){boolean[] done={false};SwingUtilities.invokeAndWait(()->done[0]=app.fields.size()==27&&!app.routingPending);if(done[0])return;Thread.sleep(25);}
         throw new AssertionError("Routing did not settle");
     }
     static void set(App app,String key,String value){app.fields.get(key).setValue(new Atom(value));}
@@ -54,8 +54,8 @@ Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.re
             System.out.println("JPL "+id+": PASS");
 
         }
-        require(b.version.equals("0.3.0"),"Knowledge version");
-        require(b.questions.size()==30,"30 questions");
+        require(b.version.equals("0.4.0"),"Knowledge version");
+        require(b.questions.size()==27,"30 questions");
         require(b.questions.stream().noneMatch(q->Set.of("age","focus").contains(q.key())),"Removed clinical identifiers");
         SwingUtilities.invokeAndWait(()->{
             Map<String,AnswerControl> controls=new LinkedHashMap<>();for(Bridge.Question q:b.questions)controls.put(q.key(),new AnswerControl(q,()->{}));
@@ -80,7 +80,7 @@ Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.re
         });
         App[] handle={null};SwingUtilities.invokeAndWait(()->handle[0]=new App());App a=handle[0];settled(a);
         SwingUtilities.invokeAndWait(()->{
-            require(a.fields.size()==30,"Application initialization");set(a,"age_group","adolescent");set(a,"tooth_type","permanent");set(a,"tooth_pain","yes");set(a,"root_maturity","mature");a.navigate("symptoms");
+            require(a.fields.size()==27,"Application initialization");set(a,"age_group","adolescent");set(a,"tooth_type","permanent");set(a,"tooth_pain","yes");set(a,"root_maturity","mature");a.navigate("symptoms");
         });settled(a);
         SwingUtilities.invokeAndWait(()->{
             set(a,"thermal_response","lingering");set(a,"sleep_pain","yes");a.navigate("findings");
@@ -118,6 +118,6 @@ Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.re
             require(a.displayedResultForTest().isEmpty()&&a.currentScreen.equals("setup"),"No delayed result/navigation after reset");
             require(a.fields.values().stream().allMatch(f->f.value().isAtom()&&f.value().name().equals("unknown")),"Reset all inputs");a.dispose();
         });
-        System.out.println("PASS: "+assessments+" JPL assessments; 30 control schemas; combined exclusivity, authoritative routing, two-step navigation, hidden clearing, scope bypass, removed result actions, new-consultation reset and delayed-callback reset.");System.exit(0);
+        System.out.println("PASS: "+assessments+" JPL assessments; 27 control schemas; combined exclusivity, authoritative routing, two-step navigation, hidden clearing, scope bypass, removed result actions, new-consultation reset and delayed-callback reset.");System.exit(0);
     }
 }

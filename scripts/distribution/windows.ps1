@@ -44,7 +44,7 @@ if ($Package) {
     Copy-Item build/stage/*.jar $input
     $out="$root/build/windows-image"
     if(Test-Path $out){Remove-Item $out -Recurse -Force}
-    Invoke-Checked "$env:JAVA_HOME/bin/jpackage.exe" @('--type','app-image','--dest',$out,'--name','DentalExplain','--input',$input,'--main-jar','DentalExplain.jar','--main-class','dental.App','--runtime-image',"$dest/runtime/java",'--app-version','1.1.0','--vendor','DentalExplain','--java-options','-Ddental.home=$APPDIR')
+    Invoke-Checked "$env:JAVA_HOME/bin/jpackage.exe" @('--type','app-image','--dest',$out,'--name','DentalExplain','--input',$input,'--main-jar','DentalExplain.jar','--main-class','dental.App','--runtime-image',"$dest/runtime/java",'--app-version','1.2.0','--vendor','DentalExplain','--java-options','-Ddental.home=$APPDIR')
     $image="$out/DentalExplain"
     Copy-Item "$dest/knowledge" "$image/app/knowledge" -Recurse
     New-Item -ItemType Directory -Force "$image/app/runtime" | Out-Null
