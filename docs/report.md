@@ -4,7 +4,7 @@ DentalExplain is a native desktop expert system for assessing common tooth-pain 
 
 The knowledge base contains 30 authored domain facts and 25 production rules. A separate catalogue defines 30 questions: four setup fields, nine reported-symptom questions and 17 examination questions. The consultation uses two adaptive questionnaire steps, preserves applicable answers during Back navigation and excludes answers when their parent makes them inapplicable. Inference evaluates the complete condition catalogue and permits coexisting candidates. Unknown information remains distinct from explicit absence.
 
-Twenty synthetic acceptance cases and 43 Prolog checks pass. Java integration and interface checks, together with bundled-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The submission includes runnable platform packages and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The expert questionnaire is drafted for confirmation, and clinical knowledge review remains pending.
+Twenty synthetic acceptance cases and 43 Prolog checks pass. Java integration and interface checks, together with bundled-runtime verification, pass on Apple Silicon macOS, Windows x64 and Ubuntu 24.04 x64. Manual desktop verification was performed on macOS; Windows and Linux verification was automated. The submission includes runnable platform packages and interface and Prolog source. Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya, is the project's human expert. The questionnaire was conducted with her, and her input together with published dental sources informed the facts and rules. Clinical validation remains pending.
 
 # 1 Introduction
 
@@ -42,13 +42,18 @@ Orthodontic planning, oral cancer diagnosis, treatment prescribing, image interp
 
 ## 3.1 Human expert and knowledge sources
 
-The project's human expert is Kushala Jayawickrama, a final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. The expert's role is to clarify domain terminology, discuss clinically relevant questions, review provisional fact/rule combinations and assess expected responses, including primary and immature permanent tooth presentations. This qualification is recorded as supplied; the report does not describe the expert as a qualified dentist.
+Knowledge was acquired through a questionnaire conducted with the human expert and review of published dental sources. The expert's contribution and qualifications are recorded below.
 
-The implemented knowledge draws on NIDCR caries information, AAE diagnostic terminology, AAPD pediatric pulp guidance, AAP gum-disease information and EFP periodontal classification references [1-6]. These sources provide provenance for the authored knowledge; citing them does not imply their authors approved DentalExplain.
+- **Name:** Kushala Jayawickrama.
+- **Qualification:** Final-year fifth-year Dental Surgery undergraduate.
+- **University:** University of Peradeniya.
+- **Contribution:** Her questionnaire input, together with published dental sources, informed the authored facts and production rules, including symptom distinctions, examination findings and dentition-related interpretation. The conducted questionnaire appears in Appendix B.
+- **Knowledge sources:** NIDCR caries information, AAE diagnostic terminology, AAPD pediatric pulp guidance, AAP gum-disease information and EFP periodontal classification references [1-6].
+- **Validation status:** Expert participation is confirmed; completed clinical validation is not claimed and remains pending. Her undergraduate qualification is not represented as qualified-dentist status.
 
 ## 3.2 Questionnaire and rule traceability
 
-The human expert questionnaire is included in Appendix B. It contains 15 questions covering the five supported conditions, relevant examination findings, dentition, root maturity, uncertainty, conflicting evidence, warning signs and expected outputs. It is drafted for confirmation. No interview responses, dates, signatures or completed approval are invented.
+The human expert questionnaire is included in Appendix B. It contains 15 questions covering the five supported conditions, relevant examination findings, dentition, root maturity, uncertainty, conflicting evidence, warning signs and expected outputs. These are the questions conducted with Kushala, as confirmed by the project author. Responses, interview dates, signatures and completed approval are not reproduced or invented.
 
 Each fact and production rule has an identifier, a source and a pending review status. Appendix C lists the implemented catalogue. For example, caries questions link to r01-r04, pulpal criteria to r05-r17 and periodontal criteria to r18-r25. This makes source interpretation and proposed expert review identifiable without adding an explanation facility to the application.
 
@@ -60,21 +65,21 @@ The acquisition process is source review, authored Prolog records, expert discus
 
 ![Figure 1 Expert system block diagram](report-assets/architecture.png)
 
-The human expert and documentary sources inform knowledge acquisition. Authored Prolog knowledge is consulted by the embedded inference engine. The dentist supplies controlled selections through Java Swing; JPL exchanges structured terms with Prolog. Routing returns applicable question identifiers, while assessment returns status, candidates, missing fields and messages to the interface.
+The user supplies consultation inputs through the User Interface and receives assessment results through the same interface. The Inference Engine applies knowledge from the Knowledge Base to those inputs. Questionnaire data from the Human Expert and published Dental Reference Sources flow through Knowledge Acquisition into the Knowledge Base. These arrows describe information flow, rather than a knowledge-editing screen.
 
 ## 4.2 Implemented components
 
 | Component | Responsibility |
 | --- | --- |
-| Human expert and knowledge acquisition | Clarify domain concepts and review authored knowledge and expected outcomes. |
-| SWI-Prolog knowledge base | Store 30 domain facts, 25 rules and the separate question catalogue with provenance. |
-| Java Swing interface | Present setup, two questionnaire steps, results and the read-only catalogue. |
-| JPL bridge | Exchange atoms, numbers, lists and compound terms with embedded Prolog. |
-| Adaptive routing | Determine applicable questions from setup, earlier answers and measurements. |
-| Forward inference | Validate observations, derive supported patterns/candidates and propagate unresolved prerequisites. |
-| Knowledge workspace | Display searchable Questions, Facts and Rules tabs without editing. |
+| User | Supply reported symptoms and dentist-supplied findings; interpret the returned assessment. |
+| User Interface | Present setup, the two questionnaire steps, results and the read-only knowledge catalogue. |
+| Inference Engine | Validate consultation inputs, apply forward chaining and identify supported candidates or missing information. |
+| Knowledge Base | Store 30 domain facts, 25 production rules and a separate question catalogue with source and review metadata. |
+| Human Expert | Contribute domain knowledge through the conducted questionnaire; clinical validation remains pending. |
+| Dental Reference Sources | Supply published evidence for clinical concepts and diagnostic criteria. |
+| Knowledge Acquisition | Translate expert questionnaire input and published sources into structured facts and rules. |
 
-Consultation observations are passed into each inference call. Intermediate deductions remain within inference processing. The architecture includes no separate working-memory component or explanation facility.
+Consultation observations are passed into each assessment. Intermediate deductions remain within inference processing. The architecture includes no separate working-memory component, explanation facility or knowledge-editing interface. Implementation technologies are described in Section 7.
 
 # 5 Knowledge Representation
 
@@ -229,7 +234,7 @@ The submission assembly verifies source inclusion, report files, three root laun
 
 DentalExplain implements a runnable native expert system combining Java Swing with embedded SWI-Prolog through JPL. Its 30-question adaptive consultation collects controlled evidence in two steps, while 25 production rules and 30 authored domain facts support five candidate conditions through forward chaining.
 
-The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, a platform-specific runnable package for each supported operating system and a user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the drafted review questionnaire is supplied in Appendix B; clinical review remains pending.
+The implementation preserves uncertainty, supports coexisting candidates and returns defined responses for incomplete, conflicting and unsupported inputs. The submission provides source, a platform-specific runnable package for each supported operating system and a user manual. Automated verification passes across the three target platforms, with manual macOS inspection. The human expert is identified and the conducted questionnaire is supplied in Appendix B; clinical review remains pending.
 
 # References
 
@@ -320,9 +325,9 @@ Choose View knowledge base from Welcome. Questions (30), Facts (30) and Rules (2
 
 # Appendix B Human Expert Questionnaire
 
-Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. Status: drafted for confirmation. The following questions are proposed for the expert discussion; no responses or completed approval are recorded.
+Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. Status: conducted questionnaire, confirmed by the project author. These 15 questions were asked of the human expert and informed the knowledge alongside published sources. Responses and interview dates are not reproduced; completed clinical approval is not claimed.
 
-## B.1 Proposed questions
+## B.1 Questionnaire questions
 
 1. Which reported symptoms and dentist-supplied findings are most useful when assessing common tooth pain and gum symptoms within these five targets? Relevant knowledge: all rule groups.
 2. Which combinations of cavitation, softened tissue, discoloration and radiographic findings support a caries candidate, including a painless presentation? Relevant rules: r01-r04.

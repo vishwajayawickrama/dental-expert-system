@@ -47,7 +47,7 @@ Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use t
 
 Results offer New consultation only; answers can be revised using Back before assessment. No result export, knowledge editor, treatment prescribing, patient database or autonomous diagnosis is provided.
 
-The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. The report's 15-question expert questionnaire is drafted for confirmation; clinical review remains pending.
+The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. The report's 15-question expert questionnaire was conducted with Kushala, as confirmed by the project author; clinical review remains pending.
 
 ## Combined submission
 

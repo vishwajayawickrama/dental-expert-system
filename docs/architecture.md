@@ -2,7 +2,7 @@
 
 **Status:** First Java Swing/JPL desktop implementation, application version 1.1.0, knowledge version 0.3.0. Automated builds and software checks pass on macOS ARM64, Windows x64 and Ubuntu 24.04 x64; native manual checks were performed on the development Mac on 29 September 2026. Clinical expert review is pending.
 
-See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), [report](report.md), and [verification record](verification.md). The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. The expert questionnaire in report Appendix B is drafted for confirmation; clinical approval remains pending.
+See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), [report](report.md), and [verification record](verification.md). The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. The expert questionnaire in report Appendix B is conducted with Kushala, as confirmed by the project author; clinical approval remains pending.
 
 ## 1. Technology decision
 
@@ -22,23 +22,10 @@ A shell script requires its interpreter and dependencies. A `.jar` contains Java
 
 ## 2. Component structure
 
-```mermaid
-flowchart TD
-    Expert["Human expert: Kushala Jayawickrama; final-year Dental Surgery undergraduate"] --> Acquisition["Knowledge acquisition and source review"]
-    Sources["Dental reference sources"] --> Acquisition
-    Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 rules"]
-    Dentist["Dentist"] -->|"Predefined consultation selections"| UI["Java Swing interface and consultation controller"]
-    UI -->|"Structured observation terms"| JPL["JPL bridge"]
-    JPL --> Routing["Prolog adaptive question routing"]
-    Routing -->|"Applicable question IDs"| JPL
-    JPL --> Engine["SWI-Prolog inference engine"]
-    KB --> Engine
-    Engine --> Forward["Forward fixed-point processing"]
-    Forward -->|"Structured assessment"| JPL
-    JPL -->|"Status, candidates, missing fields and messages"| UI
-    UI -->|"Questions and results"| Dentist
-    KB -->|"Read-only catalogue"| JPL
-```
+![Conceptual expert-system anatomy](report-assets/architecture.png)
+
+The [TikZ source](report-assets/architecture.tex) shows consultation inputs and results between User, User Interface and Inference Engine. Knowledge flows from the Knowledge Base to the Inference Engine. Human Expert questionnaire data and Dental Reference Sources pass through Knowledge Acquisition into the Knowledge Base. Technology details follow below.
+
 
 ### Java interface and consultation service
 

@@ -5,7 +5,7 @@
 - **Full name:** DentalExplain — A Dental Diagnosis Expert System
 - **Repository:** [vishwajayawickrama/dental-expert-system](https://github.com/vishwajayawickrama/dental-expert-system)
 - **Course:** CM3321 — Logic Programming and Artificial Cognitive Systems
-- **Status:** Dentist-only desktop implementation. Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. Expert questionnaire drafted for confirmation; clinical validation pending.
+- **Status:** Dentist-only desktop implementation. Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. Expert questionnaire conducted with Kushala, as confirmed by the project author; clinical validation pending.
 - **Updated:** 29 September 2026
 
 DentalExplain assesses common tooth-pain and gum-symptom presentations using native SWI-Prolog rules and facts, with Java Swing integrated through JPL. The first deliverable targets Apple Silicon macOS. See the [architecture](architecture.md), [20 cases](test-cases.md), [user manual](user-manual.md) and [actual verification](verification.md).
@@ -17,7 +17,7 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 | Expert-system shell or native implementation | Native SWI-Prolog knowledge and inference modules. |
 | Specific domain and scope | Dentist decision support for common tooth pain and gum symptoms across age groups. |
 | Expert-system anatomy | Block diagram below and detailed architecture. |
-| Human expert | Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya; questionnaire drafted for confirmation and clinical review pending. |
+| Human expert | Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya; questionnaire conducted with Kushala, as confirmed by the project author and clinical review pending. |
 | Forward chaining only | Evidence-driven fixed-point processing; this decision replaces the earlier requirement for both methods. |
 | Knowledge size | Exactly 25 meaningful production rules and 30 authored domain facts. |
 | Tests | 20 synthetic acceptance cases and additional boundary, engine and interface checks. |
@@ -41,7 +41,9 @@ Clinical sources include [NIDCR tooth decay](https://www.nidcr.nih.gov/health-in
 
 ## 3. Human expert and knowledge acquisition
 
-The human expert is **Kushala Jayawickrama**, a **final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya**, as identified by the project author. The expert's role is to clarify terminology, discuss findings and review provisional rules and expected cases, including pediatric applicability. The [report](report.md) references the 15-question human expert questionnaire in Appendix B. That questionnaire is **drafted for confirmation**; responses, interview dates and completed clinical approval are not claimed. The supplied qualification is not represented as qualified-dentist status.
+The human expert is **Kushala Jayawickrama**, a **final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya**, as identified by the project author. The expert's role is to clarify terminology, discuss findings and review provisional rules and expected cases, including pediatric applicability. The [report](report.md) references the 15-question human expert questionnaire in Appendix B. That questionnaire was **conducted with Kushala, as confirmed by the project author**; responses, interview dates and completed clinical approval are not claimed. The supplied qualification is not represented as qualified-dentist status.
+
+Her questionnaire input, together with published dental sources, informed the facts and rules. Clinical validation remains pending.
 
 The process is source research → draft facts/rules/questions → dentist review → revision → repeat software and clinical validation. Each fact has an identifier, domain statement, description, source and review status. Each rule has identifiable premises, conclusion and source; its purpose is documented in the architecture. All clinical knowledge is currently pending review.
 

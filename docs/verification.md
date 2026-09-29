@@ -1,5 +1,19 @@
 # DentalExplain verification record
 
+## Report presentation revision — 29 September 2026
+
+Application **1.1.0**, knowledge **0.3.0** and all application behavior are unchanged. The revised Word report explicitly uses Times New Roman in body text, headings, tables, captions, contents, footers and code examples. PDF font inspection confirms embedded **TimesNewRomanPSMT** and **TimesNewRomanPS-BoldMT**, with no substituted report text fonts. Conversion used an isolated Fontconfig configuration pointing to temporary copies of the Mac's installed Times New Roman fonts; those font files are neither committed nor distributed. All **28 tables** have white cells, black text, bold headings and black borders, verified in the DOCX XML.
+
+The conceptual anatomy diagram is authored in [TikZ](report-assets/architecture.tex) and rendered with XeLaTeX using Times New Roman. It contains the seven requested conceptual nodes and labeled black information-flow arrows; implementation technologies are described separately in Section 7. The built-in editor preview could not access the system font, while local XeLaTeX compilation succeeded. All **48 final PDF pages** were rendered and visually inspected, including diagram readability, current screenshots, captions, tables, appendices and contents pagination.
+
+The project author confirmed that the **15 questions in Appendix B were conducted with Kushala Jayawickrama**, the supplied final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. Current documentation now states that her questionnaire input and published sources informed the facts and rules. Responses, interview dates and approval are not invented. Clinical validation remains pending. This confirmation supersedes the earlier drafted-questionnaire status recorded in the dated evidence below; historical records are preserved.
+
+The exporter reassessed all **20 acceptance cases**, all passing, and verified **30 facts, 25 rules and 30 consultation questions**. Their complete catalogue and recorded outcomes remain in the report. Application screenshots and source/knowledge files are unchanged.
+
+The rebuilt submission ZIP passed CRC verification, all **6,678 regular-file SHA-256 checksums**, root-file checks and report-content comparison. It retains **7,448 entries**, exactly three root launch scripts, source, complete applications and redistribution notices, excluding development artifacts. Every application, source and launcher entry is byte-identical to the previously verified submission; all three application JARs remain identical. The extracted macOS root launcher passed with system-only PATH and no development environment from **build/Revised Submission With Spaces**, reporting Java 21.0.11, knowledge 0.3.0, 30 questions, 25 rules and 30 facts. Deep/strict macOS signature verification also passed. Windows/Linux checks remain the prior automated platform verification described below; no new manual verification is claimed.
+
+Submission ZIP SHA-256: `7fe4f3f08fb9599079fb5b039b705ca58a782d2c1cded8ceef6832928506c447`.
+
 ## Report and submission package — 29 September 2026
 
 Application **1.1.0** and knowledge **0.3.0** are unchanged. The [Word report](report/DentalExplain%20Report.docx) and [matching PDF](report/DentalExplain%20Report.pdf) contain 48 pages. Every rendered page was inspected, including the diagram, six current native application screenshots, tables, contents pagination and all four appendices. A final Windows-launch instruction wrapping correction changed only page 21; the remaining 47 rendered pages were byte-identical to the inspected render.

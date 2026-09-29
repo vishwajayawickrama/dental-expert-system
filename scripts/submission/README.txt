@@ -27,7 +27,6 @@ modules and development scripts, with no development build output.
 SHA256SUMS.txt contains hashes of regular files; keep ZIP symlinks intact.
 
 Only synthetic consultation data is used in the report. Clinical review remains
-pending. The named human expert's interview questionnaire is drafted for
-confirmation. Results are candidate conditions, not treatment prescriptions.
+pending. The named human expert's interview questionnaire was conducted with Kushala. Results are candidate conditions, not treatment prescriptions.
 
 For launch problems and use of the consultation, read Appendix A in the report.
