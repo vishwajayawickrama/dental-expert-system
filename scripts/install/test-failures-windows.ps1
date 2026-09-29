@@ -19,3 +19,5 @@ try{
     $env:DENTAL_PROLOG_HOME=$previousProlog;$env:DENTAL_DOWNLOAD_CACHE=$previousCache
     Remove-Item $work -Recurse -Force
 }
+# Expected child failures must not become the CI shell's final exit status.
+$global:LASTEXITCODE=0
