@@ -38,6 +38,7 @@ Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use t
 
 ## Documentation
 
+- [Academic report source and expert questionnaire](docs/report.md), [Word report](docs/report/DentalExplain%20Report.docx) and [PDF report](docs/report/DentalExplain%20Report.pdf). The combined submission ZIP is generated in ignored `dist/`.
 - [Project proposal and scope](docs/project-proposal.md)
 - [Architecture and interface decision](docs/architecture.md)
 - [20 acceptance cases and actual outcomes](docs/test-cases.md)
@@ -45,3 +46,9 @@ Double-click the generated `dist/release-<timestamp>/DentalExplain.app` to use t
 - [Verification record](docs/verification.md)
 
 Results offer New consultation only; answers can be revised using Back before assessment. No result export, knowledge editor, treatment prescribing, patient database or autonomous diagnosis is provided.
+
+The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya. The report's 15-question expert questionnaire is drafted for confirmation; clinical review remains pending.
+
+## Combined submission
+
+`DentalExplain-submission.zip` includes the report in Word and PDF, interface/Prolog source, complete macOS/Windows/Linux application packages, checksums and exactly three root launch scripts: `Open-macOS.command`, `Open-Windows.cmd` and `Open-Linux.sh`. Extract the full ZIP, then use the launcher for your platform. No development build output, runtime-download cache or CI artifact archive is included; required application runtime files are retained. See report Appendix A or the [user manual](docs/user-manual.md).

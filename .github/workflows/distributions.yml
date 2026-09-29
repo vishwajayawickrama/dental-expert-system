@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['src/**', 'knowledge/**', 'scripts/**', '.github/workflows/distributions.yml']
+    paths: ['src/**', 'knowledge/**', 'scripts/**', '!scripts/submission/**', '!scripts/package-submission.sh', '!scripts/build-report.cjs', '!scripts/report-data.pl', '.github/workflows/distributions.yml']
 defaults:
   run:
     shell: bash

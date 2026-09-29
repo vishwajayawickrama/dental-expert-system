@@ -5,7 +5,7 @@
 - **Full name:** DentalExplain — A Dental Diagnosis Expert System
 - **Repository:** [vishwajayawickrama/dental-expert-system](https://github.com/vishwajayawickrama/dental-expert-system)
 - **Course:** CM3321 — Logic Programming and Artificial Cognitive Systems
-- **Status:** First dentist-only desktop implementation. Expert identity, participation and clinical validation remain pending.
+- **Status:** Dentist-only desktop implementation. Human expert: Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. Expert questionnaire drafted for confirmation; clinical validation pending.
 - **Updated:** 29 September 2026
 
 DentalExplain assesses common tooth-pain and gum-symptom presentations using native SWI-Prolog rules and facts, with Java Swing integrated through JPL. The first deliverable targets Apple Silicon macOS. See the [architecture](architecture.md), [20 cases](test-cases.md), [user manual](user-manual.md) and [actual verification](verification.md).
@@ -17,11 +17,11 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 | Expert-system shell or native implementation | Native SWI-Prolog knowledge and inference modules. |
 | Specific domain and scope | Dentist decision support for common tooth pain and gum symptoms across age groups. |
 | Expert-system anatomy | Block diagram below and detailed architecture. |
-| Human expert | Qualified dentist's knowledge-acquisition and validation role; identity/participation pending. |
+| Human expert | Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya; questionnaire drafted for confirmation and clinical review pending. |
 | Forward chaining only | Evidence-driven fixed-point processing; this decision replaces the earlier requirement for both methods. |
 | Knowledge size | Exactly 25 meaningful production rules and 30 authored domain facts. |
 | Tests | 20 synthetic acceptance cases and additional boundary, engine and interface checks. |
-| Runnable deliverable | Development JAR and bundled macOS `.app` with native launcher and icon. |
+| Runnable deliverable | Bundled macOS `.app`, Windows x64 `.exe` image and Ubuntu x64 Java package, with three submission-root launchers. |
 | User manual | Installation, consultation, knowledge viewing, reset and troubleshooting. |
 | No Python implementation | Java, Prolog and shell only. |
 
@@ -41,7 +41,7 @@ Clinical sources include [NIDCR tooth decay](https://www.nidcr.nih.gov/health-in
 
 ## 3. Human expert and knowledge acquisition
 
-A **qualified dentist**, with pediatric expertise or additional pediatric review, should supply criteria, review question applicability, verify rule combinations and validate expected results. Expert name, qualifications, participation and review dates are **pending**. No completed expert consultation or clinical validation is claimed.
+The human expert is **Kushala Jayawickrama**, a **final-year fifth-year Dental Surgery undergraduate at the University of Peradeniya**, as identified by the project author. The expert's role is to clarify terminology, discuss findings and review provisional rules and expected cases, including pediatric applicability. The [report](report.md) references the 15-question human expert questionnaire in Appendix B. That questionnaire is **drafted for confirmation**; responses, interview dates and completed clinical approval are not claimed. The supplied qualification is not represented as qualified-dentist status.
 
 The process is source research → draft facts/rules/questions → dentist review → revision → repeat software and clinical validation. Each fact has an identifier, domain statement, description, source and review status. Each rule has identifiable premises, conclusion and source; its purpose is documented in the architecture. All clinical knowledge is currently pending review.
 
@@ -61,7 +61,7 @@ The agreed implementation target is **25 rules and 30 distinct authored domain f
 
 ```mermaid
 flowchart TD
-    Expert["Human expert: qualified dentist; participation pending"] --> Acquisition["Knowledge acquisition"]
+    Expert["Human expert: Kushala Jayawickrama; final-year Dental Surgery undergraduate"] --> Acquisition["Knowledge acquisition"]
     Sources["Dental reference sources"] --> Acquisition
     Acquisition --> KB["Knowledge base: SWI-Prolog facts and rules"]
     Dentist["Dentist"] -->|"Controlled consultation selections"| UI["Java Swing interface"]

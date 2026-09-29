@@ -1,0 +1,74 @@
+name: Submission root launchers
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/submission/**', '.github/workflows/submission-launchers.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            artifact: macos-distributions
+            platform: macos
+          - os: windows-2022
+            artifact: windows-distributions
+            platform: windows
+          - os: ubuntu-24.04
+            artifact: linux-distributions
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          run-id: 36535968417
+          github-token: ${{ github.token }}
+          path: build/vendor
+      - name: Verify Unix root launcher with relocated bundled runtime
+        if: matrix.platform != 'windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$PWD/build/Submission With Spaces"
+          mkdir -p "$root/applications/${{ matrix.platform }}" build/reports
+          if [[ '${{ matrix.platform }}' == macos ]]; then
+            unzip -q build/vendor/dist/DentalExplain-macos-arm64.zip -d "$root/applications/macos"
+            cp scripts/submission/Open-macOS.command "$root/"
+            chmod +x "$root/Open-macOS.command"
+            env -i PATH=/usr/bin:/bin "$root/Open-macOS.command" --verify-runtime | tee build/reports/root-launcher.txt
+          else
+            unzip -q build/vendor/dist/DentalExplain-java-linux-x64.zip -d "$root/applications/linux"
+            mv "$root/applications/linux/DentalExplain-java-linux-x64" "$root/applications/linux/DentalExplain"
+            cp scripts/submission/Open-Linux.sh "$root/"
+            chmod +x "$root/Open-Linux.sh"
+            env -i PATH=/usr/bin:/bin "$root/Open-Linux.sh" --verify-runtime | tee build/reports/root-launcher.txt
+          fi
+          grep -q '30 questions; 25 rules; 30 facts' build/reports/root-launcher.txt
+      - name: Verify Windows root launcher with system-only PATH
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $root="$PWD/build/Submission With Spaces"
+          New-Item -ItemType Directory -Force "$root/applications/windows",build/reports | Out-Null
+          Expand-Archive build/vendor/dist/DentalExplain-windows-x64.zip "$root/applications/windows"
+          Copy-Item scripts/submission/Open-Windows.cmd $root
+          $env:PATH="$env:SystemRoot/system32;$env:SystemRoot"
+          Remove-Item Env:JAVA_HOME -ErrorAction SilentlyContinue
+          Remove-Item Env:SWI_HOME_DIR -ErrorAction SilentlyContinue
+          $report="$PWD/build/reports/root-launcher.txt"
+          & "$root/Open-Windows.cmd" --verify-runtime "$report"
+          if($LASTEXITCODE -ne 0 -or !(Test-Path $report)){throw 'Windows root launcher failed'}
+          if(!(Select-String -Path $report -SimpleMatch '30 questions; 25 rules; 30 facts')){throw 'Catalogue mismatch'}
+          Get-Content $report
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: submission-launcher-${{ matrix.platform }}
+          path: build/reports/*.txt

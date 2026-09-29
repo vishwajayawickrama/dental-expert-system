@@ -4,6 +4,12 @@
 
 ## Installation and launch
 
+For the combined submission, extract **DentalExplain-submission.zip** completely. At its root, open **Open-Windows.cmd** on Windows x64, **Open-macOS.command** on Apple Silicon macOS, or run **./Open-Linux.sh** from a terminal on an Ubuntu 24.04 x64 desktop. The three scripts resolve their applications relative to the extracted folder, including paths containing spaces. Keep all application folders together. The Word/PDF report is in `report/`; Appendix A contains the illustrated manual. Source is supplied separately in `source/` and does not need compiling to use the app.
+
+Alternative direct launch: open `applications/windows/DentalExplain/DentalExplain.exe` on Windows or `applications/macos/DentalExplain.app` on macOS. The complete Mac app can be copied to Applications. If Unix permissions were lost during extraction, run `chmod +x Open-macOS.command` on macOS, or `chmod +x Open-Linux.sh applications/linux/DentalExplain/runtime/java/bin/java` on Linux.
+
+The following separate release packages also remain available:
+
 Choose the complete package for your computer and extract it before launching. Java 21 and matching SWI-Prolog 10.0.2/JPL are bundled; no separate installation is required.
 
 | Computer | Package and launch |
@@ -73,22 +79,6 @@ Before assessment, use Back to symptoms and Back to setup to revise selections. 
 
 From Welcome choose **View knowledge base**. Questions (30: 4 setup, 9 symptoms, 17 examination), Facts (30) and Rules (25) are separate read-only tabs. Search filters the current table. Select a row to view its full content/source/review status below; horizontal and vertical scrollbars expose long values. All clinical knowledge has pending review status. Editing knowledge through the interface is not supported.
 
-## Developer commands
-
-From the repository directory, with an Apple Silicon Mac, a Java 21 JDK and Apple's command-line tools:
-
-```sh
-./scripts/bootstrap.sh  # official SWI 10.0.2, matching JPL, checksum verified
-./scripts/build.sh      # build/stage/DentalExplain.jar and matching jpl.jar
-./scripts/test.sh       # Prolog, JPL and Swing component tests
-./scripts/run.sh        # development launch
-./scripts/package.sh    # dist/release-<timestamp>/DentalExplain.app
-```
-
-The bootstrap needs internet access. Build/launch/tests use the local runtime. `build/latest-app.txt` records the most recent timestamped package. The development JAR needs matching JPL/native resources. Packaged JARs resolve resources beside the JAR; development launch scripts set `dental.home`. Use the complete platform package, not a JAR copied alone. The source commits exclude runtime directories, generated output and the reference report.
-
-`DentalExplain.app/Contents/MacOS/DentalExplain --verify-runtime` is a diagnostic launch that verifies bundled initialization without opening a consultation window. The documented acceptance fixtures are synthetic, not patient records. Test output is in `build/reports/`; see [verification](verification.md) for the recorded results.
-
 ## Troubleshooting
 
 | Problem | Action |
@@ -103,9 +93,3 @@ The bootstrap needs internet access. Build/launch/tests use the local runtime. `
 | macOS refuses an external download | This first artifact is a local development image. A signed/notarized distribution build is pending. |
 
 See the [scope and human expert requirements](project-proposal.md) and [architecture](architecture.md) for the system's limits.
-
-## Cross-platform builds
-
-The **Cross-platform distributions** GitHub Actions workflow builds and tests on macOS ARM64, Windows x64 and Ubuntu 24.04 x64. It can be run manually and also runs for implementation changes on main. Download workflow artifacts after successful completion; each contains ZIPs, checksums and verification output. Keep downloaded artifacts outside source commits.
-
-For reproducible platform scripts, use `scripts/distribution/windows.ps1 -Bootstrap -Test -Package` on Windows after placing the shared JAR at `build/stage/DentalExplain.jar`, or `bootstrap-linux.sh`, `test-unix.sh` and `package-java.sh` on Ubuntu with Java 21 and the listed workflow build dependencies. The canonical application JAR is compiled on macOS once, then reused by the other jobs. Windows packaging uses `jpackage --type app-image`; WiX is not required because no installer is produced.

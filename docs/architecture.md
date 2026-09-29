@@ -2,7 +2,7 @@
 
 **Status:** First Java Swing/JPL desktop implementation, application version 1.1.0, knowledge version 0.3.0. Automated builds and software checks pass on macOS ARM64, Windows x64 and Ubuntu 24.04 x64; native manual checks were performed on the development Mac on 29 September 2026. Clinical expert review is pending.
 
-See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
+See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), [report](report.md), and [verification record](verification.md). The human expert is Kushala Jayawickrama, final-year fifth-year Dental Surgery undergraduate, University of Peradeniya. The expert questionnaire in report Appendix B is drafted for confirmation; clinical approval remains pending.
 
 ## 1. Technology decision
 
@@ -24,7 +24,7 @@ A shell script requires its interpreter and dependencies. A `.jar` contains Java
 
 ```mermaid
 flowchart TD
-    Expert["Human expert: qualified dentist; review pending"] --> Acquisition["Knowledge acquisition and source review"]
+    Expert["Human expert: Kushala Jayawickrama; final-year Dental Surgery undergraduate"] --> Acquisition["Knowledge acquisition and source review"]
     Sources["Dental reference sources"] --> Acquisition
     Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 rules"]
     Dentist["Dentist"] -->|"Predefined consultation selections"| UI["Java Swing interface and consultation controller"]
@@ -165,6 +165,8 @@ The Windows portable application image contains DentalExplain.exe and app/runtim
 The GitHub Actions workflow builds the canonical JAR and Mac packages on macOS ARM64, then reuses that JAR in Windows and Ubuntu jobs. Windows runs jpackage natively with type app-image; packages must be built on their target platform ([Oracle packaging guide](https://docs.oracle.com/en/java/javase/21/jpackage/packaging-tool-user-guide.pdf)). No Windows installer is produced. Mac/Windows vendor downloads and the Linux 10.0.2 source archive are SHA-256 verified. Linux builds clib, plunit and JPL with CMake, then bundles non-system native dependencies and their distribution copyright notices. Java images are built with jlink, retaining runtime redistribution notices.
 
 Artifacts include ZIPs, application-JAR hashes, ZIP checksums, tests and screenshots. Vendor runtimes, generated files and reference reports remain excluded from source commits. Windows signing, Mac notarization and manual testing on other computers remain pending. Actual outcomes are recorded in [verification](verification.md).
+
+The submission ZIP combines the verified platform images with Java/Prolog source and the Word/PDF report. `Open-Windows.cmd`, `Open-macOS.command` and `Open-Linux.sh` sit at its root and resolve applications relative to their own location. Required packaged runtimes remain included; development build folders, caches and CI artifact archives are excluded. `scripts/package-submission.sh` stages the approved files and hashes regular files before archiving with preserved symlinks and executable modes. The separate Submission root launchers workflow tests these wrappers against release 1.1.0 bundles without rebuilding the application.
 
 ## 5. Failure handling and verification
 
