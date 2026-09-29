@@ -1,5 +1,5 @@
 DentalExplain submission
-Application 1.1.0 | Knowledge 0.3.0
+Application 1.2.0 | Knowledge 0.4.0
 
 Extract this ZIP completely. Do not run an executable from inside the ZIP.
 Keep the applications folders and their runtime files together.

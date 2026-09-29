@@ -28,7 +28,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          run-id: 36535968417
+          run-id: 36566312964
           github-token: ${{ github.token }}
           path: build/vendor
       - name: Verify Unix root launcher with relocated bundled runtime
@@ -50,7 +50,7 @@ jobs:
             chmod +x "$root/Open-Linux.sh"
             env -i PATH=/usr/bin:/bin "$root/Open-Linux.sh" --verify-runtime | tee build/reports/root-launcher.txt
           fi
-          grep -q '30 questions; 25 rules; 30 facts' build/reports/root-launcher.txt
+          grep -q '27 questions; 25 rules; 30 facts' build/reports/root-launcher.txt
       - name: Verify Windows root launcher with system-only PATH
         if: matrix.platform == 'windows'
         shell: pwsh
@@ -65,7 +65,7 @@ jobs:
           $report="$PWD/build/reports/root-launcher.txt"
           & "$root/Open-Windows.cmd" --verify-runtime "$report"
           if($LASTEXITCODE -ne 0 -or !(Test-Path $report)){throw 'Windows root launcher failed'}
-          if(!(Select-String -Path $report -SimpleMatch '30 questions; 25 rules; 30 facts')){throw 'Catalogue mismatch'}
+          if(!(Select-String -Path $report -SimpleMatch '27 questions; 25 rules; 30 facts')){throw 'Catalogue mismatch'}
           Get-Content $report
       - uses: actions/upload-artifact@v4
         if: always()
