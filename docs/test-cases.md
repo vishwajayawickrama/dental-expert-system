@@ -4,6 +4,8 @@
 
 These are synthetic cases, not real patient records. They cover 14 diagnostic presentations and 6 input/lifecycle edge cases. The [proposal](project-proposal.md) defines the scope; the [architecture](architecture.md) defines Java Swing, JPL, and SWI-Prolog integration.
 
+Appendix D of the [submission report](report/DentalExplain%20Report.pdf) lists every supplied fixture input and the reassessed actual software response for all 20 cases.
+
 ## Controlled inputs and execution
 
 Setup has four fields, followed by **Reported symptoms (step 1)** and **Relevant dental findings (step 2)**. The 30-question shared catalogue contains 4 setup, 9 symptom and 17 examination questions. Tables below use actual predefined choices and stable mappings from `questions.pl` and the synthetic fixtures in `acceptance.pl`. Unspecified active questions default to Unknown. Inactive questions are not asked, are cleared to Unknown and are excluded from assessment. Exact ages in scenario titles describe the original synthetic examples; only age group is submitted. FDI numbers and unused history, severity and duration information are no longer inputs.

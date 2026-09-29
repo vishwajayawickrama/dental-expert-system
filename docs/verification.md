@@ -1,5 +1,19 @@
 # DentalExplain verification record
 
+## Report and submission package — 29 September 2026
+
+Application **1.1.0** and knowledge **0.3.0** are unchanged. The [Word report](report/DentalExplain%20Report.docx) and [matching PDF](report/DentalExplain%20Report.pdf) contain 48 pages. Every rendered page was inspected, including the diagram, six current native application screenshots, tables, contents pagination and all four appendices. A final Windows-launch instruction wrapping correction changed only page 21; the remaining 47 rendered pages were byte-identical to the inspected render.
+
+The report names Kushala Jayawickrama with the supplied final-year fifth-year Dental Surgery undergraduate qualification at the University of Peradeniya. Appendix B contains 15 questions drafted for confirmation, without invented responses or approval. Clinical validation remains pending. No Aim section, Knowledge Engineer manual or standalone Limitations section is included.
+
+The Prolog exporter reads the implemented catalogue and reassesses every acceptance fixture: **30 facts, 25 rules, 30 questions and 20 passing cases**. The existing Prolog suite passed all 20 cases and 43 additional checks; Java integration passed 20 direct assessments, 14 routed diagnostic cases and the controlled-input/navigation/reset/stale-result checks. Appendix D records actual statuses, candidates, missing fields and messages, including permitted coexisting candidates. These software passes do not establish clinical accuracy.
+
+`dist/DentalExplain-submission.zip` contains the report, Java/Prolog source, three complete platform applications and exactly five root files: three launch scripts, README and checksums. ZIP CRC verification passed. After extraction to `build/Verified Submission With Spaces`, all **6,678 regular-file SHA-256 checksums** passed; Unix launcher/runtime permissions and macOS symlinks were retained. The archive has **7,448 entries**, with no development build directories, caches, Git metadata, raw logs, CI downloads or reference report. SWI-Prolog's supplied runtime library named `library/build` is retained as part of the vendor runtime.
+
+All three packaged application JARs share SHA-256 `b0b969abaf2f1651be6dbdc587ba1f72a022082464d5ca755b8453e1123775fb`. Final extracted macOS initialization passed with an empty development environment and system-only PATH; deep/strict ad-hoc signature verification passed. Native macOS consultation/results/knowledge inspection provided the screenshots; Windows/Linux desktop verification remains automated.
+
+The separate [submission root launcher workflow](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36541917021) passed on macOS ARM64, Windows x64 and Ubuntu 24.04 x64 using the verified application distributions. Each root script launched its matching bundled runtime from a path containing spaces with system-only PATH and reported Java 21.0.11, knowledge 0.3.0, 30 questions, 25 rules and 30 facts. Windows used the packaged `.exe`; Linux used its bundled Java launcher. No manual Windows/Linux walkthrough is claimed.
+
 ## Current release: cross-platform application 1.1.0 — 29 September 2026
 
 Knowledge remains **0.3.0**, with 30 questions, 25 rules and 30 authored domain facts. Clinical expert review remains pending. All verification presentations are synthetic.
