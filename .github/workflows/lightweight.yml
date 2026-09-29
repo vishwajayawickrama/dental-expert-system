@@ -25,6 +25,7 @@ jobs:
           build/lightweight/Install-Application-macOS.command --no-launch
           build/lightweight/Install-Application-macOS.command --no-launch
           scripts/install/test-unix.sh 2>&1 | tee build/reports/external-macos.txt
+          scripts/install/test-failures-unix.sh
           env -i HOME="$HOME" PATH=/usr/bin:/bin "$HOME/Applications/DentalExplain.app/Contents/Resources/application/launch.sh" --verify-runtime
       - uses: actions/upload-artifact@v4
         if: always()
@@ -100,6 +101,7 @@ jobs:
         run: |
           sudo apt-get install -y xvfb
           xvfb-run -a scripts/install/test-unix.sh 2>&1 | tee build/reports/external-linux.txt
+          scripts/install/test-failures-unix.sh
           env -i HOME="$HOME" PATH=/usr/bin:/bin "$HOME/.local/share/DentalExplain/launch.sh" --verify-runtime
           test -f "$HOME/.local/share/applications/dentalexplain.desktop"
       - uses: actions/upload-artifact@v4
