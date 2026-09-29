@@ -25,7 +25,7 @@ public final class AnswerControl extends JPanel {
             label.setLabelFor(combo);combo.getAccessibleContext().setAccessibleName(q.label());
             combo.addActionListener(e->notifyChange());add(combo,BorderLayout.CENTER);
         }else{
-            combo=null;JPanel choices=new JPanel(q.type().equals("multi")?new GridLayout(0,4,0,0):new FlowLayout(FlowLayout.LEFT,0,0));choices.setOpaque(false);
+            combo=null;JPanel choices=new JPanel(new GridLayout(0,2,16,4));choices.setOpaque(false);
             ButtonGroup group=new ButtonGroup();
             for(Bridge.Option option:q.options()){
                 AbstractButton button=q.type().equals("radio")?new JRadioButton(option.label()):new JCheckBox(option.label());

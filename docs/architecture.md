@@ -1,6 +1,6 @@
 # DentalExplain architecture
 
-**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.2.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
+**Status:** First Java Swing/JPL desktop implementation, application bundle version 1.0.0, knowledge version 0.3.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
 
 See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
 
@@ -29,6 +29,8 @@ flowchart TD
     Acquisition --> KB["SWI-Prolog knowledge base: 30 facts and 25 rules"]
     Dentist["Dentist"] -->|"Predefined consultation selections"| UI["Java Swing interface and consultation controller"]
     UI -->|"Structured observation terms"| JPL["JPL bridge"]
+    JPL --> Routing["Prolog adaptive question routing"]
+    Routing -->|"Applicable question IDs"| JPL
     JPL --> Engine["SWI-Prolog inference engine"]
     KB --> Engine
     Engine --> Forward["Forward fixed-point processing"]
@@ -40,11 +42,11 @@ flowchart TD
 
 ### Java interface and consultation service
 
-`App.java` owns the welcome → setup → questionnaire → results flow and read-only knowledge workspace. `AnswerControl.java` builds every clinical field from the shared Prolog question catalogue. Back navigation preserves active selections. Conditional fields reset to Unknown when hidden and are excluded from submitted observations. A new consultation clears fields and results.
+`App.java` owns the welcome → setup → reported symptoms (step 1) → relevant findings (step 2) → results flow and read-only knowledge workspace. `AnswerControl.java` builds every clinical field from the shared Prolog question catalogue. Back navigation preserves active selections. Conditional fields reset to Unknown when hidden and are excluded from submitted observations. A new consultation clears fields and results.
 
 Clinical controls are non-editable dropdowns, radio groups or checkbox groups. Search in the knowledge workspace and file names in the save dialog are the only editable text inputs. Neither is clinical evidence. Dropdown keyboard type-ahead selects an existing option; it cannot create a new value. The form has accessible labels, focusable controls, button mnemonics, Tab traversal and native Mac editing shortcuts for search/save dialogs.
 
-A single background executor initializes Prolog and performs reasoning. The catalogue is loaded before the interface becomes ready; subsequent tab viewing reads cached records. Swing updates occur on the event-dispatch thread. A generation token invalidates pending callbacks after edits or reset, preventing delayed results from replacing a new consultation. See [Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
+A single background executor initializes Prolog, routes questions and performs reasoning. The catalogue is loaded before the interface becomes ready; subsequent tab viewing reads cached records. Swing updates occur on the event-dispatch thread. A generation token invalidates pending callbacks after edits, navigation or reset, preventing delayed results from replacing a new consultation. See [Swing concurrency guidance](https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html).
 
 ### JPL integration boundary
 
@@ -55,6 +57,9 @@ assess(Observations,
        result(Status, CandidateIds, MissingQuestionIds, Messages)).
 % Observations: [obs(age_group,adolescent),obs(triggers,[cold]), ...]
 % Java boundary: Bridge.assess(answers)
+active_questions(Observations, Stage, QuestionIds).
+% Stage: setup | symptoms | findings
+% Java: Bridge.activeQuestions(answers, stage)
 catalog(questions, Records).
 catalog(facts, Records).
 catalog(rules, Records).
@@ -67,13 +72,13 @@ Prolog validates the list shape, ground identifiers/values, schema membership, u
 
 ### Prolog knowledge and reasoning
 
-`domain.pl` contains exactly **30 `domain_fact/5` records and 25 `rule/5` production rules**, with sources and pending review. Questions, condition labels, IDs, source metadata, observation lists and test fixtures are excluded from these counts. `questions.pl` contains 43 questions with control types, labels, explicit allowed values and conditional visibility. Display labels map directly to stable atoms or numbers; checkbox lists expand only explicitly selected items to presence. None maps all group items to No; unchecked items otherwise remain Unknown. Not applicable stays distinct and cannot satisfy a required clinical premise.
+`domain.pl` contains exactly **30 `domain_fact/5` records and 25 `rule/5` production rules**, with sources and pending review. Questions, condition labels, IDs, source metadata, observation lists and test fixtures are excluded from these counts. `questions.pl` contains 30 questions with control types, labels, explicit allowed values and conditional visibility. Display labels map directly to stable atoms or numbers; checkbox lists expand only explicitly selected items to presence. None maps all group items to No; unchecked items otherwise remain Unknown. Not applicable stays distinct and cannot satisfy a required clinical premise.
 
 `engine.pl` forward chaining repeatedly evaluates rule premises and adds unique conclusions until the sorted conclusion set stops changing. The finite rule conclusions guarantee termination. Intermediate deductions exist only within the current inference call.
 
 **Forward chaining is the selected method.** Consultations begin with reported evidence and dentist-supplied findings. The engine evaluates all five conditions, permits coexisting candidates, and does not require the dentist to nominate a diagnosis. This evidence-first workflow suits forward chaining better than investigating a selected goal. This decision replaces the earlier requirement to implement both forward and backward chaining; backward processing and target filtering have been removed.
 
-After confirmed deductions reach a fixed point, a second forward pass propagates unresolved prerequisite sets across every unblocked rule until stable. A known false premise blocks the whole rule, including its pending-input requests. Unknown and Not applicable cannot establish a premise; their question identifiers propagate through intermediate deductions. Alternative rule branches carry their own pending sets. Missing inputs are collected only for candidates not already supported. This pass does not recursively prove candidate goals. Finite rule conclusions and finite sets of input identifiers, together with duplicate prevention, ensure termination.
+After confirmed deductions reach a fixed point, a second forward pass propagates unresolved prerequisite sets across every unblocked rule until stable. A known false premise blocks the whole rule, including its pending-input requests. Unknown and Not applicable cannot establish a premise; their question identifiers propagate through intermediate deductions. Internal gum/warning identifiers map back to their public checkbox question. When an unanswered gate hides a follow-up, requests point to that parent first. Alternative rule branches carry their own pending sets. Missing inputs are collected only for candidates not already supported. This pass does not recursively prove candidate goals. Finite rule conclusions and finite sets of input identifiers, together with duplicate prevention, ensure termination.
 
 Age group is required: Unknown, 0–5 (`young_child`), 6–12 (`child`), 13–17 (`adolescent`), 18–64 (`adult`) or 65–120 (`older_adult`). Unknown requests completion; numeric ages and unrecognized values are rejected at the boundary. These bands describe consultation context, not diagnostic thresholds. The engine does not guess dentition or root maturity from age. Primary and immature permanent teeth follow supplied findings; mature-tooth thermal fields are hidden for those teeth. Every assessment considers all five candidates, which may coexist.
 
@@ -109,11 +114,41 @@ The rule catalogue's purposes are:
 
 Exact premises, conclusions and source URLs are in the read-only Rules tab and `domain.pl`. These provisional combinations are narrower than complete dental differential diagnosis. In particular, primary-tooth symptoms can overlap with necrosis; the interface flags that limitation.
 
+### Adaptive questionnaire contract (knowledge 0.3.0)
+
+The catalogue has **4 setup + 9 symptom + 17 examination questions = 30**. It replaces 43 questions without removing any diagnostic production-rule premise. FDI tooth selectors and their consistency checks were removed, together with pain severity, symptom duration, gum tenderness, the history checklist, fracture, electric response, mobility and radiographic bone loss. These inputs were unused by the diagnostic rules. Dentition/type and programmatic pain contradiction checks remain.
+
+`active_questions/3` is authoritative; Java does not duplicate visibility predicates. Java requests all stages on its worker, clears values belonging to inactive questions to Unknown, reroutes until clearing settles, then applies only the latest generation's update on Swing's event thread. Only active answers reach assessment or saved output. Selections for the other step remain intact when applicable. Each question has tailored positive/negative wording; internal values remain `yes`, `no`, `unknown`, `na`, listed atoms or predefined numbers. No clinical free text is accepted.
+
+| Question group | Applicability |
+| --- | --- |
+| Setup | Age group, dentition, affected tooth type and region; always available. |
+| Step 1 base | Tooth pain, gum symptoms, warning signs and jaw clicking. |
+| Pain follow-ups | Triggers, persistence, spontaneous pain, sleep interruption and biting pain only when tooth pain is present. |
+| Basic examination | Cavity, discoloration, radiographic caries, plaque, probing depth, interdental/buccal attachment loss and bleeding on probing; available even without reported symptoms. |
+| Softened tissue | Hidden only when cavity and discoloration are both explicitly absent. |
+| Pulp/apical follow-ups | Percussion and apical findings for pain; root maturity for pain in a permanent tooth; thermal response for mature roots only. |
+| Interdental pattern | Nonadjacent-tooth question when interdental loss is positive or Unknown/Not applicable. |
+| Buccal/oral pattern | Two-tooth question when buccal/oral loss can be at least 3 mm and probing can exceed 3 mm. Unknown/Not applicable keeps the pattern possible. |
+| Other causes | Available if either loss pattern remains possible. |
+| Previous destruction | Available while gingivitis remains possible: plaque not explicitly absent, possible inflammation, interdental loss can be zero, probing can be ≤3 mm. |
+| Outside scope | Known swelling/drainage/fever or jaw clicking with explicitly absent tooth and gum symptoms skips examination. Scope recognition does not require an age/dentition diagnosis. |
+
+Question routing determines the display only. Forward inference continues to evaluate the complete condition catalogue; symptom-free caries, measured inflammation without reported gum symptoms and coexisting candidates remain supported.
+
+| Public checkbox | Choice → expanded observation |
+| --- | --- |
+| `triggers` | `cold` → `trigger_cold`; `sweet` → `trigger_sweet`; `hot` → `trigger_hot`. Biting remains a selectable trigger; the separate biting-pain question records the diagnostic observation. |
+| `gum_symptoms` | `bleeding` → `gum_bleeding`; `redness` → `red_gums`. |
+| `warning_signs` | `swelling` → `facial_swelling`; `drainage` → `drainage`; `fever` → `fever`. |
+
+Selected items expand to `yes`; unselected items remain `unknown`. `none` records `no` for every mapped item, `unknown` leaves all unknown and `na` records unusable evidence. Special choices are exclusive in the UI and validated at the Prolog boundary. Individual gum/warning inputs are internal expansions and are rejected if submitted directly. Removed question identifiers are also rejected. The production rules and domain facts remain at 25 and 30; the knowledge version advances to 0.3.0.
+
 ## 3. Consultation data flow and lifecycle
 
 1. Native launcher opens the bundled Java runtime and Swing window.
 2. Background initialization loads native libraries, boot resources and the shared catalogue.
-3. The dentist supplies setup, symptoms, history and professional examination selections.
+3. The dentist supplies four setup selections, then reported symptoms. Prolog routes relevant examination questions for step 2. Known warning signs or a jaw-only outside-scope presentation bypass examination and return the scope response.
 4. JPL sends structured observations to Prolog; the boundary validates them.
 5. The engine returns candidates, missing-input requests, conflicts, outside-scope or no-supported-conclusion status.
 6. Results can be saved as plain-text inputs and results. No patient database is maintained.

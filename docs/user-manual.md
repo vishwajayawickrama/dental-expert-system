@@ -1,6 +1,6 @@
 # DentalExplain user manual
 
-**Audience:** Dentists entering reported history/symptoms and findings they have already obtained and interpreted. Application bundle 1.0.0; knowledge 0.2.0; clinical expert review pending.
+**Audience:** Dentists entering reported symptoms and findings they have already obtained and interpreted. Application bundle 1.0.0; knowledge 0.3.0; clinical expert review pending.
 
 ## Installation and launch
 
@@ -12,8 +12,8 @@ Wait for the welcome screen. The window title is DentalExplain • Expert system
 
 1. Choose **Start consultation**.
 2. Select **Age group**: 0–5, 6–12, 13–17, 18–64 or 65–120 years. Unknown is the default and requests completion before assessment. Age group never automatically sets dentition or determines a diagnosis.
-3. Choose dentition, affected tooth type, FDI tooth identifier and region. For multiple teeth, a second-tooth field appears. Use Not applicable for an item that does not apply, such as a single-tooth identifier for generalized gingival symptoms.
-4. Choose **Continue to questionnaire**. All five supported conditions are assessed using forward chaining; there is no focus, reasoning-mode or candidate selector.
+3. Choose dentition, affected tooth type and region. There are four setup fields; tooth numbers are not collected.
+4. Choose **Continue to symptoms**. All five supported conditions are assessed using forward chaining; there is no focus, reasoning-mode or candidate selector.
 
 ## Questionnaire
 
@@ -21,17 +21,22 @@ All clinical entries use predefined choices. Dropdowns cannot be edited. Keyboar
 
 | Selection | Meaning |
 | --- | --- |
-| Yes | The specified symptom or finding is explicitly present. |
-| No | It is explicitly absent. |
+| Question-specific positive answer | The specified symptom or finding is explicitly present. |
+| Question-specific negative answer | It is explicitly absent. |
 | Unknown | Not supplied or not determined; the default answer. |
 | Not applicable | The question cannot be used for this assessment. It does not satisfy a required clinical premise. |
 | None (checkbox group) | Explicitly none of the listed items are present. |
 
 Checkbox groups allow multiple substantive items. None, Unknown and Not applicable are exclusive alternatives. Selecting cold, for example, records cold as present; an unchecked heat checkbox stays Unknown. Selecting None records absence of every listed trigger. Clearing the final substantive checkbox restores Unknown.
 
-Questions are grouped as reported symptoms, relevant history, dentist-supplied tooth findings and periodontal findings. Tooth-pain severity/triggers/persistence appear when pain is Yes. Root maturity applies to a supplied permanent tooth. Mature-tooth thermal/electric fields appear only when mature roots are supplied. Changing a parent to make a field inapplicable clears and excludes its answer. Other answers survive Back to setup and Continue navigation.
+**Step 1 — Reported symptoms:** tooth pain, gum symptoms, warning signs and jaw clicking. Reporting tooth pain reveals triggers, persistence, spontaneous pain, sleep interruption and biting pain. Gum symptoms combines bleeding and red/swollen gum margins; Warning signs combines facial swelling, pus/drainage and fever. Each checkbox group offers None reported, Unknown and Not applicable as exclusive alternatives. Use the question-specific choices, for example “No tooth pain reported” or “Pain interrupts sleep.”
 
-Measurements use dropdowns: probing depth and attachment loss 0–15 mm in 0.5 mm steps; bleeding on probing 0–100% in 5% steps. Record the supplied maximum examination measurements as defined by each field. Do not invent or round a finding solely to fit a rule. For unavailable or unrepresentable measurements choose Unknown; the current catalogue may request additional findings or support no conclusion. Durations use days/weeks/months/over-six-month categories; brief/lingering/episodic describe persistence, without a universal numeric pain cutoff.
+Choose **Continue to findings** for **Step 2 — Relevant dental findings**. Basic caries observations and periodontal measurements remain available without reported symptoms. Softened tissue is hidden only when both cavity and discoloration are explicitly absent. Percussion/apical findings appear for tooth pain; root maturity additionally requires an affected permanent tooth, and thermal response requires mature roots. Attachment-loss measurements reveal applicable tooth-pattern and alternative-cause questions. Unknown/Not applicable measurements keep potential follow-ups available. Previous-destruction history appears while gingivitis remains possible. Known warning signs or jaw clicking with explicitly absent tooth and gum symptoms goes directly to the outside-scope result.
+
+Use **Back to symptoms**, then **Back to setup**, to revise earlier selections. Applicable answers are preserved across steps. If a parent changes and makes a child inapplicable, that child's answer is cleared and excluded. Restoring the parent requires supplying that finding again. Brief “Updating questions…” states mean Prolog is updating applicability; Continue/Assess becomes available after the latest update.
+
+
+Measurements use dropdowns: probing depth and attachment loss 0–15 mm in 0.5 mm steps; bleeding on probing 0–100% in 5% steps. Record the supplied maximum examination measurements as defined by each field. Do not invent or round a finding solely to fit a rule. For unavailable or unrepresentable measurements choose Unknown; the current catalogue may request additional findings or support no conclusion. Brief/lingering/episodic describe persistence, without a universal numeric pain cutoff. Severity and symptom-duration questions are no longer collected.
 
 Choose **Assess presentation**. The Assess button displays Assessing… while reasoning runs. The window remains usable.
 
@@ -48,13 +53,13 @@ Choose **Assess presentation**. The Assess button displays Assessing… while re
 
 These are candidate outputs, not confirmed diagnoses, certainty scores or treatment prescriptions. Primary-tooth irreversible-pulpitis symptoms can overlap with necrosis. All clinical rules and acceptance expectations await dentist review.
 
-**Edit answers** returns to the questionnaire. To change setup, use Back to setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels including the selected age group, method (Forward chaining), knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
+**Edit answers** returns to step 2. Use Back to symptoms to revise step 1, then Back to setup to revise setup. **Save result** opens a file chooser and writes a UTF-8 plain-text snapshot with input identifiers/labels including the selected age group, method (Forward chaining), knowledge version, status, candidates, missing fields and messages. A file name may be typed; it does not become clinical evidence. A Result saved dialog confirms success. Existing files require replacement confirmation. There are no inference traces or a patient-record database.
 
 **New consultation** clears all selections and the result, restores defaults, and rejects delayed responses from the previous consultation. Saved text files remain on disk. Exiting closes the app; consultation selections are not restored on relaunch.
 
 ## Knowledge workspace
 
-From Welcome choose **View knowledge base**. Questions (43), Facts (30) and Rules (25) are separate read-only tabs. Search filters the current table. Select a row to view its full content/source/review status below; horizontal and vertical scrollbars expose long values. All clinical knowledge has pending review status. Editing knowledge through the interface is not supported.
+From Welcome choose **View knowledge base**. Questions (30: 4 setup, 9 symptoms, 17 examination), Facts (30) and Rules (25) are separate read-only tabs. Search filters the current table. Select a row to view its full content/source/review status below; horizontal and vertical scrollbars expose long values. All clinical knowledge has pending review status. Editing knowledge through the interface is not supported.
 
 ## Developer commands
 

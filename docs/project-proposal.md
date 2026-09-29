@@ -27,13 +27,13 @@ DentalExplain assesses common tooth-pain and gum-symptom presentations using nat
 
 ## 2. Specific domain and scope
 
-**Domain:** Dental diagnostic decision support for common tooth pain and gum symptoms in children, adolescents and adults. The interface is intended for dentists, who enter reported symptoms/history and explicitly supplied examination findings. This is not restricted to an educational or adult-only domain.
+**Domain:** Dental diagnostic decision support for common tooth pain and gum symptoms in children, adolescents and adults. The interface is intended for dentists, who enter reported symptoms and explicitly supplied examination findings. This is not restricted to an educational or adult-only domain.
 
 The supported candidates are **dental caries, reversible pulpitis, symptomatic irreversible pulpitis, gingivitis and periodontitis**. Age is captured using five groups (0–5, 6–12, 13–17, 18–64 and 65–120 years, or Unknown); dentition, affected tooth type and root maturity are supplied independently. No diagnosis is inferred from chronological age alone. Primary/immature teeth use appropriate question applicability and separate rule branches; these clinical rules require dentist review. Age bands describe context and are not diagnostic thresholds.
 
-Included inputs cover symptom presence, location, duration categories, severity, thermal/sweet triggers, persistence, spontaneous/sleep pain, gum bleeding/redness/tenderness, relevant history, surface/radiographic findings, root maturity, pulp-test observations, percussion, mobility and periodontal examination measurements. Numeric findings use predefined measurement dropdowns. The dentist interprets examinations and images before entering their findings.
+Setup captures age group, dentition, affected tooth type and region. Step 1 collects reported pain, pain triggers/persistence, spontaneous/sleep/biting pain, combined gum symptoms, combined warning signs and jaw clicking. Step 2 collects applicable tooth findings, root maturity/thermal response, percussion/apical findings, plaque, periodontal measurements, previous-destruction history and loss-pattern follow-ups. Numeric findings use predefined measurement dropdowns. The dentist interprets examinations and images before entering their findings.
 
-The application returns supported candidates, requests missing inputs, identifies conflicts, or reports outside-scope/no-supported-conclusion outcomes. Supported findings may coexist. All clinical inputs use dropdowns, radio buttons or checkboxes; no free-text clinical entry is allowed. Unknown, No, None and Not applicable retain distinct meanings. The shared catalogue defines every permitted mapping.
+The application returns supported candidates, requests missing inputs, identifies conflicts, or reports outside-scope/no-supported-conclusion outcomes. Supported findings may coexist. All clinical inputs use dropdowns, radio buttons or checkboxes; no free-text clinical entry is allowed. Unknown, No, None and Not applicable retain distinct meanings. The shared catalogue defines every permitted mapping and Prolog controls applicability through `active_questions/3`. It contains 30 questions: 4 setup, 9 symptoms and 17 examination findings. FDI selectors and unused questions have been removed.
 
 Orthodontic planning, oral cancer diagnosis, treatment prescribing, image interpretation, knowledge editing, autonomous clinical diagnosis, patient-record persistence and Windows packaging are outside this first implementation. Swelling, drainage or fever requires assessment beyond the five-condition catalogue. Full urgent-care and dental differential diagnosis are not implemented.
 
@@ -65,6 +65,8 @@ flowchart TD
     Sources["Dental reference sources"] --> Acquisition
     Acquisition --> KB["Knowledge base: SWI-Prolog facts and rules"]
     Dentist["Dentist"] -->|"Controlled consultation selections"| UI["Java Swing interface"]
+    UI -->|"Setup and earlier answers through JPL"| Routing["Prolog question routing: symptoms then findings"]
+    Routing -->|"Applicable question identifiers"| UI
     UI -->|"Structured inputs through JPL"| Engine["SWI-Prolog inference engine"]
     KB -->|"Shared facts and production rules"| Engine
     Engine -->|"Candidates, missing inputs, conflicts and status"| UI
@@ -95,7 +97,7 @@ The development JAR requires the matching runtime files. The macOS application i
 
 ## 7. Test and acceptance plan
 
-The [20-case catalogue](test-cases.md) retains concrete reported symptoms, history and supplied findings, source references, expected/prohibited outcomes and review status. Its automated fixtures map durations and measurements to permitted categories without introducing arbitrary age-based conclusions.
+The [20-case catalogue](test-cases.md) retains concrete reported symptoms and supplied findings, source references, expected/prohibited outcomes and review status. Its automated fixtures map checkbox selections and measurements to permitted values without introducing arbitrary age-based conclusions.
 
 Forward chaining must support the target in each of the 14 diagnostic cases and return the correct six edge-case outcomes. Additional checks cover all five age groups, Unknown/missing groups, invalid boundary values, contradictory inputs, incomplete evidence, blocked rules, unsupported presentations, coexisting findings, termination, duplicate prevention and reset. UI checks cover controlled inputs, exclusive checkbox alternatives, hidden-field clearing, back navigation, keyboard access and stale-result rejection.
 
@@ -103,4 +105,4 @@ Actual outcomes are recorded in [verification.md](verification.md); software pas
 
 ## 8. User manual
 
-The [manual](user-manual.md) describes packaged launch and developer commands, setup, questionnaire values, forward-only assessment, result interpretation, editing, saving, new consultations, knowledge browsing and troubleshooting.
+The [manual](user-manual.md) describes packaged launch and developer commands, four-field setup, two adaptive questionnaire steps, forward-only assessment, result interpretation, editing, saving, new consultations, knowledge browsing and troubleshooting.

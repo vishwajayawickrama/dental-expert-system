@@ -1,5 +1,5 @@
 :- module(dental_domain, [domain_fact/5, rule/5, condition/2, source/3, knowledge_version/1]).
-knowledge_version('0.2.0').
+knowledge_version('0.3.0').
 source(nidcr, 'NIDCR: Tooth decay', 'https://www.nidcr.nih.gov/health-info/tooth-decay').
 source(aae, 'AAE: Diagnostic terminology', 'https://www.aae.org/specialty/wp-content/uploads/sites/2/2017/07/aaeconsensusconferencerecommendeddiagnosticterminology.pdf').
 source(aapd, 'AAPD: Pediatric pulp diagnosis', 'https://www.aapd.org/media/Policies_Guidelines/BP_PulpTherapy.pdf').

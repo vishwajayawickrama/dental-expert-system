@@ -1,4 +1,4 @@
-:- module(dental_engine, [assess/2, forward_closure/2, catalog/2]).
+:- module(dental_engine, [assess/2, forward_closure/2, catalog/2, active_questions/3]).
 :- use_module(domain).
 :- use_module(questions).
 :- use_module(library(lists)).
@@ -9,8 +9,8 @@ assess(Input, Result) :-
         Result=result(invalid,[],[Key],['Choose a valid predefined value, including a listed age group.'])
     ; expand_observations(Input,Obs),
       ( conflict(Obs,Message) -> Result=result(conflict,[],[],[Message])
-      ; missing_setup(Obs,Missing) -> Result=result(incomplete,[],Missing,['Complete the required consultation inputs.'])
       ; outside_scope(Obs,Message) -> Result=result(outside_scope,[],[],[Message])
+      ; missing_setup(Obs,Missing) -> Result=result(incomplete,[],Missing,['Complete the required consultation inputs.'])
       ; assess_valid(Obs,Result) ) ).
 
 invalid_input(Input,input) :- \+ is_list(Input),!.
@@ -21,11 +21,6 @@ invalid_input(Input,K) :- select(obs(K,_),Input,Rest),memberchk(obs(K,_),Rest),!
 value(Obs,Key,V) :- (memberchk(obs(Key,Found),Obs) -> V=Found ; V=unknown).
 conflict(Obs,'Tooth-pain answers conflict. Clarify whether pain is present.') :-
     value(Obs,tooth_pain,no),member(Key,[spontaneous,sleep_pain,biting_pain]),value(Obs,Key,yes),!.
-conflict(Obs,'Tooth identifier and tooth type conflict. Check the affected tooth.') :-
-    value(Obs,tooth,T),integer(T),value(Obs,tooth_type,Type),
-    (T>=51,Type==permanent ; T=<48,Type==primary),!.
-conflict(Obs,'The two affected tooth identifiers are identical. Check the selections.') :-
-    value(Obs,region,multiple_teeth),value(Obs,tooth,T),integer(T),value(Obs,second_tooth,T),!.
 conflict(Obs,'Dentition and affected tooth type conflict. Check both selections.') :-
     value(Obs,dentition,D),value(Obs,tooth_type,T),
     (D==primary,T==permanent ; D==permanent,T==primary),!.
@@ -41,7 +36,7 @@ assess_valid(Obs,result(Status,Candidates,Missing,Messages)) :-
     findall(C,(condition(C,_),memberchk(candidate(C),Derived)),Candidates),
     pending_closure(Obs,Derived,Pending),
     findall(K,(condition(C,_),\+memberchk(C,Candidates),member(pending(candidate(C),Keys),Pending),member(K,Keys)),RawMissing),
-    sort(RawMissing,Missing),
+    findall(Request,(member(K,RawMissing),request_key(Obs,K,Request)),Requests),sort(Requests,Missing),
     (Candidates\=[] -> Status=candidates,Messages=['Candidate conditions only. Clinical knowledge review is pending.']
     ; Missing\=[] -> Status=incomplete,Messages=['Additional predefined findings are needed to assess this presentation.']
     ; Status=no_supported_condition,Messages=['No supported candidate follows from the supplied findings. This does not exclude other conditions.']).
@@ -82,6 +77,8 @@ comparison(gt,A,B) :- number(A),A>B.
 comparison(gte,A,B) :- number(A),A>=B.
 comparison(lte,A,B) :- number(A),A=<B.
 public_key(K,triggers) :- memberchk(K,[trigger_cold,trigger_sweet,trigger_hot]),!.
+public_key(K,gum_symptoms) :- memberchk(K,[gum_bleeding,red_gums]),!.
+public_key(K,warning_signs) :- memberchk(K,[facial_swelling,drainage,fever]),!.
 public_key(K,K).
 
 catalog(questions,Records) :- findall(question(K,S,T,L,O,W),question(K,S,T,L,O,W),Records).
@@ -94,6 +91,13 @@ catalog(version,[V]) :- knowledge_version(V).
 catalog(question_sources,Records) :- findall(question_source(K,U,pending),(question(K,S,_,_,_,_),question_source(S,Source),source(Source,_,U)),Records).
 question_source(setup,aapd).
 question_source(symptoms,aae).
-question_source(history,aapd).
 question_source(examination,aapd).
 question_source(periodontal,efp_g).
+
+% The same boundary schema protects routing and assessment.
+active_questions(Input,Stage,Ids) :-
+    memberchk(Stage,[setup,symptoms,findings]),
+    (invalid_input(Input,K) -> throw(error(domain_error(consultation_input,K),active_questions/3)) ; true),
+    expand_observations(Input,Obs),
+    (Stage==findings,outside_scope(Obs,_) -> Ids=[]
+    ; findall(K,(question(K,Section,_,_,_,_),stage(Section,Stage),once(visible_question(Obs,K))),Ids)).

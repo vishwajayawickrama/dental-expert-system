@@ -46,9 +46,15 @@ public final class Bridge {
     }
     private Term qualified(String name,Term... args){return new Compound(":",new Term[]{new Atom("dental_engine"),new Compound(name,args)});}
     public Term[] catalog(String kind){return catalogue.get(kind).clone();}
+    private Term observations(Map<String,Term> answers){
+        return Term.termArrayToList(answers.entrySet().stream().map(e->new Compound("obs",new Term[]{new Atom(e.getKey()),e.getValue()})).toArray(Term[]::new));
+    }
+    public List<String> activeQuestions(Map<String,Term> answers,String stage){
+        return names(query(qualified("active_questions",observations(answers),new Atom(stage),new Variable("Ids"))).get("Ids"));
+    }
     public Result assess(Map<String,Term> answers){
-        Term[] observations=answers.entrySet().stream().map(e->new Compound("obs",new Term[]{new Atom(e.getKey()),e.getValue()})).toArray(Term[]::new);
-        Term r=query(qualified("assess",Term.termArrayToList(observations),new Variable("Result"))).get("Result");
+
+        Term r=query(qualified("assess",observations(answers),new Variable("Result"))).get("Result");
         return new Result(r.arg(1).name(),names(r.arg(2)),names(r.arg(3)),names(r.arg(4)));
     }
     static List<String> names(Term list){return Arrays.stream(list.listToTermArray()).map(Term::name).toList();}

@@ -18,7 +18,13 @@ public final class IntegrationTest {
         try{Path path=Path.of("build/ui-screenshots/component-"+screen+"-"+width+"x"+height+".png");Files.createDirectories(path.getParent());ImageIO.write(image,"png",path.toFile());}
         catch(Exception e){throw new AssertionError("Layout capture",e);}
     }
-    public static void main(String[] args)throws Exception{
+    static void settled(App app)throws Exception{
+        for(int i=0;i<200;i++){boolean[] done={false};SwingUtilities.invokeAndWait(()->done[0]=app.fields.size()==30&&!app.routingPending);if(done[0])return;Thread.sleep(25);}
+        throw new AssertionError("Routing did not settle");
+    }
+    static void set(App app,String key,String value){app.fields.get(key).setValue(new Atom(value));}
+    public static void main
+(String[] args)throws Exception{
         UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         for(Object key:new ArrayList<>(UIManager.getDefaults().keySet()))if(UIManager.get(key) instanceof java.awt.Font)UIManager.put(key,new javax.swing.plaf.FontUIResource(App.BODY));
         Bridge b=new Bridge();query(new Compound("consult",new Term[]{new Atom(b.root.resolve("knowledge/acceptance.pl").toString())}));
@@ -29,12 +35,17 @@ public final class IntegrationTest {
             if(!target.equals("none"))require(f.candidates().contains(target),id+" target missing");
             else require(f.candidates().isEmpty(),id+" prohibited conclusion");
             query(new Compound(":",new Term[]{new Atom("dental_acceptance"),new Compound("verify",new Term[]{new Atom(expected),new Atom(target),new Compound("result",new Term[]{new Atom(f.status()),Term.termArrayToList(f.candidates().stream().map(Atom::new).toArray(Term[]::new)),Term.termArrayToList(f.missing().stream().map(Atom::new).toArray(Term[]::new)),Term.termArrayToList(f.messages().stream().map(Atom::new).toArray(Term[]::new))})})}));
+            if(!target.equals("none")){
+                Set<String> active=new LinkedHashSet<>();for(String stage:List.of("setup","symptoms","findings"))active.addAll(b.activeQuestions(input,stage));
+                Map<String,Term> routed=new LinkedHashMap<>();input.forEach((key,value)->{if(active.contains(key))routed.put(key,value);});
+                Bridge.Result r=b.assess(routed);require(r.status().equals(expected)&&r.candidates().contains(target),id+" adaptive route changed expected target");
+            }
             System.out.println("JPL "+id+": PASS");
+
         }
-        require(b.version.equals("0.2.0"),"Knowledge version");
-        require(b.questions.size()==43,"43 questions");
+        require(b.version.equals("0.3.0"),"Knowledge version");
+        require(b.questions.size()==30,"30 questions");
         require(b.questions.stream().noneMatch(q->Set.of("age","focus").contains(q.key())),"Removed clinical identifiers");
-        require(b.questions.stream().filter(qs->qs.key().equals("symptom_duration")).findFirst().orElseThrow().options().get(1).label().equals("1-7 days"),"Duration labels intact");
         SwingUtilities.invokeAndWait(()->{
             Map<String,AnswerControl> controls=new LinkedHashMap<>();for(Bridge.Question q:b.questions)controls.put(q.key(),new AnswerControl(q,()->{}));
             for(AnswerControl c:controls.values()){
@@ -46,27 +57,57 @@ public final class IntegrationTest {
                 }
                 c.reset();require(c.value().name().equals("unknown"),"Default Unknown");
             }
-            AnswerControl triggers=controls.get("triggers");triggers.buttons.get("cold").doClick();triggers.buttons.get("hot").doClick();require(triggers.value().listToTermArray().length==2,"Substantive selections");
-            triggers.buttons.get("none").doClick();require(triggers.value().name().equals("none"),"None exclusivity");triggers.buttons.get("cold").doClick();require(!triggers.buttons.get("none").isSelected(),"Substantive clears None");
-            triggers.buttons.get("na").doClick();require(triggers.value().name().equals("na"),"N/A exclusivity");triggers.buttons.get("unknown").doClick();require(triggers.value().name().equals("unknown"),"Unknown exclusivity");
+            for(String key:List.of("triggers","gum_symptoms","warning_signs")){
+                AnswerControl control=controls.get(key);
+                List<String> items=control.buttons.keySet().stream().filter(k->!AnswerControl.special(k)).toList();
+                control.buttons.get(items.get(0)).doClick();control.buttons.get(items.get(1)).doClick();require(control.value().listToTermArray().length==2,"Multiple findings "+key);
+                control.buttons.get("none").doClick();require(control.value().name().equals("none"),"None exclusivity "+key);
+                control.buttons.get(items.get(0)).doClick();require(!control.buttons.get("none").isSelected(),"Finding clears None "+key);
+                control.buttons.get("na").doClick();require(control.value().name().equals("na"),"NA exclusivity "+key);
+                control.buttons.get("unknown").doClick();require(control.value().name().equals("unknown"),"Unknown exclusivity "+key);
+            }
         });
-        App[] app={null};SwingUtilities.invokeAndWait(()->app[0]=new App());
-        for(int i=0;i<100;i++){boolean[] ready={false};SwingUtilities.invokeAndWait(()->ready[0]=app[0].fields.size()==b.questions.size());if(ready[0])break;Thread.sleep(50);}
+        App[] handle={null};SwingUtilities.invokeAndWait(()->handle[0]=new App());App a=handle[0];settled(a);
         SwingUtilities.invokeAndWait(()->{
-            App a=app[0];require(a.fields.size()==43,"Application initialization");a.fields.get("age_group").setValue(new Atom("adolescent"));a.fields.get("tooth_type").setValue(new Atom("permanent"));a.fields.get("root_maturity").setValue(new Atom("mature"));a.refreshVisibility();a.fields.get("thermal_response").setValue(new Atom("lingering"));
-            a.show("questionnaire");a.show("setup");require(a.fields.get("age_group").value().name().equals("adolescent"),"Back navigation preserved");
-            a.fields.get("tooth_type").setValue(new Atom("primary"));a.refreshVisibility();require(a.fields.get("thermal_response").value().name().equals("unknown"),"Hidden response cleared");require(!a.answers().containsKey("thermal_response"),"Hidden response excluded");
-            for(int[] size:List.of(new int[]{1180,850},new int[]{960,680}))for(String screen:List.of("setup","questionnaire","knowledge"))render(a,screen,size[0],size[1]);
-            a.fields.get("tooth_pain").setValue(new Atom("no"));a.fields.get("radiographic_caries").setValue(new Atom("yes"));a.assess();
-        });
-        for(int i=0;i<100;i++){boolean[] done={false};SwingUtilities.invokeAndWait(()->done[0]=app[0].savedResultForTest()!=null);if(done[0])break;Thread.sleep(50);}
+            require(a.fields.size()==30,"Application initialization");set(a,"age_group","adolescent");set(a,"tooth_type","permanent");set(a,"tooth_pain","yes");set(a,"root_maturity","mature");a.navigate("symptoms");
+        });settled(a);
         SwingUtilities.invokeAndWait(()->{
-            App a=app[0];String saved=a.savedResultForTest();require(saved!=null&&saved.contains("age_group = adolescent | 13-17 years")&&saved.contains("Method: Forward chaining")&&!saved.contains("Goal:"),"Saved age group and forward-only method");
+            set(a,"thermal_response","lingering");set(a,"sleep_pain","yes");a.navigate("findings");
+        });settled(a);
+        SwingUtilities.invokeAndWait(()->{a.navigate("symptoms");});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.fields.get("sleep_pain").value().name().equals("yes"),"Step 1 answer preserved");require(a.fields.get("thermal_response").value().name().equals("lingering"),"Step 2 answer preserved");a.navigate("setup");});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.fields.get("age_group").value().name().equals("adolescent"),"Setup preserved");set(a,"tooth_type","primary");a.refreshVisibility();});settled(a);
+        SwingUtilities.invokeAndWait(()->{
+            require(a.fields.get("thermal_response").value().name().equals("unknown"),"Hidden thermal cleared");require(!a.answers().containsKey("thermal_response"),"Hidden thermal excluded");
+            set(a,"tooth_pain","no");a.refreshVisibility();
+        });settled(a);
+        SwingUtilities.invokeAndWait(()->{
+            require(a.fields.get("sleep_pain").value().name().equals("unknown"),"Hidden symptom cleared");require(!a.answers().containsKey("sleep_pain"),"Hidden symptom excluded");
+            set(a,"cavity","no");set(a,"discoloration","no");set(a,"soft_tissue","yes");a.fields.get("cal_mm").setValue(new org.jpl7.Integer(0));a.fields.get("buccal_cal_mm").setValue(new org.jpl7.Integer(0));set(a,"two_teeth","yes");a.refreshVisibility();
+        });settled(a);
+        SwingUtilities.invokeAndWait(()->{
+            require(!a.answers().containsKey("soft_tissue")&&a.fields.get("soft_tissue").value().name().equals("unknown"),"Softened tissue cleared");
+            require(!a.answers().containsKey("two_teeth")&&a.fields.get("two_teeth").value().name().equals("unknown"),"Periodontal follow-up cleared");
+            for(int[] size:List.of(new int[]{1180,850},new int[]{960,680}))for(String screen:List.of("setup","symptoms","findings","knowledge"))render(a,screen,size[0],size[1]);
+            set(a,"radiographic_caries","yes");a.assess();
+        });settled(a);
+        SwingUtilities.invokeAndWait(()->{
+            String saved=a.savedResultForTest();require(saved!=null&&saved.contains("age_group = adolescent | 13-17 years")&&saved.contains("Method: Forward chaining")&&!saved.contains("Goal:")&&!saved.contains("sleep_pain ="),"Saved active answers and method");
+            require(saved.contains("Dental caries"),"Symptom-free caries result");
+            try{Files.writeString(Path.of("build/reports/adaptive-result.txt"),saved);}catch(Exception e){throw new AssertionError(e);}
             for(int[] size:List.of(new int[]{1180,850},new int[]{960,680}))render(a,"results",size[0],size[1]);
-            // Reset executes before the worker callback reaches EDT; a delayed result must be discarded.
-            a.assess();a.reset();require(a.answers().get("age_group").name().equals("unknown"),"Reset inputs");
+            a.navigate("findings");
+        });settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("findings"),"Editing opens step 2");set(a,"warning_signs","none");a.fields.get("warning_signs").setValue(Term.termArrayToList(new Term[]{new Atom("fever")}));a.continueToFindings();});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.savedResultForTest().contains("STATUS: outside_scope"),"Warning signs bypass examination");a.reset();a.show("setup");});settled(a);
+        SwingUtilities.invokeAndWait(()->{set(a,"age_group","adult");set(a,"tooth_pain","no");set(a,"gum_symptoms","none");set(a,"jaw_clicking","yes");a.continueToFindings();});settled(a);
+        SwingUtilities.invokeAndWait(()->{require(a.currentScreen.equals("results")&&a.savedResultForTest().contains("STATUS: outside_scope"),"Jaw-only bypasses examination");a.reset();});settled(a);
+        // Queue edits, navigation and an assessment, then reset before any callback.
+        SwingUtilities.invokeAndWait(()->{set(a,"age_group","adult");set(a,"tooth_pain","yes");a.refreshVisibility();a.navigate("symptoms");a.assess();a.reset();a.show("setup");});settled(a);
+        SwingUtilities.invokeAndWait(()->{
+            require(a.savedResultForTest()==null&&a.currentScreen.equals("setup"),"No delayed result/navigation after reset");
+            require(a.fields.values().stream().allMatch(f->f.value().isAtom()&&f.value().name().equals("unknown")),"Reset all inputs");a.dispose();
         });
-        Thread.sleep(300);SwingUtilities.invokeAndWait(()->{require(app[0].savedResultForTest()==null,"No delayed result after reset");app[0].dispose();});
-        System.out.println("PASS: "+assessments+" JPL assessments; 43 control schemas; exclusivity, conditional clearing, navigation and delayed-result reset.");System.exit(0);
+        System.out.println("PASS: "+assessments+" JPL assessments; 30 control schemas; combined exclusivity, authoritative routing, two-step navigation, hidden clearing, scope bypass, saved output and delayed-callback reset.");System.exit(0);
     }
 }
