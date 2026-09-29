@@ -1,6 +1,6 @@
 # DentalExplain architecture
 
-**Status:** First Java Swing/JPL desktop implementation, application version 1.1.0, knowledge version 0.3.0. Verified on the development Apple Silicon Mac on 29 September 2026. Clinical expert review is pending.
+**Status:** First Java Swing/JPL desktop implementation, application version 1.1.0, knowledge version 0.3.0. Automated builds and software checks pass on macOS ARM64, Windows x64 and Ubuntu 24.04 x64; native manual checks were performed on the development Mac on 29 September 2026. Clinical expert review is pending.
 
 See the [proposal](project-proposal.md), [20 acceptance cases](test-cases.md), [user manual](user-manual.md), and [verification record](verification.md).
 

@@ -1,6 +1,37 @@
 # DentalExplain verification record
 
-## Current check: result actions removed — 29 September 2026
+## Current release: cross-platform application 1.1.0 — 29 September 2026
+
+Knowledge remains **0.3.0**, with 30 questions, 25 rules and 30 authored domain facts. Clinical expert review remains pending. All verification presentations are synthetic.
+
+The final [cross-platform workflow run](https://github.com/vishwajayawickrama/dental-expert-system/actions/runs/36535968417), built from source commit `777ab83`, completed successfully on all three runners. Earlier download-filename and Windows DLL-discovery failures were corrected before this run. All jobs use configured Temurin Java 21.0.11 and pinned SWI-Prolog 10.0.2/JPL.
+
+| Check | macOS ARM64 | Windows x64 | Ubuntu 24.04 x64 |
+| --- | --- | --- | --- |
+| 20 forward-chaining acceptance cases | PASS | PASS | PASS |
+| 43 Prolog unit checks | PASS | PASS | PASS |
+| 20 direct JPL cases and 14 routed diagnostic cases | PASS | PASS | PASS |
+| 30 control schemas, conditional clearing, navigation, results, reset and stale-callback checks | PASS | PASS | PASS, under Xvfb |
+| Extracted bundled-Java launch from path containing spaces | PASS | PASS | PASS |
+| Independent native launcher | PASS, Mac app | PASS, Windows exe with system-only PATH | Not provided; Java launcher used |
+
+Runtime verification on every platform reported:
+
+```text
+Bundled runtime: Java 21.0.11; SWI/JPL ready; KB 0.3.0; 30 questions; 25 rules; 30 facts
+```
+
+The Windows test clears JAVA_HOME and SWI_HOME_DIR and limits PATH to Windows system directories before testing both Launch.cmd and DentalExplain.exe. Windows native dependency DLLs are included beside the executable so no development Prolog PATH is needed. Mac/Ubuntu Java launch tests use an empty environment except standard PATH. Linux bundles required non-system Prolog dependencies with distribution copyright notices; normal desktop/system libraries remain required.
+
+The development Mac passed the same tests and native consultation → results → New consultation walkthrough. Result text and reset were inspected; screenshot evidence is in ignored `build/ui-screenshots/distribution-native-results.png`. `/Applications/DentalExplain.app` is updated to 1.1.0, passes deep/strict signature verification and launches with bundled dependencies. The previous installation is preserved at `/private/tmp/DentalExplain-before-1.1.0.app`.
+
+Downloaded Mac, Windows and Linux artifact archives match their GitHub SHA-256 digests. Every distribution ZIP matches its published checksum (Windows checksum text uses CRLF). Generated results/findings/setup screenshots were inspected for readable labels and unclipped controls at default/minimum sizes; these are automated Swing captures, separate from the Mac native walkthrough. All three Java ZIPs and the Windows exe image contain the identical application JAR.
+
+The shared application JAR SHA-256 is `b0b969abaf2f1651be6dbdc587ba1f72a022082464d5ca755b8453e1123775fb`, also matching the installed Mac app. Packages, archive digests, ZIP checksums, logs and screenshots are retained in ignored `dist/final/` and `build/reports/`. Local CI log evidence: `build/reports/cross-platform-final-ci.txt`.
+
+Windows and Ubuntu validation is automated on hosted runners; no manual consultation on a separate Windows/Linux desktop is claimed. Windows signing, macOS notarization, additional architectures and qualified-dentist clinical validation remain pending.
+
+## Historical check: result actions removed — 29 September 2026
 
 The results screen now offers **New consultation** only. Edit answers, Save result, result snapshot construction and file dialogs have been removed. Back navigation remains available before assessment. Knowledge remains version 0.3.0 with 30 questions, 25 rules and 30 domain facts; clinical review remains pending.
 
