@@ -1,0 +1,8 @@
+#!/bin/bash
+APP=$(CDPATH= cd -- "$(dirname -- "$0")/../Resources/application" && pwd)
+if [[ ! -f "$APP/launch.sh" ]]; then /usr/bin/osascript -e 'display alert "DentalExplain" message "Run Install-Application-macOS.command first."'; exit 1; fi
+mkdir -p "$HOME/Library/Logs"
+"$APP/launch.sh" "$@" 2>"$HOME/Library/Logs/DentalExplain-startup.log"
+STATUS=$?
+if [[ $STATUS -ne 0 ]]; then /usr/bin/osascript -e 'display alert "DentalExplain could not start" message "Run Install-Dependencies-macOS.command again. Details are in Library/Logs/DentalExplain-startup.log."'; fi
+exit "$STATUS"
