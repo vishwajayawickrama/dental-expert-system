@@ -76,8 +76,8 @@ jobs:
           Remove-Item Env:JAVA_HOME -ErrorAction SilentlyContinue
           Remove-Item Env:SWI_HOME_DIR -ErrorAction SilentlyContinue
           $report="$PWD/build/reports/windows-exe-runtime.txt"
-& "$destination/DentalExplain-java-windows-x64/Launch.cmd" --verify-runtime
-if($LASTEXITCODE -ne 0){throw 'Bundled Java launcher failed'}
+          & "$destination/DentalExplain-java-windows-x64/Launch.cmd" --verify-runtime
+          if($LASTEXITCODE -ne 0){throw 'Bundled Java launcher failed'}
           $process=Start-Process "$destination/DentalExplain/DentalExplain.exe" -ArgumentList @('--verify-runtime',"`"$report`"") -Wait -PassThru -RedirectStandardOutput "$PWD/build/reports/windows-exe-stdout.txt" -RedirectStandardError "$PWD/build/reports/windows-exe-stderr.txt"
           if($process.ExitCode -ne 0 -or !(Test-Path $report)){Get-Content build/reports/windows-exe-stderr.txt; throw "Packaged .exe runtime verification failed (exit $($process.ExitCode))"}
           Get-Content $report
